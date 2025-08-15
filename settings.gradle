@@ -1,0 +1,2 @@
+rootProject.name = "SecondMindMinimal"
+include(":app")
