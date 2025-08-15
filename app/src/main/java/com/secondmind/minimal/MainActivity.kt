@@ -34,6 +34,8 @@ import com.secondmind.minimal.data.Keys
 import com.secondmind.minimal.data.dataStore
 import com.secondmind.minimal.ui.DetailsScreen
 import com.secondmind.minimal.ui.InboxScreen
+import com.secondmind.minimal.ui.HomeTopCards
+import com.secondmind.minimal.ui.QuickNoteCard
 import com.secondmind.minimal.ui.QuickNoteCard
 import com.secondmind.minimal.ui.DebugScreen
 import com.secondmind.minimal.tts.Reader
