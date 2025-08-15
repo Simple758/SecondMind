@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -26,16 +27,8 @@ class MainActivity : ComponentActivity() {
 fun SecondMindApp() {
   val nav = rememberNavController()
   MaterialTheme {
-    Scaffold(
-      topBar = {
-        SmallTopAppBar(title = { Text("SecondMind") })
-      }
-    ) { inner ->
-      NavHost(
-        navController = nav,
-        startDestination = "home",
-        modifier = Modifier.padding(inner)
-      ) {
+    Scaffold(topBar = { SmallTopAppBar(title = { Text("SecondMind") }) }) { inner ->
+      NavHost(navController = nav, startDestination = "home", modifier = Modifier.padding(inner)) {
         composable("home") { HomeScreen(nav) }
         composable("inbox") { InboxScreen(onBack = { nav.popBackStack() }) }
         composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
@@ -45,25 +38,17 @@ fun SecondMindApp() {
 }
 
 @Composable
-fun HomeScreen(navController: androidx.navigation.NavController) {
-  Column(
-    modifier = Modifier.fillMaxSize().padding(16.dp),
-    verticalArrangement = Arrangement.spacedBy(12.dp)
-  ) {
+fun HomeScreen(nav: NavController) {
+  Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
     Text("Welcome", style = MaterialTheme.typography.titleLarge)
-    HomeTopCards(nav = navController) {
-      QuickNoteCard(modifier = Modifier.fillMaxWidth())
-    }
-    OutlinedButton(onClick = { navController.navigate("settings") }) { Text("Settings") }
+    HomeTopCards(nav = nav) { QuickNoteCard(modifier = Modifier.fillMaxWidth()) }
+    OutlinedButton(onClick = { nav.navigate("settings") }) { Text("Settings") }
   }
 }
 
 @Composable
 fun SettingsScreen(onBack: () -> Unit) {
-  Column(
-    modifier = Modifier.fillMaxSize().padding(16.dp),
-    verticalArrangement = Arrangement.spacedBy(12.dp)
-  ) {
+  Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
     Text("Settings", style = MaterialTheme.typography.titleLarge)
     OutlinedButton(onClick = onBack) { Text("Back") }
   }

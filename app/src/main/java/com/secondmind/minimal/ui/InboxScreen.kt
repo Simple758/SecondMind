@@ -8,10 +8,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun InboxScreen(onBack: () -> Unit) {
-  Column(
-    modifier = Modifier.fillMaxSize().padding(16.dp),
-    verticalArrangement = Arrangement.spacedBy(12.dp)
-  ) {
+  Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
     Text("Inbox", style = MaterialTheme.typography.titleLarge)
     Text("Your captured notifications will appear here.")
     OutlinedButton(onClick = onBack) { Text("Back") }
