@@ -34,6 +34,8 @@ import com.secondmind.minimal.data.Keys
 import com.secondmind.minimal.data.dataStore
 import com.secondmind.minimal.ui.DetailsScreen
 import com.secondmind.minimal.ui.InboxScreen
+import com.secondmind.minimal.ui.QuickNoteCard
+import com.secondmind.minimal.ui.DebugScreen
 import com.secondmind.minimal.tts.Reader
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -72,6 +74,7 @@ fun AppNav() {
       composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }) }
       composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
       composable("inbox") { InboxScreen(nav) }
+      composable("debug") { DebugScreen(onBack = { nav.popBackStack() }) }
       composable(
         route = "notification/{id}",
         arguments = listOf(navArgument("id"){ type = NavType.LongType })
@@ -107,6 +110,9 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
     Text("SecondMind Compose", fontSize = 24.sp)
     Text("Tap to leap forward → $count")
     Button(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.COUNT] = count + 1 } } }) { Text("Increment") }
+        Spacer(modifier = Modifier.height(8.dp))
+        QuickNoteCard(modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(8.dp))
     OutlinedButton(onClick = onInbox) { Text("Inbox") }
     OutlinedButton(onClick = onSettings) { Text("Settings") }
     OutlinedButton(onClick = { showLocalNotification(ctx) }) { Text("Test Notification") }
@@ -215,6 +221,7 @@ fun SettingsScreen(onBack: () -> Unit) {
       }) { Text("Toggle My Accessibility") }
     }
 
+    OutlinedButton(onClick = { navController()?.navigate("debug") }) { Text("A11y Debug") }
     OutlinedButton(onClick = onBack) { Text("Back") }
   }
 }
