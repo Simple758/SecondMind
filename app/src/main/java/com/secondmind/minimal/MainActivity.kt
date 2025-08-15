@@ -26,10 +26,12 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.preferences.core.edit
-import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import com.secondmind.minimal.data.Keys
 import com.secondmind.minimal.data.dataStore
+import com.secondmind.minimal.ui.DetailsScreen
+import com.secondmind.minimal.ui.InboxScreen
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -39,16 +41,11 @@ class MainActivity : ComponentActivity() {
     ensureChannel()
     setContent {
       val mode by rememberThemeMode()
-      val dark = when (mode) {
-        "dark" -> true
-        "light" -> false
-        else -> isSystemInDarkTheme()
-      }
+      val dark = when (mode) { "dark" -> true; "light" -> false; else -> isSystemInDarkTheme() }
       val scheme = if (dark) darkColorScheme() else lightColorScheme()
       MaterialTheme(colorScheme = scheme) { AppNav() }
     }
   }
-
   private fun ensureChannel() {
     if (Build.VERSION.SDK_INT >= 26) {
       val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -67,12 +64,15 @@ fun rememberThemeMode(): State<String> {
 @Composable
 fun AppNav() {
   val nav = rememberNavController()
-  Scaffold(topBar = {
-    CenterAlignedTopAppBar(title = { Text(titleFor(nav)) })
-  }) { pad ->
-    NavHost(navController = nav, startDestination = "home", modifier = Modifier.padding(pad)) {
-      composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }) }
+  Scaffold(topBar = { CenterAlignedTopAppBar(title = { Text(titleFor(nav)) }) }) { pad ->
+    NavHost(nav, startDestination = "home", modifier = Modifier.padding(pad)) {
+      composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }) }
       composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
+      composable("inbox") { InboxScreen(nav) }
+      composable("notification/{id}", arguments = listOf(navArgument("id"){ type = NavType.LongType })) { back ->
+        val id = back.arguments?.getLong("id") ?: -1L
+        DetailsScreen(id)
+      }
     }
   }
 }
@@ -80,32 +80,28 @@ fun AppNav() {
 @Composable
 fun titleFor(nav: NavHostController): String {
   val e by nav.currentBackStackEntryAsState()
-  return when (e?.destination?.route ?: "home") {
+  return when (e?.destination?.route?.substringBefore("/")) {
     "settings" -> "Settings"
+    "inbox" -> "Inbox"
+    "notification" -> "Details"
     else -> "SecondMind"
   }
 }
 
 @Composable
-fun HomeScreen(onSettings: () -> Unit) {
+fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
   val ctx = LocalContext.current
   val scope = rememberCoroutineScope()
   val countFlow = remember { ctx.dataStore.data.map { it[Keys.COUNT] ?: 0 } }
   val count by countFlow.collectAsState(initial = 0)
-
   val notifPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
-  LaunchedEffect(Unit) {
-    if (Build.VERSION.SDK_INT >= 33) notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
-  }
+  LaunchedEffect(Unit) { if (Build.VERSION.SDK_INT >= 33) notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS) }
 
-  Column(
-    Modifier.fillMaxSize().padding(24.dp),
-    verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-    horizontalAlignment = Alignment.CenterHorizontally
-  ) {
+  Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically), horizontalAlignment = Alignment.CenterHorizontally) {
     Text("SecondMind Compose", fontSize = 24.sp)
     Text("Tap to leap forward → $count")
     Button(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.COUNT] = count + 1 } } }) { Text("Increment") }
+    OutlinedButton(onClick = onInbox) { Text("Inbox") }
     OutlinedButton(onClick = onSettings) { Text("Settings") }
     OutlinedButton(onClick = { showLocalNotification(ctx) }) { Text("Test Notification") }
     OutlinedButton(onClick = { ctx.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) }) { Text("Enable Notification Listener") }
@@ -127,17 +123,20 @@ fun SettingsScreen(onBack: () -> Unit) {
   val scope = rememberCoroutineScope()
   val flow = remember { ctx.dataStore.data.map { it[Keys.THEME] ?: "system" } }
   val theme by flow.collectAsState(initial = "system")
+  val retentionFlow = remember { ctx.dataStore.data.map { it[Keys.RETENTION_DAYS] ?: 7 } }
+  val retention by retentionFlow.collectAsState(initial = 7)
 
-  Column(
-    Modifier.fillMaxSize().padding(24.dp),
-    verticalArrangement = Arrangement.spacedBy(16.dp),
-    horizontalAlignment = Alignment.CenterHorizontally
-  ) {
+  Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
     Text("Settings", fontSize = 22.sp)
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
       OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "system" } } }) { Text("System") }
       OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "light" } } }) { Text("Light") }
       OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "dark" } } }) { Text("Dark") }
+    }
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+      Text("Retention (days): $retention")
+      OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.RETENTION_DAYS] = maxOf(1, retention - 1) } } }) { Text("-") }
+      OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.RETENTION_DAYS] = retention + 1 } } }) { Text("+") }
     }
     OutlinedButton(onClick = onBack) { Text("Back") }
   }
