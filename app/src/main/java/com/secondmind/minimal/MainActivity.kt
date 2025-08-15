@@ -34,6 +34,7 @@ import com.secondmind.minimal.data.Keys
 import com.secondmind.minimal.data.dataStore
 import com.secondmind.minimal.ui.DetailsScreen
 import com.secondmind.minimal.ui.InboxScreen
+import com.secondmind.minimal.tts.Reader
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -102,11 +103,7 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
   val notifPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
   LaunchedEffect(Unit) { if (Build.VERSION.SDK_INT >= 33) notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS) }
 
-  Column(
-    Modifier.fillMaxSize().padding(24.dp),
-    verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-    horizontalAlignment = Alignment.CenterHorizontally
-  ) {
+  Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically), horizontalAlignment = Alignment.CenterHorizontally) {
     Text("SecondMind Compose", fontSize = 24.sp)
     Text("Tap to leap forward → $count")
     Button(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.COUNT] = count + 1 } } }) { Text("Increment") }
@@ -130,25 +127,63 @@ private fun showLocalNotification(ctx: Context) {
 fun SettingsScreen(onBack: () -> Unit) {
   val ctx = LocalContext.current
   val scope = rememberCoroutineScope()
-  val flow = remember { ctx.dataStore.data.map { it[Keys.THEME] ?: "system" } }
-  val theme by flow.collectAsState(initial = "system")
+
+  val themeFlow = remember { ctx.dataStore.data.map { it[Keys.THEME] ?: "system" } }
+  val theme by themeFlow.collectAsState(initial = "system")
+
   val retentionFlow = remember { ctx.dataStore.data.map { it[Keys.RETENTION_DAYS] ?: 7 } }
   val retention by retentionFlow.collectAsState(initial = 7)
 
-  Column(Modifier.fillMaxSize().padding(24.dp),
-    verticalArrangement = Arrangement.spacedBy(16.dp),
-    horizontalAlignment = Alignment.CenterHorizontally) {
+  val enabledFlow = remember { ctx.dataStore.data.map { it[Keys.READER_ENABLED] ?: true } }
+  val readerEnabled by enabledFlow.collectAsState(initial = true)
+
+  val rateFlow = remember { ctx.dataStore.data.map { it[Keys.READER_RATE] ?: 1.0f } }
+  val readerRate by rateFlow.collectAsState(initial = 1.0f)
+
+  val pitchFlow = remember { ctx.dataStore.data.map { it[Keys.READER_PITCH] ?: 1.0f } }
+  val readerPitch by pitchFlow.collectAsState(initial = 1.0f)
+
+  LaunchedEffect(readerEnabled, readerRate, readerPitch) {
+    Reader.updateConfig(readerEnabled, readerRate, readerPitch, ctx)
+  }
+
+  Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
     Text("Settings", fontSize = 22.sp)
+
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
       OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "system" } } }) { Text("System") }
       OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "light" } } }) { Text("Light") }
       OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "dark" } } }) { Text("Dark") }
     }
+
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
       Text("Retention (days): $retention")
       OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.RETENTION_DAYS] = maxOf(1, retention - 1) } } }) { Text("-") }
       OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.RETENTION_DAYS] = retention + 1 } } }) { Text("+") }
     }
+
+    Divider()
+
+    Text("Reader", style = MaterialTheme.typography.titleMedium)
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+      Text("Enabled")
+      Switch(checked = readerEnabled, onCheckedChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_ENABLED] = v } } })
+    }
+    Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+      Text("Rate: ${"%.2f".format(readerRate)}")
+      Slider(value = readerRate, onValueChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_RATE] = v.coerceIn(0.5f, 1.5f) } } }, valueRange = 0.5f..1.5f, steps = 10)
+      Text("Pitch: ${"%.2f".format(readerPitch)}")
+      Slider(value = readerPitch, onValueChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_PITCH] = v.coerceIn(0.5f, 1.5f) } } }, valueRange = 0.5f..1.5f, steps = 10)
+    }
+
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+      OutlinedButton(onClick = { Reader.speak(ctx, "This is a test of the SecondMind reader.") }) { Text("Test Read") }
+      OutlinedButton(onClick = {
+        val i = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+        ctx.startActivity(i)
+      }) { Text("Open Accessibility Settings") }
+    }
+
     OutlinedButton(onClick = onBack) { Text("Back") }
   }
 }
