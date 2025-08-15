@@ -2,6 +2,7 @@
 <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
   android:accessibilityEventTypes="typeNotificationStateChanged|typeWindowStateChanged|typeWindowContentChanged"
   android:accessibilityFeedbackType="feedbackSpoken"
+  android:accessibilityFlags="flagDefault|flagReportViewIds|flagIncludeNotImportantViews"
+  android:canRetrieveWindowContent="true"
   android:notificationTimeout="100"
-  android:canRetrieveWindowContent="false"
-  android:summary="@string/accessibility_service_summary" />
+  android:summary="@string/accessibility_service_summary"/>
