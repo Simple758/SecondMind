@@ -221,7 +221,7 @@ fun SettingsScreen(onBack: () -> Unit) {
       }) { Text("Toggle My Accessibility") }
     }
 
-    OutlinedButton(onClick = { navController()?.navigate("debug") }) { Text("A11y Debug") }
+    OutlinedButton(onClick = { val ctx2 = ctx; ctx2.startActivity(android.content.Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS)) }) { Text("Accessibility") }
     OutlinedButton(onClick = onBack) { Text("Back") }
   }
 }
