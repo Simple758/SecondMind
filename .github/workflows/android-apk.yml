@@ -21,7 +21,7 @@ jobs:
       - uses: gradle/gradle-build-action@v3
         with:
           gradle-version: 8.7
-          arguments: clean :app:assembleDebug
+          arguments: clean :app:assembleDebug --stacktrace --info --no-daemon
       - name: Copy APK to artifacts folder
         run: |
           mkdir -p artifacts

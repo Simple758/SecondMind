@@ -112,7 +112,7 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
     Text("SecondMind Compose", fontSize = 24.sp)
     Text("Tap to leap forward → $count")
     Button(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.COUNT] = count + 1 } } }) { Text("Increment") }
-        HomeTopCards(nav = nav) { QuickNoteCard(modifier = Modifier.fillMaxWidth()) }
+        HomeTopCards(nav = nav) { HomeTopCards(nav = nav) { QuickNoteCard(modifier = Modifier.fillMaxWidth()) } }
         Spacer(Modifier.height(12.dp))
 OutlinedButton(onClick = onInbox) { Text("Inbox") }
     OutlinedButton(onClick = onSettings) { Text("Settings") }
