@@ -10,6 +10,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.secondmind.minimal.inbox.InboxViewModel
+import com.secondmind.minimal.tts.Reader
 
 @Composable
 fun DetailsScreen(id: Long, vm: InboxViewModel = viewModel(factory = com.secondmind.minimal.inbox.InboxViewModel.factory(LocalContext.current.applicationContext as android.app.Application))) {
@@ -22,12 +23,15 @@ fun DetailsScreen(id: Long, vm: InboxViewModel = viewModel(factory = com.secondm
     return
   }
 
+  val readText = listOfNotNull(n.title, n.text).joinToString("\n").ifBlank { "No content" }
+
   Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
     Text(n.title ?: "(no title)", style = MaterialTheme.typography.titleLarge)
     Text(n.text ?: "(no text)")
     Text("App: ${n.appPackage}")
     Text("When: ${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(java.util.Date(n.postedAt))}")
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+      Button(onClick = { Reader.speak(ctx, readText) }) { Text("Read") }
       Button(onClick = {
         val s = listOfNotNull(n.title, n.text).joinToString("\n")
         val i = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, s)
