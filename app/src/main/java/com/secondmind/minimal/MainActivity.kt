@@ -26,8 +26,10 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.preferences.core.edit
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
+import androidx.navigation.navArgument
 import com.secondmind.minimal.data.Keys
 import com.secondmind.minimal.data.dataStore
 import com.secondmind.minimal.ui.DetailsScreen
@@ -69,7 +71,10 @@ fun AppNav() {
       composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }) }
       composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
       composable("inbox") { InboxScreen(nav) }
-      composable("notification/{id}", arguments = listOf(navArgument("id"){ type = NavType.LongType })) { back ->
+      composable(
+        route = "notification/{id}",
+        arguments = listOf(navArgument("id"){ type = NavType.LongType })
+      ) { back ->
         val id = back.arguments?.getLong("id") ?: -1L
         DetailsScreen(id)
       }
@@ -97,7 +102,11 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
   val notifPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
   LaunchedEffect(Unit) { if (Build.VERSION.SDK_INT >= 33) notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS) }
 
-  Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically), horizontalAlignment = Alignment.CenterHorizontally) {
+  Column(
+    Modifier.fillMaxSize().padding(24.dp),
+    verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+    horizontalAlignment = Alignment.CenterHorizontally
+  ) {
     Text("SecondMind Compose", fontSize = 24.sp)
     Text("Tap to leap forward → $count")
     Button(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.COUNT] = count + 1 } } }) { Text("Increment") }
@@ -126,7 +135,9 @@ fun SettingsScreen(onBack: () -> Unit) {
   val retentionFlow = remember { ctx.dataStore.data.map { it[Keys.RETENTION_DAYS] ?: 7 } }
   val retention by retentionFlow.collectAsState(initial = 7)
 
-  Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+  Column(Modifier.fillMaxSize().padding(24.dp),
+    verticalArrangement = Arrangement.spacedBy(16.dp),
+    horizontalAlignment = Alignment.CenterHorizontally) {
     Text("Settings", fontSize = 22.sp)
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
       OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "system" } } }) { Text("System") }
