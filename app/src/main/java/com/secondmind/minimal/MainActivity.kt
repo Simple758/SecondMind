@@ -112,10 +112,9 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
     Text("SecondMind Compose", fontSize = 24.sp)
     Text("Tap to leap forward → $count")
     Button(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.COUNT] = count + 1 } } }) { Text("Increment") }
-        Spacer(modifier = Modifier.height(8.dp))
-        QuickNoteCard(modifier = Modifier.fillMaxWidth())
-        Spacer(modifier = Modifier.height(8.dp))
-    OutlinedButton(onClick = onInbox) { Text("Inbox") }
+        HomeTopCards(nav = nav) { QuickNoteCard(modifier = Modifier.fillMaxWidth()) }
+        Spacer(Modifier.height(12.dp))
+OutlinedButton(onClick = onInbox) { Text("Inbox") }
     OutlinedButton(onClick = onSettings) { Text("Settings") }
     OutlinedButton(onClick = { showLocalNotification(ctx) }) { Text("Test Notification") }
     OutlinedButton(onClick = { ctx.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) }) { Text("Enable Notification Listener") }
