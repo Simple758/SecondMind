@@ -184,6 +184,21 @@ fun SettingsScreen(onBack: () -> Unit) {
       }) { Text("Open Accessibility Settings") }
     }
 
+    
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+      OutlinedButton(onClick = {
+        val ctx2 = ctx
+        try {
+          val cn = android.content.ComponentName(ctx2, com.secondmind.minimal.access.SecondMindAccessibilityService::class.java)
+          val i = android.content.Intent(android.provider.Settings.ACTION_ACCESSIBILITY_DETAILS_SETTINGS)
+          i.putExtra(android.provider.Settings.EXTRA_ACCESSIBILITY_COMPONENT_NAME, cn.flattenToString())
+          ctx2.startActivity(i)
+        } catch (e: Throwable) {
+          ctx2.startActivity(android.content.Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS))
+        }
+      }) { Text("Toggle My Accessibility") }
+    }
+
     OutlinedButton(onClick = onBack) { Text("Back") }
   }
 }
