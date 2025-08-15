@@ -165,6 +165,22 @@ fun SettingsScreen(onBack: () -> Unit) {
     Divider()
 
     Text("Reader", style = MaterialTheme.typography.titleMedium)
+
+    val idText = remember {
+      android.content.ComponentName(
+        ctx, com.secondmind.minimal.access.SecondMindAccessibilityService::class.java
+      ).flattenToString()
+    }
+    val enabledNow = remember {
+      val v = android.provider.Settings.Secure.getString(
+        ctx.contentResolver,
+        android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+      )
+      v?.contains(idText) == true
+    }
+    Text("Accessibility: " + if (enabledNow) "ON" else "OFF")
+    Text("Service ID: " + idText, fontSize = 12.sp)
+    
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
       Text("Enabled")
       Switch(checked = readerEnabled, onCheckedChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_ENABLED] = v } } })
