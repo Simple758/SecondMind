@@ -1,4 +1,5 @@
 name: Android APK
+
 on:
   workflow_dispatch:
   push:
@@ -9,27 +10,37 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
           cache: gradle
-      - uses: android-actions/setup-android@v3
-      - run: |
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept licenses & install SDK packages
+        run: |
           yes | sdkmanager --licenses
           sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
-      - uses: gradle/gradle-build-action@v3
+
+      - name: Build Debug APK (Gradle action, no wrapper)
+        uses: gradle/gradle-build-action@v3
         with:
           gradle-version: 8.7
           arguments: clean :app:assembleDebug --stacktrace --info --no-daemon
-      - name: Copy APK to artifacts folder
+
+      - name: Collect APKs
         run: |
           mkdir -p artifacts
-          cp app/build/outputs/apk/debug/app-debug.apk artifacts/ || true
-          ls -R artifacts || true
-      - name: Upload APK
+          cp -v app/build/outputs/apk/debug/*.apk artifacts/ || true
+          echo "Artifacts:" && ls -l artifacts || true
+
+      - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: SecondMind-debug
+          name: apk-debug
           path: artifacts/*.apk
           if-no-files-found: error
