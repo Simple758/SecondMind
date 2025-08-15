@@ -22,5 +22,9 @@
         <action android:name="android.service.notification.NotificationListenerService"/>
       </intent-filter>
     </service>
+    <activity
+      android:name=".access.AccessibilitySettingsActivity"
+      android:exported="false"
+      android:label="@string/accessibility_service_label"/>
   </application>
 </manifest>

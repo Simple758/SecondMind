@@ -190,8 +190,8 @@ fun SettingsScreen(onBack: () -> Unit) {
         val ctx2 = ctx
         try {
           val cn = android.content.ComponentName(ctx2, com.secondmind.minimal.access.SecondMindAccessibilityService::class.java)
-          val i = android.content.Intent(android.provider.Settings.ACTION_ACCESSIBILITY_DETAILS_SETTINGS)
-          i.putExtra(android.provider.Settings.EXTRA_ACCESSIBILITY_COMPONENT_NAME, cn.flattenToString())
+          val i = android.content.Intent("android.settings.ACCESSIBILITY_DETAILS_SETTINGS")
+          i.putExtra("android.provider.extra.EXTRA_ACCESSIBILITY_COMPONENT_NAME", cn.flattenToString())
           ctx2.startActivity(i)
         } catch (e: Throwable) {
           ctx2.startActivity(android.content.Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS))
