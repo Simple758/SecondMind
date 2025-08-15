@@ -12,7 +12,7 @@ android {
     applicationId "com.secondmind.minimal"
     minSdk 24
     targetSdk 34
-    versionCode 10005
+    versionCode 10006
     versionName "1.0.0"
   }
 
@@ -58,4 +58,14 @@ dependencies {
 
 kapt {
   correctErrorTypes = true
+}
+
+sourceSets {
+  main {
+    java {
+      exclude("com/secondmind/minimal/notify/**")
+      exclude("com/secondmind/minimal/access/**")
+      // keep TTS + Notes + Inbox
+    }
+  }
 }
