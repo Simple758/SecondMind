@@ -1,0 +1,7 @@
+plugins { id com.android.library }
+android {
+  namespace "com.secondmind.coreui"
+  compileSdk 34
+  defaultConfig { minSdk 24 }
+}
+dependencies { }

@@ -12,3 +12,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "SecondMindMinimal"
 include(":app")
+include(":contracts")
+include(":core-ui")
+include(":stubs")
