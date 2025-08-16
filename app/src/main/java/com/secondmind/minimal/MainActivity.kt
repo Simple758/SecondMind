@@ -8,48 +8,60 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.secondmind.minimal.ui.HomeTopCards
-import com.secondmind.minimal.ui.QuickNoteCard
 import com.secondmind.minimal.ui.InboxScreen
+import com.secondmind.minimal.ui.QuickNoteCard
+import com.secondmind.minimal.ui.DebugScreen
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContent { SecondMindApp() }
+    setContent { App() }
   }
 }
 
 @Composable
-fun SecondMindApp() {
-  val nav = rememberNavController()
+fun App() {
   MaterialTheme {
-    Scaffold(topBar = { SmallTopAppBar(title = { Text("SecondMind") }) }) { inner ->
-      NavHost(navController = nav, startDestination = "home", modifier = Modifier.padding(inner)) {
-        composable("home") { HomeScreen(nav) }
-        composable("inbox") { InboxScreen(onBack = { nav.popBackStack() }) }
-        composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
+    val nav = rememberNavController()
+    Scaffold(
+      topBar = { CenterAlignedTopAppBar(title = { Text("SecondMind") }) }
+    ) { p ->
+      NavHost(navController = nav, startDestination = "home", modifier = Modifier.padding(p)) {
+
+        composable("home") {
+          Column(
+            Modifier.fillMaxSize().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+          ) {
+            Text("Welcome", style = MaterialTheme.typography.titleLarge)
+            HomeTopCards(
+              quickNote = { QuickNoteCard(modifier = Modifier.fillMaxWidth()) },
+              onOpenInbox = { nav.navigate("inbox") }
+            )
+            Spacer(Modifier.height(8.dp))
+            OutlinedButton(onClick = { nav.navigate("debug") }) { Text("A11y Debug") }
+            OutlinedButton(onClick = { nav.navigate("settings") }) { Text("Settings") }
+          }
+        }
+
+        composable("inbox") { InboxScreen(nav) }
+
+        composable("debug") {
+          // Debug screen exists in repo; if not, replace with a simple Back button.
+          DebugScreen(onBack = { nav.popBackStack() })
+        }
+
+        composable("settings") {
+          Column(Modifier.fillMaxSize().padding(16.dp)) {
+            Text("Settings", style = MaterialTheme.typography.titleLarge)
+            OutlinedButton(onClick = { nav.popBackStack() }) { Text("Back") }
+          }
+        }
       }
     }
-  }
-}
-
-@Composable
-fun HomeScreen(nav: NavController) {
-  Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-    Text("Welcome", style = MaterialTheme.typography.titleLarge)
-    HomeTopCards(quickNote = { QuickNoteCard(modifier = Modifier.fillMaxWidth(, onOpenInbox = {} )) }, onOpenInbox = { try { nav.navigate("inbox") } catch (_: Throwable) {} })
-    OutlinedButton(onClick = { nav.navigate("settings") }) { Text("Settings") }
-  }
-}
-
-@Composable
-fun SettingsScreen(onBack: () -> Unit) {
-  Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-    Text("Settings", style = MaterialTheme.typography.titleLarge)
-    OutlinedButton(onClick = onBack) { Text("Back") }
   }
 }

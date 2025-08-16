@@ -17,10 +17,8 @@ fun HomeTopCards(
     horizontalArrangement = Arrangement.spacedBy(12.dp),
     verticalAlignment = Alignment.CenterVertically
   ) {
-    // Left: Notes (reuses your QuickNoteCard)
     Box(modifier = Modifier.weight(1f)) { quickNote() }
 
-    // Right: Inbox card, H1 style
     Card(
       modifier = Modifier.weight(1f),
       shape = MaterialTheme.shapes.large,
