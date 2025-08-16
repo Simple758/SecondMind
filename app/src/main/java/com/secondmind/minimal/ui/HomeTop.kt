@@ -18,7 +18,6 @@ fun HomeTopCards(
     verticalAlignment = Alignment.CenterVertically
   ) {
     Box(modifier = Modifier.weight(1f)) { quickNote() }
-
     Card(
       modifier = Modifier.weight(1f),
       shape = MaterialTheme.shapes.large,
@@ -31,10 +30,9 @@ fun HomeTopCards(
       ) {
         Text("Inbox", style = MaterialTheme.typography.titleMedium)
         Text("Your captured notifications", style = MaterialTheme.typography.bodySmall)
-        FilledTonalButton(
-          onClick = onOpenInbox,
-          shape = MaterialTheme.shapes.extraLarge
-        ) { Text("Open Inbox") }
+        FilledTonalButton(onClick = onOpenInbox, shape = MaterialTheme.shapes.extraLarge) {
+          Text("Open Inbox")
+        }
       }
     }
   }

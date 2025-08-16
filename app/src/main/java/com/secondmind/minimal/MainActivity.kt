@@ -27,9 +27,7 @@ class MainActivity : ComponentActivity() {
 fun App() {
   MaterialTheme {
     val nav = rememberNavController()
-    Scaffold(
-      topBar = { CenterAlignedTopAppBar(title = { Text("SecondMind") }) }
-    ) { p ->
+    Scaffold(topBar = { CenterAlignedTopAppBar(title = { Text("SecondMind") }) }) { p ->
       NavHost(navController = nav, startDestination = "home", modifier = Modifier.padding(p)) {
 
         composable("home") {
@@ -48,14 +46,9 @@ fun App() {
           }
         }
 
-        composable("inbox") { InboxScreen(nav) }
-
-        composable("debug") {
-          // Debug screen exists in repo; if not, replace with a simple Back button.
-          DebugScreen(onBack = { nav.popBackStack() })
-        }
-
-        composable("settings") {
+        composable("inbox")   { InboxScreen(nav) }
+        composable("debug")   { DebugScreen(onBack = { nav.popBackStack() }) }
+        composable("settings"){
           Column(Modifier.fillMaxSize().padding(16.dp)) {
             Text("Settings", style = MaterialTheme.typography.titleLarge)
             OutlinedButton(onClick = { nav.popBackStack() }) { Text("Back") }
