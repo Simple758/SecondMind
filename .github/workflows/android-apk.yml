@@ -36,7 +36,7 @@ jobs:
         continue-on-error: true
         with:
           gradle-version: 8.7
-          arguments: :app:compileCoreDebugKotlin --stacktrace --info --no-daemon
+          arguments: :app:compileCoreDebugKotlin --stacktrace --info --warning-mode all --console=plain --no-daemon
 
       # Always gather Kotlin/Gradle logs so we see the exact file+line of the failure.
       - name: Collect debug logs
