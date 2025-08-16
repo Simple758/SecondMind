@@ -1,8 +1,13 @@
 <resources>
-  <string name="app_name">SecondMind Compose</string>
-  <string name="accessibility_desc">Helps read notifications and detect heads-up alerts. No data leaves your device.</string>
-</resources>
-<resources>
+  <string name="app_name">SecondMind</string>
+
   <string name="accessibility_service_label">SecondMind Accessibility</string>
-  <string name="accessibility_service_summary">Reads notifications and detects heads-up alerts. No data leaves your device.</string>
+  <string name="accessibility_service_summary">
+    Helps read notifications and detect heads-up alerts. No data leaves your device.
+  </string>
+
+  <string name="tts_enable">Enable TTS</string>
+  <string name="tts_rate">Speech rate</string>
+  <string name="tts_pitch">Pitch</string>
+  <string name="tts_test">Test voice</string>
 </resources>
