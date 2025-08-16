@@ -2,16 +2,15 @@ package com.secondmind.minimal.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 
 @Composable
 fun HomeTopCards(
-  nav: NavController,
-  quickNote: @Composable () -> Unit
+  quickNote: @Composable () -> Unit,
+  onOpenInbox: () -> Unit
 ) {
   Row(
     modifier = Modifier.fillMaxWidth(),
@@ -21,7 +20,7 @@ fun HomeTopCards(
     // Left: Notes (reuses your QuickNoteCard)
     Box(modifier = Modifier.weight(1f)) { quickNote() }
 
-    // Right: Inbox card to match H1 look with big action
+    // Right: Inbox card, H1 style
     Card(
       modifier = Modifier.weight(1f),
       shape = MaterialTheme.shapes.large,
@@ -35,7 +34,7 @@ fun HomeTopCards(
         Text("Inbox", style = MaterialTheme.typography.titleMedium)
         Text("Your captured notifications", style = MaterialTheme.typography.bodySmall)
         FilledTonalButton(
-          onClick = { try { nav.navigate("inbox") } catch (_: Throwable) {} },
+          onClick = onOpenInbox,
           shape = MaterialTheme.shapes.extraLarge
         ) { Text("Open Inbox") }
       }

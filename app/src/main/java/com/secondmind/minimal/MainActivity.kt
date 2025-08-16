@@ -41,7 +41,7 @@ fun SecondMindApp() {
 fun HomeScreen(nav: NavController) {
   Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
     Text("Welcome", style = MaterialTheme.typography.titleLarge)
-    HomeTopCards(nav = nav) { QuickNoteCard(modifier = Modifier.fillMaxWidth()) }
+    HomeTopCards(quickNote = { QuickNoteCard(modifier = Modifier.fillMaxWidth(, onOpenInbox = {} )) }, onOpenInbox = { try { nav.navigate("inbox") } catch (_: Throwable) {} })
     OutlinedButton(onClick = { nav.navigate("settings") }) { Text("Settings") }
   }
 }
