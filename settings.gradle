@@ -1,14 +1,19 @@
 pluginManagement {
-  repositories { google(); mavenCentral(); gradlePluginPortal() }
+  repositories {
+    google()
+    mavenCentral()
+    gradlePluginPortal()
+  }
   plugins {
-    id "com.android.application" version "8.5.1"
-    id "org.jetbrains.kotlin.android" version "1.9.24"
-    id "com.google.devtools.ksp" version "1.9.24-1.0.20"
+    id("com.android.application") version "8.5.1"
+    id("org.jetbrains.kotlin.android") version "1.9.10"
+    // KSP not applied in core; reserved for full flavor later
+    id("com.google.devtools.ksp") version "1.9.10-1.0.13"
   }
 }
 dependencyResolutionManagement {
   repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
   repositories { google(); mavenCentral() }
 }
-rootProject.name = "SecondMindMinimal"
+rootProject.name = "SecondMind"
 include(":app")
