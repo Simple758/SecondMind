@@ -25,16 +25,27 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      # Compile only (so Kotlin prints exact file:line in this step)
-      - name: Compile core debug (print Kotlin errors)
+      - name: Compile core debug (always show Kotlin error)
         run: |
-          gradle -v
-          gradle :app:compileCoreDebugKotlin --stacktrace --info --warning-mode all -Pkotlin.incremental=false | tee kotlin-compile.log
+          set -o pipefail
+          gradle :app:compileCoreDebugKotlin \
+            --stacktrace --info --warning-mode all --no-daemon \
+            -Pkotlin.incremental=false \
+            -Dkotlin.compiler.execution.strategy=in-process \
+            -Dkotlin.colors.enabled=false | tee kotlin-compile.log
+        shell: bash
 
-      # If compile passed, assemble APK
+      - name: Echo first Kotlin error line (if any)
+        if: failure()
+        run: |
+          echo "----- FIRST ERROR LINE(S) -----"
+          grep -E "^[[:space:]]*e: .+\.kt:([0-9]+)" -m 5 -n kotlin-compile.log || true
+          echo "----- LAST 200 LINES -----"
+          tail -n 200 kotlin-compile.log || true
+
       - name: Assemble core debug APK
         if: success()
-        run: gradle :app:assembleCoreDebug --stacktrace --info
+        run: gradle :app:assembleCoreDebug --stacktrace --info --no-daemon
 
       - name: Collect APKs
         if: always()
