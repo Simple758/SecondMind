@@ -4,17 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.OutlinedTextField
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.secondmind.minimal.ui.HomeTopCards
-import com.secondmind.minimal.ui.InboxScreen
-import com.secondmind.minimal.ui.QuickNoteCard
-import com.secondmind.minimal.ui.DebugScreen
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,34 +22,92 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun App() {
   MaterialTheme {
-    val nav = rememberNavController()
-    Scaffold(topBar = { CenterAlignedTopAppBar(title = { Text("SecondMind") }) }) { p ->
-      NavHost(navController = nav, startDestination = "home", modifier = Modifier.padding(p)) {
+    Surface(modifier = Modifier.fillMaxSize()) {
+      HomeScreen()
+    }
+  }
+}
 
-        composable("home") {
-          Column(
-            Modifier.fillMaxSize().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-          ) {
-            Text("Welcome", style = MaterialTheme.typography.titleLarge)
-            HomeTopCards(
-              quickNote = { QuickNoteCard(modifier = Modifier.fillMaxWidth()) },
-              onOpenInbox = { nav.navigate("inbox") }
-            )
-            Spacer(Modifier.height(8.dp))
-            OutlinedButton(onClick = { nav.navigate("debug") }) { Text("A11y Debug") }
-            OutlinedButton(onClick = { nav.navigate("settings") }) { Text("Settings") }
-          }
-        }
+@Composable
+fun HomeScreen() {
+  Column(
+    Modifier.fillMaxSize().padding(16.dp),
+    verticalArrangement = Arrangement.spacedBy(12.dp)
+  ) {
+    Text("SecondMind", style = MaterialTheme.typography.headlineSmall)
 
-        composable("inbox")   { InboxScreen(nav) }
-        composable("debug")   { DebugScreen(onBack = { nav.popBackStack() }) }
-        composable("settings"){
-          Column(Modifier.fillMaxSize().padding(16.dp)) {
-            Text("Settings", style = MaterialTheme.typography.titleLarge)
-            OutlinedButton(onClick = { nav.popBackStack() }) { Text("Back") }
+    Row(
+      Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.spacedBy(12.dp),
+      verticalAlignment = Alignment.Top
+    ) {
+      Box(Modifier.weight(1f)) { QuickNoteCard() }
+      Box(Modifier.weight(1f)) { InboxCard() }
+    }
+  }
+}
+
+@Composable
+fun QuickNoteCard() {
+  var text by remember { mutableStateOf("") }
+  var notes by remember { mutableStateOf(listOf<String>()) }
+
+  Card(
+    shape = MaterialTheme.shapes.large,
+    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+  ) {
+    Column(
+      Modifier.fillMaxWidth().padding(16.dp),
+      verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+      Text("Notes", style = MaterialTheme.typography.titleMedium)
+
+      val preview = notes.lastOrNull() ?: "Quick note…"
+      Text(
+        preview,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        style = MaterialTheme.typography.bodySmall
+      )
+
+      OutlinedTextField(
+        value = text,
+        onValueChange = { text = it },
+        placeholder = { Text("Type note") },
+        modifier = Modifier.fillMaxWidth()
+      )
+
+      Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+      ) {
+        Button(onClick = {
+          if (text.isNotBlank()) {
+            notes = notes + text.trim()
+            text = ""
           }
-        }
+        }) { Text("Save") }
+
+        Text("Total: ${notes.size}", style = MaterialTheme.typography.labelSmall)
+      }
+    }
+  }
+}
+
+@Composable
+fun InboxCard(onOpen: (() -> Unit)? = null) {
+  Card(
+    shape = MaterialTheme.shapes.large,
+    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+  ) {
+    Column(
+      Modifier.fillMaxWidth().padding(16.dp),
+      verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+      Text("Inbox", style = MaterialTheme.typography.titleMedium)
+      Text("Your captured notifications", style = MaterialTheme.typography.bodySmall)
+      FilledTonalButton(onClick = { onOpen?.invoke() }) {
+        Text("Open Inbox")
       }
     }
   }
