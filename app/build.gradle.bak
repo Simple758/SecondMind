@@ -1,6 +1,7 @@
 plugins {
   id 'com.android.application'
   id 'org.jetbrains.kotlin.android'
+  id 'com.google.devtools.ksp'
 }
 
 android {
@@ -11,32 +12,21 @@ android {
     applicationId "com.secondmind.minimal"
     minSdk 24
     targetSdk 34
-    versionCode 10002
-    versionName "1.0.1"
+    versionCode 20002
+    versionName "2.0.1"
   }
 
-  buildTypes {
-    release {
-      minifyEnabled false
-      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-    }
+  flavorDimensions += "edition"
+  productFlavors {
+    core { dimension "edition" }
+    full { dimension "edition" }
   }
-
-  compileOptions {
-    sourceCompatibility JavaVersion.VERSION_17
-    targetCompatibility JavaVersion.VERSION_17
-  }
-  kotlinOptions { jvmTarget = "17" }
 
   buildFeatures { compose true }
   composeOptions { kotlinCompilerExtensionVersion "1.5.14" }
 
-  // Keep flavors, but we only build core in CI
-  flavorDimensions "tier"
-  productFlavors {
-    core { dimension "tier" }
-    full { dimension "tier" } // full flavor code exists but we don't compile it in CI
-  }
+  compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+  kotlinOptions { jvmTarget = "17" }
 
   packagingOptions {
     resources { excludes += ["/META-INF/{AL2.0,LGPL2.1}"] }
@@ -53,8 +43,13 @@ dependencies {
   implementation "androidx.compose.ui:ui-tooling-preview"
   debugImplementation "androidx.compose.ui:ui-tooling"
   implementation "androidx.compose.material3:material3:1.2.1"
-  implementation "androidx.compose.material:material-icons-extended:1.6.8"
   implementation "androidx.navigation:navigation-compose:2.7.7"
-  implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.7.0"
   implementation "androidx.appcompat:appcompat:1.7.0"
+  implementation "androidx.compose.material:material-icons-extended:1.6.8"
+
+  // Room only for the full flavor (KSP variant-scoped):
+  fullImplementation "androidx.room:room-runtime:2.6.1"
+  fullImplementation "androidx.room:room-ktx:2.6.1"
+  kspFullDebug "androidx.room:room-compiler:2.6.1"
+  kspFullRelease "androidx.room:room-compiler:2.6.1"
 }
