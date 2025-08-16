@@ -1,9 +1,8 @@
 name: Android APK
-
 on:
-  workflow_dispatch:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -11,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -30,31 +29,36 @@ jobs:
         uses: gradle/gradle-build-action@v3
         with:
           gradle-version: 8.7
-          arguments: clean :app:assembleDebug --stacktrace --info --no-daemon --no-build-cache --rerun-tasks
+          arguments: clean :app:assembleDebug --stacktrace --info --no-daemon
 
-      - name: Collect APKs
+      - name: Show outputs tree
+        if: always()
+        run: |
+          echo "== app/build/outputs =="
+          ls -R app/build/outputs || true
+
+      - name: Collect APKs (robust find)
+        if: always()
         run: |
           mkdir -p artifacts
-          cp -v app/build/outputs/apk/debug/*.apk artifacts/ || true
-          echo "Artifacts:" && ls -l artifacts || true
+          find app/build/outputs -type f \( -name "*.apk" -o -name "*.aab" \) -print -exec cp -v {} artifacts/ \; || true
+          echo "== Artifacts collected =="
+          ls -l artifacts || true
 
       - name: Upload APK artifacts
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: apk-debug
-          path: artifacts/*.apk
-          if-no-files-found: error
+          path: artifacts/*
 
-      - name: Upload build logs on failure
-        if: failure()
-        run: |
-          mkdir -p logs
-          find . -type f \( -name "*.log" -o -name "*.kotlin_module" -o -name "kotlin-compiler*" \) -print0 | xargs -0 -I{} bash -lc 'dest=logs/$(echo {} | sed s#^\./##); mkdir -p "$(dirname "$dest")"; cp -v "{}" "$dest" || true'
-          cp -vR app/build/reports logs/ || true
-      - name: Upload logs artifact
+      - name: Upload debug reports on failure (manifests, reports, logs)
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: build-logs
-          path: logs
+          name: build-debug-info
+          path: |
+            app/build/outputs/**
+            app/build/reports/**
+            app/build/intermediates/manifest_merge_report/**/AndroidManifest.xml
           if-no-files-found: warn
