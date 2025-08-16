@@ -1,0 +1,39 @@
+<manifest package="com.secondmind.minimal" xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <!-- Accessibility settings entry (if class exists in full flavor) -->
+    <activity
+      android:name=".access.AccessibilitySettingsActivity"
+      android:exported="false"
+      android:label="@string/accessibility_service_label" />
+    <!-- Accessibility services (keep only the ones you actually use) -->
+    <service
+      android:name=".access.SecondMindAccessibilityService"
+      android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+      android:exported="true"
+      android:label="@string/accessibility_service_label">
+      <intent-filter>
+        <action android:name="android.accessibilityservice.AccessibilityService"/>
+      </intent-filter>
+      <meta-data
+        android:name="android.accessibilityservice"
+        android:resource="@xml/secondmind_accessibility_service"/>
+    </service>
+
+    <!-- If you still have the classic service, include it here, not in core -->
+    <service
+      android:name=".MyAccessibilityService"
+      android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+      android:exported="true"
+      android:label="@string/accessibility_service_label">
+      <intent-filter>
+        <action android:name="android.accessibilityservice.AccessibilityService"/>
+      </intent-filter>
+      <meta-data
+        android:name="android.accessibilityservice"
+        android:resource="@xml/accessibility_service_config"/>
+    </service>
+
+    <!-- If you have a push service in full flavor, declare it here -->
+    <!-- <service android:name=".notify.PushService" android:exported="false" /> -->
+  </application>
+</manifest>

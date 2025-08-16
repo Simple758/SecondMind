@@ -8,23 +8,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
           cache: gradle
-
       - uses: android-actions/setup-android@v3
-
       - name: Accept licenses & install SDK packages
         run: |
           yes | sdkmanager --licenses
           sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
-
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3
 
+      # Compile-only step to surface Kotlin errors (if any)
       - name: Compile core debug (always show Kotlin error)
         run: |
           set -o pipefail
@@ -43,9 +40,21 @@ jobs:
           echo "----- LAST 200 LINES -----"
           tail -n 200 kotlin-compile.log || true
 
-      - name: Assemble core debug APK
+      # Assemble and capture resource/AAPT errors too
+      - name: Assemble core debug APK (tee log)
         if: success()
-        run: gradle :app:assembleCoreDebug --stacktrace --info --no-daemon
+        run: |
+          set -o pipefail
+          gradle :app:assembleCoreDebug --stacktrace --info --no-daemon | tee assemble.log
+        shell: bash
+
+      - name: Echo first AAPT/resource error (if any)
+        if: failure()
+        run: |
+          echo "----- AAPT/Resource error snippets -----"
+          grep -E "AAPT: error:|Android resource linking failed|error: resource .+ not found|Duplicate resources|invalid file name" -n assemble.log || true
+          echo "----- LAST 200 LINES (assemble) -----"
+          tail -n 200 assemble.log || true
 
       - name: Collect APKs
         if: always()
@@ -54,12 +63,15 @@ jobs:
           find app/build/outputs -type f -name "*Core*debug*.apk" -o -name "*debug*.apk" -print -exec cp -v {} artifacts/ \; || true
           echo "Artifacts:" && ls -l artifacts || true
 
-      - name: Upload compile log
+      - name: Upload logs and problems report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: kotlin-compile-log
-          path: kotlin-compile.log
+          name: build-logs
+          path: |
+            kotlin-compile.log
+            assemble.log
+            build/reports/problems/problems-report.html
           if-no-files-found: warn
 
       - name: Upload APK artifacts

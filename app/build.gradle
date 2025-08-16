@@ -11,7 +11,7 @@ android {
     applicationId "com.secondmind.minimal"
     minSdk 24
     targetSdk 34
-    versionCode 10008
+    versionCode 10009
     versionName "1.0.1"
   }
 
