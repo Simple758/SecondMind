@@ -29,20 +29,60 @@ jobs:
           yes | sdkmanager --licenses
           sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
-      - name: Build Core Debug APK (Gradle action)
+      # Compile only first, but don't stop the workflow on failure.
+      - name: Compile coreDebug Kotlin (in-process)
+        id: kt
+        uses: gradle/gradle-build-action@v3
+        continue-on-error: true
+        with:
+          gradle-version: 8.7
+          arguments: :app:compileCoreDebugKotlin --stacktrace --info --no-daemon
+
+      # Always gather Kotlin/Gradle logs so we see the exact file+line of the failure.
+      - name: Collect debug logs
+        if: always()
+        run: |
+          mkdir -p debug-logs
+          # Kotlin compile tmp + reports
+          cp -R app/build/tmp/kotlin-compileCoreDebugKotlin || true debug-logs/kotlin-compileCoreDebugKotlin
+          cp -R app/build/reports || true debug-logs/reports
+          # Gradle scan/build logs
+          find . -type f -name "*.log" -o -path "*/build/*" | tar -czf debug-logs/misc.tar.gz --files-from=-
+          echo "Collected:"
+          find debug-logs -maxdepth 3 -type f -print || true
+
+      - name: Upload debug logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kotlin-logs
+          path: debug-logs
+
+      # If compile failed, fail the job cleanly after uploading logs.
+      - name: Fail if Kotlin compile failed
+        if: steps.kt.outcome == 'failure'
+        run: |
+          echo "Kotlin compile failed (see kotlin-logs artifact for exact file & line)."
+          exit 1
+
+      # If compile passed, assemble APK and upload
+      - name: Build Core Debug APK
+        if: steps.kt.outcome == 'success'
         uses: gradle/gradle-build-action@v3
         with:
           gradle-version: 8.7
           arguments: clean :app:assembleCoreDebug --stacktrace --info --no-daemon
 
       - name: Collect APKs
+        if: steps.kt.outcome == 'success'
         run: |
           mkdir -p artifacts
-          # Collect all possible debug APK outputs (single- and multi-variant)
-          find app/build/outputs -type f -name "*Core*debug*.apk" -o -name "*debug*.apk" -print -exec cp -v {} artifacts/ \; || true
+          find app/build/outputs -type f -name "*Core*debug*.apk" -o -name "*debug*.apk" \
+            -exec cp -v {} artifacts/ \; || true
           echo "Artifacts:" && ls -l artifacts || true
 
       - name: Upload APK artifacts
+        if: steps.kt.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: apk-core-debug
