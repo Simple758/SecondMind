@@ -1,7 +1,7 @@
-plugins { id com.android.library }
-android {
-  namespace "com.secondmind.stubs"
-  compileSdk 34
-  defaultConfig { minSdk 24 }
+plugins {
+  id "org.jetbrains.kotlin.jvm" version "1.9.24"
 }
-dependencies { }
+repositories { mavenCentral() }
+dependencies {
+  implementation project(":contracts")
+}

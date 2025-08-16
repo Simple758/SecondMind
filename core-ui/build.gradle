@@ -1,4 +1,4 @@
-plugins { id com.android.library }
+plugins { id "com.android.library" }
 android {
   namespace "com.secondmind.coreui"
   compileSdk 34
