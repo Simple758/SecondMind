@@ -35,7 +35,7 @@ fun AppInboxScreen(
             if (a.preview.isNotBlank())
               Text(a.preview, style = MaterialTheme.typography.labelSmall, maxLines = 1)
           }
-          FilledIconButton(
+          IconButton(
             onClick = { onReadApp(a.appPackage) },
             shape = MaterialTheme.shapes.extraLarge
           ) { Icon(Icons.Filled.VolumeUp, contentDescription = "Read all") }

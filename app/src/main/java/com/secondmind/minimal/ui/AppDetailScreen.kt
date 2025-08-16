@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 
 data class AppMessage(val id: Long, val title: String, val text: String, val ts: Long)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppDetailScreen(
   appLabel: String,
@@ -26,7 +27,7 @@ fun AppDetailScreen(
         title = { Text(appLabel) },
         navigationIcon = { TextButton(onClick = onBack) { Text("Back") } },
         actions = {
-          FilledIconButton(onClick = onReadAll, shape = MaterialTheme.shapes.extraLarge) {
+          IconButton(onClick = onReadAll) {
             Icon(Icons.Filled.VolumeUp, contentDescription = "Read all")
           }
         }
@@ -48,7 +49,7 @@ fun AppDetailScreen(
               if (m.title.isNotBlank()) Text(m.title, style = MaterialTheme.typography.titleSmall)
               Text(m.text, style = MaterialTheme.typography.bodySmall)
             }
-            FilledIconButton(onClick = { onReadOne(m.id) }, shape = MaterialTheme.shapes.extraLarge) {
+            IconButton(onClick = { onReadOne(m.id) }) {
               Icon(Icons.Filled.VolumeUp, contentDescription = "Read")
             }
           }
