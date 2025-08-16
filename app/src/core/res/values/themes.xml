@@ -1,0 +1,4 @@
+<resources>
+  <!-- Use a standard Material3 no-action-bar theme -->
+  <style name="Theme.SecondMind" parent="Theme.Material3.DayNight.NoActionBar" />
+</resources>

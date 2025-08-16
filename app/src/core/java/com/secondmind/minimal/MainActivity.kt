@@ -15,18 +15,15 @@ class MainActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     setContent {
       MaterialTheme {
-        Surface(Modifier.fillMaxSize()) {
-          Column(
-            Modifier.fillMaxSize().padding(24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-          ) {
-            Text("SecondMind — Core", style = MaterialTheme.typography.headlineMedium)
-            Spacer(Modifier.height(12.dp))
-            Text("Minimal Compose build target (no services, no Room).")
-            Spacer(Modifier.height(24.dp))
-            var taps by remember { mutableStateOf(0) }
-            Button(onClick = { taps++ }) { Text("Tap me ($taps)") }
+        Surface(modifier = Modifier.fillMaxSize()) {
+          Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally,
+                   verticalArrangement = Arrangement.spacedBy(12.dp)) {
+              Text("SecondMind Core", style = MaterialTheme.typography.titleLarge)
+              var clicks by remember { mutableStateOf(0) }
+              Button(onClick = { clicks++ }) { Text("Tap ($clicks)") }
+              Text("This is the minimal core build (Compose only).")
+            }
           }
         }
       }
