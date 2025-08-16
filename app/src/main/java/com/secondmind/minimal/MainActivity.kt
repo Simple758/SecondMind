@@ -22,20 +22,14 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun App() {
   MaterialTheme {
-    Surface(modifier = Modifier.fillMaxSize()) {
-      HomeScreen()
-    }
+    Surface(Modifier.fillMaxSize()) { HomeScreen() }
   }
 }
 
 @Composable
 fun HomeScreen() {
-  Column(
-    Modifier.fillMaxSize().padding(16.dp),
-    verticalArrangement = Arrangement.spacedBy(12.dp)
-  ) {
+  Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
     Text("SecondMind", style = MaterialTheme.typography.headlineSmall)
-
     Row(
       Modifier.fillMaxWidth(),
       horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -52,42 +46,16 @@ fun QuickNoteCard() {
   var text by remember { mutableStateOf("") }
   var notes by remember { mutableStateOf(listOf<String>()) }
 
-  Card(
-    shape = MaterialTheme.shapes.large,
-    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-  ) {
-    Column(
-      Modifier.fillMaxWidth().padding(16.dp),
-      verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
+  Card(shape = MaterialTheme.shapes.large, elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+    Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
       Text("Notes", style = MaterialTheme.typography.titleMedium)
-
       val preview = notes.lastOrNull() ?: "Quick note…"
-      Text(
-        preview,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        style = MaterialTheme.typography.bodySmall
-      )
-
-      OutlinedTextField(
-        value = text,
-        onValueChange = { text = it },
-        placeholder = { Text("Type note") },
-        modifier = Modifier.fillMaxWidth()
-      )
-
-      Row(
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically
-      ) {
+      Text(preview, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodySmall)
+      OutlinedTextField(value = text, onValueChange = { text = it }, placeholder = { Text("Type note") }, modifier = Modifier.fillMaxWidth())
+      Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
         Button(onClick = {
-          if (text.isNotBlank()) {
-            notes = notes + text.trim()
-            text = ""
-          }
+          if (text.isNotBlank()) { notes = notes + text.trim(); text = "" }
         }) { Text("Save") }
-
         Text("Total: ${notes.size}", style = MaterialTheme.typography.labelSmall)
       }
     }
@@ -96,19 +64,11 @@ fun QuickNoteCard() {
 
 @Composable
 fun InboxCard(onOpen: (() -> Unit)? = null) {
-  Card(
-    shape = MaterialTheme.shapes.large,
-    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-  ) {
-    Column(
-      Modifier.fillMaxWidth().padding(16.dp),
-      verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
+  Card(shape = MaterialTheme.shapes.large, elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+    Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
       Text("Inbox", style = MaterialTheme.typography.titleMedium)
       Text("Your captured notifications", style = MaterialTheme.typography.bodySmall)
-      FilledTonalButton(onClick = { onOpen?.invoke() }) {
-        Text("Open Inbox")
-      }
+      FilledTonalButton(onClick = { onOpen?.invoke() }) { Text("Open Inbox") }
     }
   }
 }

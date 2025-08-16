@@ -1,90 +1,60 @@
 name: Android APK
-
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  push: { branches: [ "main" ] }
+  pull_request: { branches: [ "main" ] }
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
           cache: gradle
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - uses: android-actions/setup-android@v3
 
       - name: Accept licenses & install SDK packages
         run: |
           yes | sdkmanager --licenses
           sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
-      # Compile only first, but don't stop the workflow on failure.
-      - name: Compile coreDebug Kotlin (in-process)
-        id: kt
-        uses: gradle/gradle-build-action@v3
-        continue-on-error: true
-        with:
-          gradle-version: 8.7
-          arguments: :app:compileCoreDebugKotlin --stacktrace --info --warning-mode all --console=plain --no-daemon
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
 
-      # Always gather Kotlin/Gradle logs so we see the exact file+line of the failure.
-      - name: Collect debug logs
+      # Compile only (so Kotlin prints exact file:line in this step)
+      - name: Compile core debug (print Kotlin errors)
+        run: |
+          gradle -v
+          gradle :app:compileCoreDebugKotlin --stacktrace --info --warning-mode all -Pkotlin.incremental=false | tee kotlin-compile.log
+
+      # If compile passed, assemble APK
+      - name: Assemble core debug APK
+        if: success()
+        run: gradle :app:assembleCoreDebug --stacktrace --info
+
+      - name: Collect APKs
         if: always()
         run: |
-          mkdir -p debug-logs
-          # Kotlin compile tmp + reports
-          cp -R app/build/tmp/kotlin-compileCoreDebugKotlin || true debug-logs/kotlin-compileCoreDebugKotlin
-          cp -R app/build/reports || true debug-logs/reports
-          # Gradle scan/build logs
-          find . -type f -name "*.log" -o -path "*/build/*" | tar -czf debug-logs/misc.tar.gz --files-from=-
-          echo "Collected:"
-          find debug-logs -maxdepth 3 -type f -print || true
+          mkdir -p artifacts
+          find app/build/outputs -type f -name "*Core*debug*.apk" -o -name "*debug*.apk" -print -exec cp -v {} artifacts/ \; || true
+          echo "Artifacts:" && ls -l artifacts || true
 
-      - name: Upload debug logs
+      - name: Upload compile log
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: kotlin-logs
-          path: debug-logs
-
-      # If compile failed, fail the job cleanly after uploading logs.
-      - name: Fail if Kotlin compile failed
-        if: steps.kt.outcome == 'failure'
-        run: |
-          echo "Kotlin compile failed (see kotlin-logs artifact for exact file & line)."
-          exit 1
-
-      # If compile passed, assemble APK and upload
-      - name: Build Core Debug APK
-        if: steps.kt.outcome == 'success'
-        uses: gradle/gradle-build-action@v3
-        with:
-          gradle-version: 8.7
-          arguments: clean :app:assembleCoreDebug --stacktrace --info --no-daemon
-
-      - name: Collect APKs
-        if: steps.kt.outcome == 'success'
-        run: |
-          mkdir -p artifacts
-          find app/build/outputs -type f -name "*Core*debug*.apk" -o -name "*debug*.apk" \
-            -exec cp -v {} artifacts/ \; || true
-          echo "Artifacts:" && ls -l artifacts || true
+          name: kotlin-compile-log
+          path: kotlin-compile.log
+          if-no-files-found: warn
 
       - name: Upload APK artifacts
-        if: steps.kt.outcome == 'success'
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: apk-core-debug
           path: artifacts/*.apk
-          if-no-files-found: error
+          if-no-files-found: warn
