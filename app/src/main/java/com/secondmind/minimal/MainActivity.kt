@@ -34,6 +34,8 @@ import com.secondmind.minimal.data.Keys
 import com.secondmind.minimal.data.dataStore
 import com.secondmind.minimal.ui.DetailsScreen
 import com.secondmind.minimal.ui.InboxScreen
+import com.secondmind.minimal.ui.AppInboxScreen
+import com.secondmind.minimal.ui.AppSummary
 import com.secondmind.minimal.ui.HomeTopCards
 import com.secondmind.minimal.ui.QuickNoteCard
 import com.secondmind.minimal.tts.Reader
@@ -73,7 +75,18 @@ fun AppNav() {
     NavHost(nav, startDestination = "home", modifier = Modifier.padding(pad)) {
       composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }) }
       composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
-      composable("inbox") { InboxScreen(nav) }
+      composable("inbox") {
+  val sample = listOf(
+    AppSummary("com.whatsapp","WhatsApp",3,"DM: Hey, you free?"),
+    AppSummary("com.instagram.android","Instagram",2,"New message from Alex"),
+    AppSummary("com.twitter.android","X",1,"You were mentioned…")
+  )
+  AppInboxScreen(
+    apps = sample,
+    onOpenApp = { /* TODO: navigate to detail */ },
+    onReadApp = { /* TODO: TTS all for that app */ }
+  )
+}
       composable(
         route = "notification/{id}",
         arguments = listOf(navArgument("id"){ type = NavType.LongType })
