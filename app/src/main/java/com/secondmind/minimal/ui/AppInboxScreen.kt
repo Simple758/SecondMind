@@ -1,12 +1,11 @@
 package com.secondmind.minimal.ui
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.VolumeUp
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -33,7 +32,8 @@ fun AppInboxScreen(
           Column(Modifier.weight(1f)) {
             Text(a.appLabel, style = MaterialTheme.typography.titleMedium)
             Text("${a.count} notifications", style = MaterialTheme.typography.bodySmall)
-            if (a.preview.isNotBlank()) Text(a.preview, style = MaterialTheme.typography.labelSmall, maxLines = 1)
+            if (a.preview.isNotBlank())
+              Text(a.preview, style = MaterialTheme.typography.labelSmall, maxLines = 1)
           }
           FilledIconButton(
             onClick = { onReadApp(a.appPackage) },
