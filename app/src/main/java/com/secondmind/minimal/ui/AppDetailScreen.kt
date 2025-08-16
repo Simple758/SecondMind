@@ -3,7 +3,7 @@ package com.secondmind.minimal.ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.VolumeUp
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,12 +22,12 @@ fun AppDetailScreen(
 ) {
   Scaffold(
     topBar = {
-      SmallTopAppBar(
+      CenterAlignedTopAppBar(
         title = { Text(appLabel) },
         navigationIcon = { TextButton(onClick = onBack) { Text("Back") } },
         actions = {
           FilledIconButton(onClick = onReadAll, shape = MaterialTheme.shapes.extraLarge) {
-            Icon(Icons.Rounded.VolumeUp, contentDescription = "Read all")
+            Icon(Icons.Filled.VolumeUp, contentDescription = "Read all")
           }
         }
       )
@@ -49,7 +49,7 @@ fun AppDetailScreen(
               Text(m.text, style = MaterialTheme.typography.bodySmall)
             }
             FilledIconButton(onClick = { onReadOne(m.id) }, shape = MaterialTheme.shapes.extraLarge) {
-              Icon(Icons.Rounded.VolumeUp, contentDescription = "Read")
+              Icon(Icons.Filled.VolumeUp, contentDescription = "Read")
             }
           }
         }
