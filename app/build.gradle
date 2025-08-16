@@ -12,8 +12,8 @@ android {
     applicationId "com.secondmind.minimal"
     minSdk 24
     targetSdk 34
-    versionCode 10011
-    versionName "1.0.0"
+    versionCode 10002
+    versionName "1.0.1"
   }
 
   buildTypes {
@@ -32,12 +32,13 @@ android {
   buildFeatures { compose true }
   composeOptions { kotlinCompilerExtensionVersion "1.5.14" }
 
-  packagingOptions {
+  packaging {
     resources { excludes += ["/META-INF/{AL2.0,LGPL2.1}"] }
   }
 }
 
 dependencies {
+  // Compose BOM keeps all compose libs in sync
   def composeBom = platform("androidx.compose:compose-bom:2024.06.00")
   implementation composeBom
   androidTestImplementation composeBom
@@ -52,24 +53,14 @@ dependencies {
   implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.7.0"
   implementation "androidx.appcompat:appcompat:1.7.0"
 
+  // Room (KSP)
+  implementation "androidx.room:room-runtime:2.6.1"
   implementation "androidx.room:room-ktx:2.6.1"
   ksp "androidx.room:room-compiler:2.6.1"
 }
 
 ksp {
-}
-
-sourceSets {
-  main {
-    java {
-      exclude("com/secondmind/minimal/notify/**")
-      exclude("com/secondmind/minimal/access/**")
-      // keep TTS + Notes + Inbox
-    }
-  }
-}
-
-ksp {
-  arg('room.generateKotlin', 'true')
-  arg('room.schemaLocation', "$projectDir/schemas")
+  arg("room.schemaLocation", "$projectDir/schemas")
+  arg("room.incremental", "true")
+  arg("room.generateKotlin", "true")
 }
