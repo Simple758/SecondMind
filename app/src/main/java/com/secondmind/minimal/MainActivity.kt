@@ -1,5 +1,10 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
+import com.secondmind.minimal.InboxStore
+import com.secondmind.minimal.Tts
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 package com.secondmind.minimal
 
 import android.Manifest
@@ -47,7 +52,9 @@ class MainActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     ensureChannel()
     setContent {
-      val mode by rememberThemeMode()
+      val ctx = LocalContext.current
+      DisposableEffect(Unit) { Tts.init(ctx); onDispose { Tts.shutdown() } }
+val mode by rememberThemeMode()
       val dark = when (mode) { "dark" -> true; "light" -> false; else -> isSystemInDarkTheme() }
       val scheme = if (dark) darkColorScheme() else lightColorScheme()
       MaterialTheme(colorScheme = scheme) { AppNav() }
@@ -76,14 +83,18 @@ fun AppNav() {
       composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }) }
       composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
       composable("inbox") {
-  val sample = listOf(
-    AppSummary("com.whatsapp","WhatsApp",3,"DM: Hey, you free?"),
-    AppSummary("com.instagram.android","Instagram",2,"New message from Alex"),
-    AppSummary("com.twitter.android","X",1,"You were mentioned…")
-  )
+  val items by InboxStore.items.collectAsState()
+  val apps = remember(items) { InboxStore.summaries() }
   AppInboxScreen(
-    apps = sample,
-    onOpenApp = { /* TODO: navigate to detail */ },
+    apps = apps,
+    onOpenApp = { /* later: navigate to details */ },
+    onReadApp = { pkg ->
+      val msgs = InboxStore.messagesForPackage(pkg).take(5)
+      val payload = msgs.joinToString(". ") { if (it.title.isBlank()) it.text else "${it.title}: ${it.text}" }
+      Tts.speak(payload)
+    }
+  )
+},
     onReadApp = { /* TODO: TTS all for that app */ }
   )
 }

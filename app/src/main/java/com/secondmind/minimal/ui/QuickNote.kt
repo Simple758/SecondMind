@@ -43,7 +43,7 @@ fun QuickNoteCard(modifier: Modifier = Modifier) {
         )
         Text("Total: ${NoteStore.count()}", style = MaterialTheme.typography.labelSmall)
       }
-      FilledIconButton(onClick = { show = true }, shape = MaterialTheme.shapes.extraLarge) {
+      FilledIconButton(onClick = { show = true }) {
         Icon(Icons.Rounded.Add, contentDescription = "New note")
       }
     }

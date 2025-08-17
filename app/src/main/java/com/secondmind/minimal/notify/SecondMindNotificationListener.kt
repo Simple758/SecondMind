@@ -1,3 +1,4 @@
+import com.secondmind.minimal.InboxStore
 package com.secondmind.minimal.notify
 
 import android.service.notification.NotificationListenerService
