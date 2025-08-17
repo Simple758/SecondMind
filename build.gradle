@@ -1,1 +1,5 @@
-/* empty on purpose; plugins resolved via settings.gradle */
+/**
+ * Root build script intentionally minimal.
+ * All Android configuration is in :app/app/build.gradle
+ */
+plugins { }
