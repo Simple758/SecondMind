@@ -44,3 +44,21 @@ dependencies {
   implementation "androidx.appcompat:appcompat:1.7.0"
   debugImplementation "androidx.compose.ui:ui-tooling"
 }
+    
+android {
+    // ensure a dimension
+    flavorDimensions "tier"
+
+    productFlavors {
+        core {
+            dimension "tier"
+            applicationIdSuffix ".core"
+            versionNameSuffix "-core"
+        }
+        full {
+            dimension "tier"
+            applicationIdSuffix ".full"
+            versionNameSuffix "-full"
+        }
+    }
+}
