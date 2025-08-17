@@ -35,7 +35,8 @@ fun DetailsScreen(id: Long, vm: InboxViewModel = viewModel(factory = com.secondm
       Button(onClick = { Reader.speak(ctx, readText) }) { Text("Read") }
       Button(onClick = {
         val s: String? = (listOfNotNull(n.title, n.text).joinToString("\n")
-        val i = Intent(Intent.ACTION_SEND).setType("text/plain").putStringExtraSafe(Intent.EXTRA_TEXT, s)
+        val i = Intent(Intent.ACTION_SEND)
+i.type = "text/plain"
         ctx.startActivity(Intent.createChooser(i, "Share"))
       }) { Text("Share") }
       OutlinedButton(onClick = { vm.delete(n.id) }) { Text("Delete") }
