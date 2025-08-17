@@ -1,3 +1,4 @@
+import androidx.lifecycle.viewModelScope
 package com.secondmind.minimal.dev
 
 import android.app.Application
@@ -52,7 +53,7 @@ class PatchInboxViewModel(private val app: Application) : ViewModel() {
       }.sortedByDescending { it.messages.firstOrNull()?.ts ?: 0L }
 
       _groups.clear(); _groups.addAll(snap)
-    }.launchIn(androidx.lifecycle.viewmodel.viewModelScope(this))
+    }.launchIn(viewModelScope)
   }
 }
 
