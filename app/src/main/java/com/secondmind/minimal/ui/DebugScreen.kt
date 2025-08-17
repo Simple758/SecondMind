@@ -41,7 +41,7 @@ fun DebugScreen(onBack: () -> Unit) {
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
       OutlinedButton(onClick = {
         val i = Intent("android.settings.ACCESSIBILITY_DETAILS_SETTINGS")
-        i.putExtra("android.provider.extra.EXTRA_ACCESSIBILITY_COMPONENT_NAME", comp)
+        i.putParcelableExtraSafe("android.provider.extra.EXTRA_ACCESSIBILITY_COMPONENT_NAME", comp)
         ctx.startActivity(i)
       }) { Text("Open Service Page") }
       OutlinedButton(onClick = { ctx.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) }) { Text("Open Accessibility") }
