@@ -1,14 +1,16 @@
 <manifest package="com.secondmind.minimal"
     xmlns:android="http://schemas.android.com/apk/res/android">
   <application>
-    <activity
-      android:name=".dev.PatchHarnessActivity"
+    <!-- Second launcher icon that opens the SAME MainActivity -->
+    <activity-alias
+      android:name=".dev.PatchLauncher"
+      android:targetActivity=".MainActivity"
       android:exported="true"
       android:label="SecondMind (Patch)">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
-    </activity>
+    </activity-alias>
   </application>
 </manifest>
