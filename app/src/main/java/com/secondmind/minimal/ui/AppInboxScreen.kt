@@ -3,7 +3,7 @@ package com.secondmind.minimal.ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.VolumeUp
+import androidx.compose.material.icons.rounded.VolumeUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,10 +35,9 @@ fun AppInboxScreen(
             if (a.preview.isNotBlank())
               Text(a.preview, style = MaterialTheme.typography.labelSmall, maxLines = 1)
           }
-          IconButton(
-            onClick = { onReadApp(a.appPackage) },
-            
-          ) { Icon(Icons.Filled.VolumeUp, contentDescription = "Read all") }
+          IconButton(onClick = { onReadApp(a.appPackage) }) {
+            Icon(Icons.Rounded.VolumeUp, contentDescription = "Read all")
+          }
         }
       }
     }
