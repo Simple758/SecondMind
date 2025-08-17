@@ -1,11 +1,10 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+package com.secondmind.minimal
 
 import com.secondmind.minimal.InboxStore
 import com.secondmind.minimal.Tts
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-package com.secondmind.minimal
 
 import android.Manifest
 import android.app.NotificationChannel

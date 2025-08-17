@@ -1,5 +1,5 @@
-import com.secondmind.minimal.InboxStore
 package com.secondmind.minimal.notify
+import com.secondmind.minimal.InboxStore
 
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
