@@ -37,7 +37,7 @@ fun AppInboxScreen(
           }
           IconButton(
             onClick = { onReadApp(a.appPackage) },
-            shape = MaterialTheme.shapes.extraLarge
+            
           ) { Icon(Icons.Filled.VolumeUp, contentDescription = "Read all") }
         }
       }
