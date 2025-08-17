@@ -1,4 +1,5 @@
 package com.secondmind.minimal.ui
+import com.secondmind.minimal.util.putParcelableExtraSafe
 
 import android.accessibilityservice.AccessibilityService
 import android.content.ComponentName

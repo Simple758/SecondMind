@@ -1,4 +1,5 @@
 package com.secondmind.minimal.ui
+import com.secondmind.minimal.util.putStringExtraSafe
 
 import android.content.Intent
 import androidx.compose.foundation.layout.*
