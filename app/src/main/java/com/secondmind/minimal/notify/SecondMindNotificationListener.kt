@@ -1,32 +1,22 @@
 package com.secondmind.minimal.notify
-import com.secondmind.minimal.diag.NotifDiag
-import android.util.Log
 
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
-import com.secondmind.minimal.data.AppDb
-import com.secondmind.minimal.data.InboxRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import android.util.Log
 
 class SecondMindNotificationListener : NotificationListenerService() {
-  private val scope = CoroutineScope(Dispatchers.IO)
-  private val repo by lazy { InboxRepository(AppDb.get(applicationContext).notificationDao()) }
-
-  override fun onNotificationPosted(sbn: StatusBarNotification?) {
-        NotifDiag.markPosted(this); Log.d("SM-Notif","posted")
-    if (sbn == null) return
-    scope.launch { repo.onPosted(sbn) }
-  }
-
-  override fun onNotificationRemoved(sbn: StatusBarNotification?) {
-    if (sbn == null) return
-    scope.launch { repo.onRemoved(sbn) }
-  }
-}
 
     override fun onListenerConnected() {
-        NotifDiag.markConnected(this); Log.d("SM-Notif","listener connected")
+        super.onListenerConnected()
+        Log.d("SM-Notif", "listener connected")
+    }
+
+    override fun onNotificationPosted(sbn: StatusBarNotification) {
+        Log.d("SM-Notif", "posted from ${sbn.packageName}")
+        // TODO: forward to repository if/when we add one
+    }
+
+    override fun onNotificationRemoved(sbn: StatusBarNotification) {
+        Log.d("SM-Notif", "removed from ${sbn.packageName}")
     }
 }
