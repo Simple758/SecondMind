@@ -1,28 +1,16 @@
 <manifest package="com.secondmind.minimal"
     xmlns:android="http://schemas.android.com/apk/res/android">
-
-  <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-
   <application>
-    <!-- Second launcher icon for patch testing -->
-    <activity
-      android:name=".dev.PatchHarnessActivity"
+    <!-- Second launcher icon that opens the SAME MainActivity -->
+    <activity-alias
+      android:name=".dev.PatchLauncher"
+      android:targetActivity=".MainActivity"
       android:exported="true"
       android:label="SecondMind (Patch)">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
-    </activity>
-
-    <!-- Debug-only Notification Listener (independent of prod one) -->
-    <service
-      android:name=".dev.PatchNotificationListener"
-      android:exported="true"
-      android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
-      <intent-filter>
-        <action android:name="android.service.notification.NotificationListenerService" />
-      </intent-filter>
-    </service>
+    </activity-alias>
   </application>
 </manifest>
