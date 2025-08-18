@@ -1,3 +1,4 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 package com.secondmind.minimal.a1
 
 import android.app.Application
