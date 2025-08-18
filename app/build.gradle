@@ -11,7 +11,7 @@ android {
     applicationId "com.secondmind.minimal"
     minSdk 24
     targetSdk 34
-versionCode 18
+versionCode 7
     versionName "1.2"
   }
   buildTypes {
@@ -27,19 +27,6 @@ versionCode 18
 }
 
 dependencies {
-  // debug-only deps for Patch Harness
-  debugImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.4'
-  debugImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4'
-  debugImplementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4'
-  debugImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'
-  // debug-only deps for Patch Harness
-  debugImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.4'
-  debugImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4'
-  debugImplementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4'
-  debugImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'
-    implementation 'androidx.compose.material:material-icons-extended'
-    debugImplementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4'
-    debugImplementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.4'
   implementation "com.google.firebase:firebase-messaging:24.0.0"
   implementation platform("androidx.compose:compose-bom:2024.06.00")
   implementation "androidx.activity:activity-compose:1.9.2"
