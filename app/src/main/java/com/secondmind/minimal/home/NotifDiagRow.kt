@@ -13,19 +13,24 @@ import java.util.*
 @Composable
 fun NotifDiagRow(modifier: Modifier = Modifier) {
   val ctx = LocalContext.current
-  var knob by remember { mutableStateOf(0) } // simple refresh
+  var refresh by remember { mutableStateOf(0) }
 
-  val connectedAt = NotifDiag.connectedAt(ctx)
-  val posted = NotifDiag.postedCount(ctx)
+  // snapshot values on each refresh to avoid heavy observation machinery
+  val connectedAt = remember(refresh) { NotifDiag.connectedAt(ctx) }
+  val posted = remember(refresh) { NotifDiag.postedCount(ctx) }
+
   val status = if (connectedAt > 0L) {
     val time = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(connectedAt))
-    "Listener: connected at $time, seen $posted"
+    "Listener connected @ $time • seen $posted"
   } else {
-    "Listener: not connected yet, seen $posted"
+    "Listener NOT connected • seen $posted"
   }
 
-  Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+  Row(
+    modifier = modifier.fillMaxWidth(),
+    horizontalArrangement = Arrangement.SpaceBetween
+  ) {
     Text(status, style = MaterialTheme.typography.bodyMedium)
-    TextButton(onClick = { knob++ }) { Text("Refresh") }
+    TextButton(onClick = { refresh++ }) { Text("Refresh") }
   }
 }
