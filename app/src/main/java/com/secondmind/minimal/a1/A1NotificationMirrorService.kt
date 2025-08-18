@@ -1,4 +1,6 @@
 package com.secondmind.minimal.a1
+import com.secondmind.minimal.diag.NotifDiag
+import android.util.Log
 
 import android.app.Notification
 import android.app.Application

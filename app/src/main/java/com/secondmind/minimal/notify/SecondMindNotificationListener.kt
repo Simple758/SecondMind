@@ -1,4 +1,6 @@
 package com.secondmind.minimal.notify
+import com.secondmind.minimal.diag.NotifDiag
+import android.util.Log
 
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
@@ -13,6 +15,7 @@ class SecondMindNotificationListener : NotificationListenerService() {
   private val repo by lazy { InboxRepository(AppDb.get(applicationContext).notificationDao()) }
 
   override fun onNotificationPosted(sbn: StatusBarNotification?) {
+        NotifDiag.markPosted(this); Log.d("SM-Notif","posted")
     if (sbn == null) return
     scope.launch { repo.onPosted(sbn) }
   }
@@ -21,4 +24,9 @@ class SecondMindNotificationListener : NotificationListenerService() {
     if (sbn == null) return
     scope.launch { repo.onRemoved(sbn) }
   }
+}
+
+    override fun onListenerConnected() {
+        NotifDiag.markConnected(this); Log.d("SM-Notif","listener connected")
+    }
 }
