@@ -2,6 +2,7 @@
 
 package com.secondmind.minimal
 
+
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -40,6 +41,7 @@ import kotlinx.coroutines.launch
 import com.secondmind.minimal.ui.components.NotificationAccessBanner
 import com.secondmind.minimal.ui.components.QuickNoteCard
 import com.secondmind.minimal.home.NotifDiagRow
+import com.secondmind.minimal.home.HomeCarousel
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,7 +76,7 @@ fun AppNav() {
     NavHost(nav, startDestination = "home", modifier = Modifier.padding(pad)) {
       composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }) }
       composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
-      composable("inbox") { InboxScreen(nav) }
+      composable("inbox") { InboxScreen() }
       composable(
         route = "notification/{id}",
         arguments = listOf(navArgument("id"){ type = NavType.LongType })
@@ -106,13 +108,12 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
   val notifPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
   LaunchedEffect(Unit) { if (Build.VERSION.SDK_INT >= 33) notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS) }
 
-  Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically), horizontalAlignment = Alignment.CenterHorizontally) {
+  Column(modifier = Modifier.verticalScroll(rememberScrollState()), Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically), horizontalAlignment = Alignment.CenterHorizontally) {
+    HomeCarousel(modifier = Modifier.padding(top = 8.dp))
+
     NotifDiagRow(modifier = Modifier.padding(bottom = 8.dp))
 
     NotificationAccessBanner(modifier = Modifier.padding(bottom = 12.dp))
-    QuickNoteCard(modifier = Modifier.padding(bottom = 12.dp))
-
-    Text("SecondMind Compose", fontSize = 24.sp)
     Text("Tap to leap forward → $count")
     Button(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.COUNT] = count + 1 } } }) { Text("Increment") }
     OutlinedButton(onClick = onInbox) { Text("Inbox") }
