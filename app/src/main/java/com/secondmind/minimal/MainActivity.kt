@@ -74,7 +74,7 @@ fun AppNav() {
     NavHost(nav, startDestination = "home", modifier = Modifier.padding(pad)) {
       composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }) }
       composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
-      composable("inbox") { InboxScreen(nav) }
+      composable("inbox") { InboxScreen() }
       composable(
         route = "notification/{id}",
         arguments = listOf(navArgument("id"){ type = NavType.LongType })
