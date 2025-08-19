@@ -2,25 +2,37 @@ package com.secondmind.minimal.notify
 
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
-import com.secondmind.minimal.diag.NotifDiag
+import android.util.Log
 import com.secondmind.minimal.inbox.InboxStore
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 class SecondMindNotificationListener : NotificationListenerService() {
 
     override fun onListenerConnected() {
-        try { NotifDiag.markConnected(this) } catch (_: Throwable) {}
-        InboxStore.connectedAt = System.currentTimeMillis()
+        super.onListenerConnected()
+        Log.d("SM-Notif", "listener connected")
+        try {
+            val pm = applicationContext.packageManager
+            val list = activeNotifications ?: emptyArray()
+            for (sbn in list) {
+                val label = try {
+                    pm.getApplicationLabel(pm.getApplicationInfo(sbn.packageName, 0)).toString()
+                } catch (_: Throwable) { null }
+                InboxStore.push(sbn, label)
+            }
+        } catch (_: Throwable) { /* ignore */ }
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
-        try { NotifDiag.bumpPosted(this) } catch (_: Throwable) {}
-        try { GlobalScope.launch(Dispatchers.Default) { InboxStore.push(sbn) } } catch (_: Throwable) {}
+        try {
+            val pm = applicationContext.packageManager
+            val label = try {
+                pm.getApplicationLabel(pm.getApplicationInfo(sbn.packageName, 0)).toString()
+            } catch (_: Throwable) { null }
+            InboxStore.push(sbn, label)
+        } catch (_: Throwable) { /* ignore */ }
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
-        try { GlobalScope.launch(Dispatchers.Default) { InboxStore.remove(sbn.key) } } catch (_: Throwable) {}
+        try { InboxStore.remove(sbn.key) } catch (_: Throwable) { /* ignore */ }
     }
 }

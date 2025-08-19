@@ -4,47 +4,40 @@ import android.app.Notification
 import android.service.notification.StatusBarNotification
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 
 data class NotificationItem(
     val key: String,
     val pkg: String,
+    val appLabel: String,
     val title: String,
     val text: String,
     val ts: Long
 )
 
 object InboxStore {
-    private val mutex = Mutex()
     private val _items = MutableStateFlow<List<NotificationItem>>(emptyList())
-    val items: StateFlow<List<NotificationItem>> get() = _items
+    val items: StateFlow<List<NotificationItem>> = _items
 
-    @Volatile var connectedAt: Long = 0L
-    @Volatile var seenCount: Long = 0L
-
-    suspend fun push(sbn: StatusBarNotification) {
-        mutex.withLock {
-            val e = sbn.notification.extras
-            val title = (e?.getCharSequence(Notification.EXTRA_TITLE)?.toString()).orEmpty()
-            val text  = (e?.getCharSequence(Notification.EXTRA_TEXT )?.toString()).orEmpty()
-            val item = NotificationItem(sbn.key, sbn.packageName, title, text, sbn.postTime)
-
-            val list = _items.value.toMutableList()
-            val i = list.indexOfFirst { it.key == item.key }
-            if (i >= 0) list[i] = item else list += item
-            _items.value = list.sortedByDescending { it.ts }
-            seenCount++
+    @Synchronized
+    fun push(sbn: StatusBarNotification, appLabel: String?) {
+        val e = sbn.notification.extras
+        val title = (e?.getCharSequence(Notification.EXTRA_TITLE)?.toString()).orEmpty()
+        val text  = (e?.getCharSequence(Notification.EXTRA_TEXT )?.toString()).orEmpty()
+        val label = appLabel?.takeIf { it.isNotBlank() } ?: sbn.packageName
+        val item = NotificationItem(sbn.key, sbn.packageName, label, title, text, sbn.postTime)
+        val list = _items.value.toMutableList().apply {
+            removeAll { it.key == item.key }
+            add(item)
+            sortByDescending { it.ts }
+            if (size > 200) subList(200, size).clear()
         }
+        _items.value = list
     }
 
-    suspend fun remove(key: String) {
-        mutex.withLock {
-            _items.value = _items.value.filterNot { it.key == key }
-        }
+    @Synchronized fun remove(key: String) {
+        if (_items.value.isEmpty()) return
+        _items.value = _items.value.filterNot { it.key == key }
     }
 
-    fun clear() {
-        _items.value = emptyList()
-    }
+    @Synchronized fun clear() { _items.value = emptyList() }
 }

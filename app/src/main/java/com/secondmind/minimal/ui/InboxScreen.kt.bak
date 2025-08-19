@@ -14,32 +14,36 @@ import com.secondmind.minimal.inbox.NotificationItem
 @Composable
 fun InboxScreen() {
     val items by InboxStore.items.collectAsState()
+
     Column(Modifier.fillMaxSize()) {
+        // header row (optional)
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Inbox", style = MaterialTheme.typography.headlineMedium)
+            Text(text = "Inbox", style = MaterialTheme.typography.headlineMedium)
             TextButton(onClick = { InboxStore.clear() }) { Text("Clear") }
         }
+
         if (items.isEmpty()) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("No notifications yet", style = MaterialTheme.typography.bodyLarge)
             }
             return
         }
+
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            items(items) { n: NotificationItem ->
+            items(items) { it ->
                 Card(Modifier.fillMaxWidth()) {
                     Column(Modifier.fillMaxWidth().padding(14.dp)) {
-                        Text(n.appLabel, style = MaterialTheme.typography.titleMedium)
+                        Text(it.appLabel, style = MaterialTheme.typography.titleMedium)
                         val line = buildString {
-                            if (n.title.isNotBlank()) append(n.title).append(" — ")
-                            append(n.text)
+                            if (it.title.isNotBlank()) append(it.title).append(" — ")
+                            append(it.text)
                         }.ifBlank { "(no text)" }
                         Text(line, style = MaterialTheme.typography.bodyMedium)
                     }
@@ -48,7 +52,3 @@ fun InboxScreen() {
         }
     }
 }
-
-/** Compatibility overload: compiles even if old callers pass params. */
-@Composable
-fun InboxScreen(vararg unused: Any?) = InboxScreen()
