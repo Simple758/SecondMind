@@ -2,6 +2,7 @@
 
 package com.secondmind.minimal
 
+
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -40,6 +41,7 @@ import kotlinx.coroutines.launch
 import com.secondmind.minimal.ui.components.NotificationAccessBanner
 import com.secondmind.minimal.ui.components.QuickNoteCard
 import com.secondmind.minimal.home.NotifDiagRow
+import com.secondmind.minimal.home.HomeCarousel
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -228,4 +230,3 @@ fun SettingsScreen(onBack: () -> Unit) {
     OutlinedButton(onClick = onBack) { Text("Back") }
   }
 }
-import com.secondmind.minimal.home.HomeCarousel
