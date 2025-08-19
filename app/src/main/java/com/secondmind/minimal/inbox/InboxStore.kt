@@ -27,17 +27,17 @@ object InboxStore {
         val item = NotificationItem(sbn.key, sbn.packageName, label, title, text, sbn.postTime)
         val list = _items.value.toMutableList().apply {
             removeAll { it.key == item.key }
-            add(item)
-            sortByDescending { it.ts }
+            add(0, item) // newest first
             if (size > 200) subList(200, size).clear()
         }
         _items.value = list
     }
 
     @Synchronized fun remove(key: String) {
-        if (_items.value.isEmpty()) return
         _items.value = _items.value.filterNot { it.key == key }
     }
 
-    @Synchronized fun clear() { _items.value = emptyList() }
+    @Synchronized fun clear() {
+        _items.value = emptyList()
+    }
 }
