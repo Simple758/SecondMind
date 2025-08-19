@@ -1,4 +1,5 @@
 package com.secondmind.minimal.ui
+
 import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
@@ -14,7 +15,6 @@ import com.secondmind.minimal.inbox.InboxStore
 import com.secondmind.minimal.inbox.NotificationItem
 import com.secondmind.minimal.tts.TtsSpeaker
 import java.util.*
-
 
 private data class AppGroup(
     val pkg: String,

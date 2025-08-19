@@ -1,129 +1,219 @@
 package com.secondmind.minimal.ui
+
 import android.content.Intent
-import android.widget.Toast
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import android.provider.Settings
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.secondmind.minimal.inbox.InboxStore
-import com.secondmind.minimal.inbox.NotificationItem
 import com.secondmind.minimal.tts.TtsSpeaker
-import java.util.*
-
-
-private data class AppGroup(
-    val pkg: String,
-    val label: String,
-    val count: Int,
-    val summary: String,
-    val latestTs: Long
-)
 
 @Composable
 fun InboxScreen() {
     val ctx = LocalContext.current
     val items by InboxStore.items.collectAsState()
+    val groups = remember(items) { items.groupBy { it.pkg } }
 
-    // Group notifications by package and sort by most recent
-    val groups by remember(items) {
-        mutableStateOf(
-            items.groupBy { it.pkg }.map { (pkg, list) ->
-                val latest = list.maxBy { it.ts }
-                val summary = buildString {
-                    if (latest.title.isNotBlank()) append(latest.title).append(" — ")
-                    append(latest.text.ifBlank { "(no text)" })
-                }
-                AppGroup(
-                    pkg = pkg,
-                    label = latest.appLabel.ifBlank { pkg },
-                    count = list.size,
-                    summary = summary,
-                    latestTs = latest.ts
-                )
-            }.sortedByDescending { it.latestTs }
-        )
-    }
+    Column(Modifier.fillMaxSize().padding(16.dp)) {
 
-    Column(Modifier.fillMaxSize().padding(top = 12.dp)) {
+        // Quick settings chips
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Inbox", style = MaterialTheme.typography.headlineLarge)
+            AssistChip("Notif access") {
+                ctx.startActivity(
+                    Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                )
+            }
+            AssistChip("A11y settings") {
+                ctx.startActivity(
+                    Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                )
+            }
+        }
+
+        Spacer(Modifier.height(8.dp))
+        Text("Inbox", style = MaterialTheme.typography.headlineLarge)
+        Spacer(Modifier.height(8.dp))
+
+        // Speak All / Clear
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            TextButton(onClick = {
+                val joined = items.take(30).joinToString(". ") {
+                    val t = listOf(it.title, it.text)
+                        .filter { s -> !s.isNullOrBlank() }
+                        .joinToString(" — ")
+                    if (t.isBlank()) "(no text)" else t
+                }
+                TtsSpeaker.speak(ctx, joined)
+            }) { Text("Speak All") }
+
             TextButton(onClick = { InboxStore.clear() }) { Text("Clear") }
         }
 
+        Spacer(Modifier.height(4.dp))
+
         if (groups.isEmpty()) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("No notifications yet", style = MaterialTheme.typography.bodyLarge)
+                Text("No notifications", style = MaterialTheme.typography.bodyLarge)
             }
             return
         }
 
         LazyColumn(
-            modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(bottom = 12.dp)
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(groups) { g ->
-                Card(Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large) {
-                    Column(Modifier.fillMaxWidth().padding(16.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(g.label, style = MaterialTheme.typography.titleMedium)
-                                Spacer(Modifier.width(8.dp))
-                                Text("• ${g.count}", style = MaterialTheme.typography.labelMedium)
-                            }
-                            Row {
-                                TextButton(onClick = {
-                                    val text = "${g.label}: ${g.summary}"
-                                    TtsSpeaker.speak(ctx, text)
-                                }) { Text("Speak") }
-
-                                Spacer(Modifier.width(8.dp))
-
-                                TextButton(onClick = {
-                                    val intent = ctx.packageManager.getLaunchIntentForPackage(g.pkg)
-                                    if (intent != null) {
-                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                        ctx.startActivity(intent)
-                                    } else {
-                                        Toast.makeText(ctx, "Can't open ${g.label}", Toast.LENGTH_SHORT).show()
-                                    }
-                                }) { Text("Open") }
-                            }
+            val sortedKeys = groups.keys.sorted()
+            items(sortedKeys) { pkg ->
+                val list = groups[pkg]!!.sortedByDescending { it.ts }
+                val first = list.first()
+                GroupCard(
+                    packageName = pkg,
+                    appLabel = first.appLabel.ifBlank { pkg },
+                    count = list.size,
+                    preview = buildString {
+                        val t = first.title
+                        val x = first.text
+                        if (!t.isNullOrBlank()) append(t).append(" — ")
+                        if (!x.isNullOrBlank()) append(x)
+                    }.ifBlank { "(no text)" },
+                    onSpeak = {
+                        val say = list.take(10).joinToString(". ") { i ->
+                            listOf(i.title, i.text)
+                                .filter { s -> !s.isNullOrBlank() }
+                                .joinToString(" — ")
+                                .ifBlank { "(no text)" }
                         }
-                        Spacer(Modifier.height(8.dp))
-                        Text(g.summary, style = MaterialTheme.typography.bodyMedium)
+                        TtsSpeaker.speak(ctx, say)
+                    },
+                    onOpen = {
+                        val launch = ctx.packageManager.getLaunchIntentForPackage(pkg)
+                        if (launch != null) {
+                            ctx.startActivity(launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                        }
                     }
-                }
+                )
             }
-        }
-
-        // Speak All
-        Box(Modifier.fillMaxWidth().padding(16.dp)) {
-            Button(
-                onClick = {
-                    // Speak top N summaries in chronological order (newest first)
-                    val say = groups.take(10).joinToString(". ") { "${it.label}: ${it.summary}" }
-                    if (say.isNotBlank()) TtsSpeaker.speak(ctx, say)
-                },
-                modifier = Modifier.align(Alignment.Center)
-            ) { Text("Speak All") }
         }
     }
 }
 
-/** Compatibility overload: compiles even if old callers pass params. */
 @Composable
-fun InboxScreen(vararg unused: Any?) = InboxScreen()
+private fun GroupCard(
+    packageName: String,
+    appLabel: String,
+    count: Int,
+    preview: String,
+    onSpeak: () -> Unit,
+    onOpen: () -> Unit
+) {
+    Card(Modifier.fillMaxWidth()) {
+        Column(Modifier.fillMaxWidth().padding(16.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                AppIcon(packageName)
+                Spacer(Modifier.width(12.dp))
+                Column(Modifier.weight(1f)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            appLabel,
+                            style = MaterialTheme.typography.titleMedium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text("  •  $count", style = MaterialTheme.typography.titleMedium)
+                    }
+                }
+                // Actions (emoji to avoid extra deps)
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(onClick = onSpeak) { Text("🔊") }
+                    TextButton(onClick = onOpen) { Text("↗") }
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+            Text(
+                preview,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(Modifier.height(8.dp))
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                TextButton(onClick = { /* TODO: per-app mute list */ }) { Text("Mute") }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AssistChip(label: String, onClick: () -> Unit) {
+    OutlinedButton(
+        onClick = onClick,
+        shape = MaterialTheme.shapes.large,
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+    ) { Text(label) }
+}
+
+@Composable
+private fun AppIcon(packageName: String, size: Dp = 36.dp) {
+    val ctx = LocalContext.current
+    val density = ctx.resources.displayMetrics.density
+    val sizePx = (size.value * density).toInt().coerceAtLeast(8)
+    val iconBitmap by remember(packageName) {
+        mutableStateOf(loadAppIconBitmap(ctx.packageManager, packageName, sizePx))
+    }
+    if (iconBitmap != null) {
+        Image(
+            bitmap = iconBitmap!!.asImageBitmap(),
+            contentDescription = null,
+            modifier = Modifier.size(size).clip(CircleShape)
+        )
+    } else {
+        Box(
+            Modifier.size(size)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+        )
+    }
+}
+
+// Small, dependency-free Drawable -> Bitmap
+private fun loadAppIconBitmap(pm: PackageManager, pkg: String, sizePx: Int): Bitmap? {
+    return try {
+        val dr: Drawable = pm.getApplicationIcon(pkg)
+        when (dr) {
+            is BitmapDrawable -> Bitmap.createScaledBitmap(dr.bitmap, sizePx, sizePx, true)
+            else -> {
+                val bmp = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888)
+                val c = Canvas(bmp)
+                dr.setBounds(0, 0, sizePx, sizePx)
+                dr.draw(c)
+                bmp
+            }
+        }
+    } catch (_: Throwable) { null }
+}

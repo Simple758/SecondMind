@@ -1,0 +1,26 @@
+Diff: CURRENT vs 8ef38b2
+----------------------------------------
+
+== app/src/main/java/com/secondmind/minimal/ui/InboxScreen.kt ==
+--- /data/data/com.termux/files/home/SecondMind/SecondMind/.inbox_pick_20250820_010248/best/app/src/main/java/com/secondmind/minimal/ui/InboxScreen.kt	2025-08-20 01:02:48.641160087 +0200
++++ /data/data/com.termux/files/home/SecondMind/SecondMind/.inbox_pick_20250820_010248/current/app/src/main/java/com/secondmind/minimal/ui/InboxScreen.kt	2025-08-20 01:02:48.409160087 +0200
+@@ -1,5 +1,4 @@
+ package com.secondmind.minimal.ui
+-
+ import android.content.Intent
+ import android.widget.Toast
+ import androidx.compose.foundation.layout.*
+@@ -16,6 +15,7 @@
+ import com.secondmind.minimal.tts.TtsSpeaker
+ import java.util.*
+ 
++
+ private data class AppGroup(
+     val pkg: String,
+     val label: String,
+
+== app/src/main/java/com/secondmind/minimal/inbox/InboxStore.kt ==
+
+== app/src/main/java/com/secondmind/minimal/notify/SecondMindNotificationListener.kt ==
+
+== app/src/main/java/com/secondmind/minimal/tts/TtsSpeaker.kt ==
