@@ -1,9 +1,9 @@
 package com.secondmind.minimal.ui
 
 import android.content.Intent
-import android.provider.Settings
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.provider.Settings
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,25 +13,27 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.OpenInNew
+import androidx.compose.material.icons.rounded.VolumeUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import com.secondmind.minimal.inbox.InboxStore
-import com.secondmind.minimal.inbox.NotificationItem
-import com.secondmind.minimal.inbox.MutedRegistry
-import com.secondmind.minimal.tts.TtsSpeaker
-import androidx.compose.material.icons.rounded.VolumeUp
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.secondmind.minimal.inbox.InboxStore
+import com.secondmind.minimal.inbox.MutedRegistry
+import com.secondmind.minimal.inbox.NotificationItem
+import com.secondmind.minimal.tts.TtsSpeaker
+import kotlin.math.roundToInt
 
 @Composable
 fun InboxScreen() {
@@ -48,7 +50,7 @@ fun InboxScreen() {
     }
 
     val filtered = when (tab) {
-        1 -> groups // "Recent" is same order; could add time windows later
+        1 -> groups
         2 -> groups.filter { muted.contains(it.pkg) }
         else -> groups.filter { !muted.contains(it.pkg) }
     }
@@ -57,36 +59,39 @@ fun InboxScreen() {
     DisposableEffect(Unit) { onDispose { speaker.shutdown() } }
 
     Column(Modifier.fillMaxSize().padding(12.dp)) {
-
-        // Header chips (Notif access / A11y)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            AssistChip(onClick = {
-                ctx.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-            }, label = { Text("Notif access") })
-            AssistChip(onClick = {
-                ctx.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-            }, label = { Text("A11y settings") })
+            AssistChip(
+                onClick = {
+                    ctx.startActivity(
+                        Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    )
+                },
+                label = { Text("Notif access") }
+            )
+            AssistChip(
+                onClick = {
+                    ctx.startActivity(
+                        Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    )
+                },
+                label = { Text("A11y settings") }
+            )
         }
 
         Spacer(Modifier.height(8.dp))
-
         Text("Inbox", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(4.dp))
 
-        // Tabs
         TabRow(selectedTabIndex = tab) {
-            listOf("All","Recent","Muted").forEachIndexed { i, name ->
-                Tab(selected = tab==i, onClick = { tab = i }, text = { Text(name) })
+            listOf("All", "Recent", "Muted").forEachIndexed { i, name ->
+                Tab(selected = tab == i, onClick = { tab = i }, text = { Text(name) })
             }
         }
 
         Spacer(Modifier.height(6.dp))
-
-        // Top right actions
-        Row(
-            Modifier.fillMaxWidth().padding(vertical = 4.dp),
-            horizontalArrangement = Arrangement.End
-        ) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             TextButton(onClick = {
                 val text = buildString {
                     filtered.take(6).forEach { g ->
@@ -133,7 +138,7 @@ fun InboxScreen() {
                         try {
                             val i = ctx.packageManager.getLaunchIntentForPackage(g.pkg)
                             if (i != null) ctx.startActivity(i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                        } catch (_:Throwable) {}
+                        } catch (_: Throwable) {}
                     },
                     onToggleMute = {
                         muted = MutedRegistry.toggle(ctx, g.pkg)
@@ -159,9 +164,7 @@ private fun AppGroupCard(
     onOpen: () -> Unit,
     onToggleMute: () -> Unit
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth()
-    ) {
+    Card(modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.fillMaxWidth().padding(14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AppIcon(pkg = group.pkg, size = 36.dp)
@@ -205,11 +208,12 @@ private fun AppGroupCard(
 @Composable
 private fun AppIcon(pkg: String, size: Dp) {
     val ctx = LocalContext.current
-    val px = with(LocalDensity.current) { size.roundToPx() }
-    var bmp by remember(pkg) { mutableStateOf<Bitmap?>(null) }
+    val density = LocalDensity.current
+    val px = with(density) { size.toPx().roundToInt() }
+    var bmp by remember(pkg, px) { mutableStateOf<Bitmap?>(null) }
 
     LaunchedEffect(pkg, px) {
-        val d = try { ctx.packageManager.getApplicationIcon(pkg) } catch (_:Throwable) { null }
+        val d = try { ctx.packageManager.getApplicationIcon(pkg) } catch (_: Throwable) { null }
         if (d != null) {
             val b = Bitmap.createBitmap(px, px, Bitmap.Config.ARGB_8888)
             val c = Canvas(b)
@@ -232,6 +236,6 @@ private fun AppIcon(pkg: String, size: Dp) {
     }
 }
 
-/** Compatibility overload for older call sites. */
+/** Compatibility overload for old call sites. */
 @Composable
 fun InboxScreen(vararg unused: Any?) = InboxScreen()
