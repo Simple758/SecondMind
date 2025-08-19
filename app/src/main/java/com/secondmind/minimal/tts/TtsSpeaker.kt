@@ -4,24 +4,33 @@ import android.content.Context
 import android.speech.tts.TextToSpeech
 import java.util.Locale
 
-class TtsSpeaker(ctx: Context) {
-    private var tts: TextToSpeech? = null
+object TtsSpeaker {
+    @Volatile private var tts: TextToSpeech? = null
+    @Volatile private var ready: Boolean = false
+    @Volatile private var initTried: Boolean = false
 
-    init {
-        val appCtx = ctx.applicationContext
-        tts = TextToSpeech(appCtx) { res ->
-            if (res == TextToSpeech.SUCCESS) {
-                try { tts?.language = Locale.getDefault() } catch (_: Throwable) {}
+    private fun ensure(ctx: Context) {
+        if (ready && tts != null) return
+        if (!initTried) {
+            initTried = true
+            tts = TextToSpeech(ctx.applicationContext) { status ->
+                ready = (status == TextToSpeech.SUCCESS).also {
+                    if (it) {
+                        tts?.language = Locale.getDefault()
+                        tts?.setPitch(1.0f)
+                        tts?.setSpeechRate(1.0f)
+                    }
+                }
             }
         }
     }
 
-    fun speak(text: String) {
+    @Synchronized
+    fun speak(ctx: Context, text: String) {
         if (text.isBlank()) return
-        try { tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "sm-a1") } catch (_: Throwable) {}
-    }
-
-    fun shutdown() {
-        try { tts?.shutdown() } catch (_: Throwable) {}
+        ensure(ctx)
+        val engine = tts ?: return
+        // Keep IDs unique and short
+        engine.speak(text.take(500), TextToSpeech.QUEUE_ADD, null, "sm-${System.currentTimeMillis() and 0xFFFF}")
     }
 }
