@@ -107,6 +107,8 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
   LaunchedEffect(Unit) { if (Build.VERSION.SDK_INT >= 33) notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS) }
 
   Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically), horizontalAlignment = Alignment.CenterHorizontally) {
+    HomeCarousel(modifier = Modifier.padding(top = 8.dp))
+
     NotifDiagRow(modifier = Modifier.padding(bottom = 8.dp))
 
     NotificationAccessBanner(modifier = Modifier.padding(bottom = 12.dp))
@@ -226,3 +228,4 @@ fun SettingsScreen(onBack: () -> Unit) {
     OutlinedButton(onClick = onBack) { Text("Back") }
   }
 }
+import com.secondmind.minimal.home.HomeCarousel
