@@ -42,6 +42,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import com.secondmind.minimal.ui.components.NotificationAccessBanner
 import com.secondmind.minimal.ui.components.QuickNoteCard
+            Spacer(Modifier.height(12.dp))
+            com.secondmind.minimal.feature.wiki.WikiBrainFoodCard()
+            Spacer(Modifier.height(12.dp))
+            com.secondmind.minimal.feature.youtube.YtWatchLaterCard()
 import com.secondmind.minimal.home.NotifDiagRow
 import com.secondmind.minimal.home.HomeCarousel
 import androidx.compose.foundation.layout.Arrangement

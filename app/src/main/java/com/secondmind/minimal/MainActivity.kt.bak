@@ -1,6 +1,8 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
 package com.secondmind.minimal
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 
 import android.Manifest
@@ -42,6 +44,7 @@ import com.secondmind.minimal.ui.components.NotificationAccessBanner
 import com.secondmind.minimal.ui.components.QuickNoteCard
 import com.secondmind.minimal.home.NotifDiagRow
 import com.secondmind.minimal.home.HomeCarousel
+import androidx.compose.foundation.layout.Arrangement
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -108,7 +111,13 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
   val notifPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
   LaunchedEffect(Unit) { if (Build.VERSION.SDK_INT >= 33) notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS) }
 
-  Column(modifier = Modifier.verticalScroll(rememberScrollState()), Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically), horizontalAlignment = Alignment.CenterHorizontally) {
+  Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
     HomeCarousel(modifier = Modifier.padding(top = 8.dp))
 
     NotifDiagRow(modifier = Modifier.padding(bottom = 8.dp))
