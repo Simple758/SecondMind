@@ -1,6 +1,5 @@
 package com.secondmind.minimal.feature.youtube
 
-import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import com.secondmind.minimal.feature.storage.JsonPrefs
@@ -11,13 +10,14 @@ object YtStore {
     private const val KEY_LIST = "yt.list"
     private const val KEY_META_PREFIX = "yt.meta."
 
-    fun list(ctx: Context): List<YtItem> {
-        val arr = JsonPrefs.getArray(ctx, KEY_LIST) ?: JSONArray()
-        return (0 until arr.length()).mapNotNull {
-            val id = arr.optString(it, null) ?: return@mapNotNull null
+    private fun listRaw(ctx: Context): JSONArray = JsonPrefs.getArray(ctx, KEY_LIST) ?: JSONArray()
+
+    fun list(ctx: Context): List<YtItem> =
+        (0 until listRaw(ctx).length()).mapNotNull {
+            val id = listRaw(ctx).optString(it, null) ?: return@mapNotNull null
             YtItem(id, YtId.canonicalUrl(id))
         }
-    }
+
     private fun saveList(ctx: Context, ids: List<String>) {
         val arr = JSONArray().apply { ids.forEach { put(it) } }
         JsonPrefs.put(ctx, KEY_LIST, arr)
@@ -31,6 +31,7 @@ object YtStore {
         saveList(ctx, ids)
         return true
     }
+
     fun remove(ctx: Context, id: String) {
         saveList(ctx, list(ctx).map { it.id }.filterNot { it == id })
         JsonPrefs.remove(ctx, KEY_META_PREFIX + id)
@@ -38,14 +39,16 @@ object YtStore {
 
     fun meta(ctx: Context, id: String): YtMeta? {
         val o = JsonPrefs.getObject(ctx, KEY_META_PREFIX + id) ?: return null
-        val title = o.optString("title"); val author = o.optString("author"); val thumb = o.optString("thumb")
+        val title = o.optString("title")
+        val author = o.optString("author")
+        val thumb = o.optString("thumb")
         if (title.isBlank() || thumb.isBlank()) return null
         return YtMeta(id, title, author, thumb)
     }
+
     fun putMeta(ctx: Context, m: YtMeta) {
         JsonPrefs.put(ctx, KEY_META_PREFIX + m.id,
-            JSONObject().put("title", m.title).put("author", m.channel).put("thumb", m.thumbUrl)
-        )
+            JSONObject().put("title", m.title).put("author", m.channel).put("thumb", m.thumbUrl))
     }
 
     fun addFromClipboard(ctx: Context): String? {

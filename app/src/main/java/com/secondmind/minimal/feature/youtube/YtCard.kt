@@ -22,98 +22,6 @@ import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import java.net.URL
 
-data class YtItem(val id: String, val url: String)
-data class YtMeta(val id: String, val title: String, val channel: String, val thumbUrl: String)
-
-object YtId {
-    private val patterns = listOf(
-        Regex("""youtu\.be/([A-Za-z0-9_-]{6,})"""),
-        Regex("""youtube\.com/watch\?[^#]*v=([A-Za-z0-9_-]{6,})"""),
-        Regex("""youtube\.com/shorts/([A-Za-z0-9_-]{6,})""")
-    )
-    fun extract(from: String): String? {
-        for (r in patterns) r.find(from)?.let { return it.groupValues[1] }
-        return if (from.matches(Regex("""^[A-Za-z0-9_-]{6,}$"""))) from else null
-    }
-    fun canonicalUrl(id: String) = "https://www.youtube.com/watch?v=$id"
-}
-
-object YtRepo {
-    data class OEmbed(val title: String, val author: String, val thumbnail: String)
-    suspend fun fetchOEmbed(videoUrl: String, timeoutMs: Int = 6000): OEmbed? =
-        withContext(Dispatchers.IO) {
-            runCatching {
-                val endpoint = "https://www.youtube.com/oembed?format=json&url=$videoUrl"
-                val conn = (URL(endpoint).openConnection() as HttpURLConnection).apply {
-                    connectTimeout = timeoutMs; readTimeout = timeoutMs; requestMethod = "GET"
-                    setRequestProperty("User-Agent", "SecondMind/1.0 (+oembed)")
-                }
-                conn.inputStream.use { ins ->
-                    val txt = ins.readBytes().toString(Charsets.UTF_8)
-                    val j = org.json.JSONObject(txt)
-                    val title = j.optString("title")
-                    val author = j.optString("author_name")
-                    val thumb = j.optString("thumbnail_url")
-                    if (title.isNotBlank() && thumb.isNotBlank()) OEmbed(title, author, thumb) else null
-                }
-            }.getOrNull()
-        }
-}
-
-object YtStore {
-    private const val KEY_LIST = "yt.list"
-    private const val KEY_META_PREFIX = "yt.meta."
-
-    private fun listRaw(ctx: android.content.Context): org.json.JSONArray =
-        com.secondmind.minimal.feature.storage.JsonPrefs.getArray(ctx, KEY_LIST) ?: org.json.JSONArray()
-
-    fun list(ctx: android.content.Context): List<YtItem> =
-        (0 until listRaw(ctx).length()).mapNotNull {
-            val id = listRaw(ctx).optString(it, null) ?: return@mapNotNull null
-            YtItem(id, YtId.canonicalUrl(id))
-        }
-
-    private fun saveList(ctx: android.content.Context, ids: List<String>) {
-        val arr = org.json.JSONArray().apply { ids.forEach { put(it) } }
-        com.secondmind.minimal.feature.storage.JsonPrefs.put(ctx, KEY_LIST, arr)
-    }
-
-    fun addId(ctx: android.content.Context, id: String): Boolean {
-        val ids = list(ctx).map { it.id }.toMutableList()
-        if (ids.contains(id)) return false
-        ids.add(0, id)
-        if (ids.size > 50) ids.removeLast()
-        saveList(ctx, ids)
-        return true
-    }
-
-    fun remove(ctx: android.content.Context, id: String) {
-        saveList(ctx, list(ctx).map { it.id }.filterNot { it == id })
-        com.secondmind.minimal.feature.storage.JsonPrefs.remove(ctx, KEY_META_PREFIX + id)
-    }
-
-    fun meta(ctx: android.content.Context, id: String): YtMeta? {
-        val o = com.secondmind.minimal.feature.storage.JsonPrefs.getObject(ctx, KEY_META_PREFIX + id) ?: return null
-        val title = o.optString("title"); val author = o.optString("author"); val thumb = o.optString("thumb")
-        if (title.isBlank() || thumb.isBlank()) return null
-        return YtMeta(id, title, author, thumb)
-    }
-    fun putMeta(ctx: android.content.Context, m: YtMeta) {
-        com.secondmind.minimal.feature.storage.JsonPrefs.put(
-            ctx, KEY_META_PREFIX + m.id,
-            org.json.JSONObject().put("title", m.title).put("author", m.channel).put("thumb", m.thumbUrl)
-        )
-    }
-
-    fun addFromClipboard(ctx: android.content.Context): String? {
-        val cm = ctx.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-        val text = cm.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.text?.toString() ?: return null
-        val id = YtId.extract(text) ?: return null
-        addId(ctx, id)
-        return id
-    }
-}
-
 @Composable
 private fun NetImage(url: String?, modifier: Modifier, contentDesc: String?) {
     val bmp = remember(url) { mutableStateOf<android.graphics.Bitmap?>(null) }
@@ -153,7 +61,6 @@ private fun rememberYtMeta(id: String): State<YtMeta?> {
             val meta = if (o != null) {
                 YtMeta(id, o.title, o.author, o.thumbnail)
             } else {
-                // Fallback: static thumbnail + generic title
                 YtMeta(id, "YouTube video", "", "https://img.youtube.com/vi/$id/hqdefault.jpg")
             }
             YtStore.putMeta(ctx, meta)
@@ -172,7 +79,8 @@ fun YtWatchLaterCard(modifier: Modifier = Modifier) {
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Column(Modifier.fillMaxWidth().padding(16.dp)) {
-            Row(Modifier.fillMaxWidth(),
+            Row(
+                Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -198,12 +106,16 @@ fun YtWatchLaterCard(modifier: Modifier = Modifier) {
                         Column {
                             NetImage(meta?.thumbUrl, Modifier.fillMaxWidth().height(140.dp), meta?.title)
                             Column(Modifier.padding(12.dp)) {
-                                Text(meta?.title ?: "Loading…",
+                                Text(
+                                    meta?.title ?: "Loading…",
                                     maxLines = 2, overflow = TextOverflow.Ellipsis,
-                                    style = MaterialTheme.typography.titleMedium)
-                                Text(meta?.channel ?: "",
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                                Text(
+                                    meta?.channel ?: "",
                                     maxLines = 1, overflow = TextOverflow.Ellipsis,
-                                    style = MaterialTheme.typography.bodySmall)
+                                    style = MaterialTheme.typography.bodySmall
+                                )
                                 Spacer(Modifier.height(8.dp))
                                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                                     TextButton(onClick = {
