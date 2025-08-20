@@ -1,5 +1,4 @@
 package com.secondmind.minimal.feature.wiki
-
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -22,6 +21,10 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+
+
 
 @Composable
 private fun NetImage(url: String?, modifier: Modifier) {
@@ -48,6 +51,7 @@ private fun NetImage(url: String?, modifier: Modifier) {
 @Composable
 fun WikiBrainFoodCard(modifier: Modifier = Modifier) {
     val ctx = LocalContext.current
+    val scope = rememberCoroutineScope()
     val dayKey = remember {
         val sdf = SimpleDateFormat("yyyyMMdd", Locale.US)
         "wiki.daily." + sdf.format(Date())
@@ -82,7 +86,7 @@ fun WikiBrainFoodCard(modifier: Modifier = Modifier) {
         Column(Modifier.fillMaxWidth().padding(16.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Text("Brain Food (Wikipedia)", style = MaterialTheme.typography.titleLarge)
-                TextButton(onClick = { kotlinx.coroutines.GlobalScope.launch { fetchAndCache() } }) { Text("Refresh") }
+                TextButton(onClick = { scope.launch { fetchAndCache() } }) { Text("Refresh") }
             }
             Spacer(Modifier.height(8.dp))
             if (summary == null) {
