@@ -1,4 +1,5 @@
 package com.secondmind.minimal.feature.wiki
+
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -16,15 +17,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.secondmind.minimal.feature.storage.JsonPrefs
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
-
-
 
 @Composable
 private fun NetImage(url: String?, modifier: Modifier) {
@@ -35,7 +34,8 @@ private fun NetImage(url: String?, modifier: Modifier) {
         bmp.value = withContext(Dispatchers.IO) {
             runCatching {
                 val c = (URL(url).openConnection() as HttpURLConnection).apply {
-                    connectTimeout = 5000; readTimeout = 5000
+                    connectTimeout = 6000; readTimeout = 6000
+                    setRequestProperty("User-Agent", "SecondMind/1.0 (+wiki)")
                 }
                 c.inputStream.use { BitmapFactory.decodeStream(it) }
             }.getOrNull()
@@ -52,51 +52,89 @@ private fun NetImage(url: String?, modifier: Modifier) {
 fun WikiBrainFoodCard(modifier: Modifier = Modifier) {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
+
     val dayKey = remember {
         val sdf = SimpleDateFormat("yyyyMMdd", Locale.US)
         "wiki.daily." + sdf.format(Date())
     }
-    var tried by remember { mutableStateOf(false) }
+
     var summary by remember {
         val cached = JsonPrefs.getObject(ctx, dayKey)?.let {
             WikiRepo.Summary(
                 it.optString("title"), it.optString("extract"),
-                it.optString("url"), it.optString("thumb")
+                it.optString("url"), it.optString("thumb").takeIf { s -> s.isNotBlank() }
             )
         }
         mutableStateOf(cached)
     }
+    var loading by remember { mutableStateOf(false) }
+    var tried by remember { mutableStateOf(false) }
 
     suspend fun fetchAndCache() {
-    suspend fun __doFetch() {
+        loading = true
         tried = true
-        val s = WikiRepo.randomSummary()
+        val s = withContext(Dispatchers.IO) { WikiRepo.randomSummary() }
         if (s != null) {
             summary = s
-            val o = org.json.JSONObject()
-                .put("title", s.title).put("extract", s.extract)
-                .put("url", s.url).put("thumb", s.thumb ?: "")
+            val o = JSONObject()
+                .put("title", s.title)
+                .put("extract", s.extract)
+                .put("url", s.url)
+                .put("thumb", s.thumb ?: "")
             JsonPrefs.put(ctx, dayKey, o)
         }
-    }
-    suspend fun fetchAndCache() { __doFetch() }
-        val s = WikiRepo.randomSummary()
-        if (s != null) {
-            summary = s
-            val o = org.json.JSONObject()
-                .put("title", s.title).put("extract", s.extract)
-                .put("url", s.url).put("thumb", s.thumb ?: "")
-            JsonPrefs.put(ctx, dayKey, o)
-        }
+        loading = false
     }
 
-    LaunchedEffect(Unit) { if (summary == null) fetchAndCache() }
+    LaunchedEffect(dayKey) { if (summary == null) fetchAndCache() }
 
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Column(Modifier.fillMaxWidth().padding(16.dp)) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text("Brain Food (Wikipedia)", style = MaterialTheme.typography.titleLarge)
                 TextButton(onClick = { scope.launch { fetchAndCache() } }) { Text("Refresh") }
+            }
+            Spacer(Modifier.height(8.dp))
+
+            if (summary == null) {
+                val msg = when {
+                    loading -> "Loading..."
+                    tried -> "Couldn’t load. Check internet and tap Refresh."
+                    else -> "Loading..."
+                }
+                Text(msg, style = MaterialTheme.typography.bodyMedium)
+                return@Column
+            }
+
+            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
+                Column {
+                    if (!summary!!.thumb.isNullOrBlank()) {
+                        NetImage(summary!!.thumb, Modifier.fillMaxWidth().height(140.dp))
+                    }
+                    Column(Modifier.padding(12.dp)) {
+                        Text(summary!!.title, style = MaterialTheme.typography.titleMedium,
+                            maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Spacer(Modifier.height(6.dp))
+                        Text(summary!!.extract, style = MaterialTheme.typography.bodyMedium,
+                            maxLines = 5, overflow = TextOverflow.Ellipsis)
+                        Spacer(Modifier.height(8.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            TextButton(onClick = {
+                                val i = Intent(Intent.ACTION_VIEW, Uri.parse(summary!!.url)).apply {
+                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                }
+                                runCatching { ctx.startActivity(i) }
+                            }) { Text("Open") }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
