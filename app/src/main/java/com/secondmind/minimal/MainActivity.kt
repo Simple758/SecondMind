@@ -1,10 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.secondmind.minimal
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-
-
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -19,6 +13,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,20 +32,25 @@ import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 import com.secondmind.minimal.data.Keys
 import com.secondmind.minimal.data.dataStore
+import com.secondmind.minimal.home.HomeCarousel
+import com.secondmind.minimal.home.NotifDiagRow
+import com.secondmind.minimal.tts.Reader
 import com.secondmind.minimal.ui.DetailsScreen
 import com.secondmind.minimal.ui.InboxScreen
-import com.secondmind.minimal.tts.Reader
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import com.secondmind.minimal.ui.components.NotificationAccessBanner
 import com.secondmind.minimal.ui.components.QuickNoteCard
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+
+@file:OptIn(ExperimentalMaterial3Api::class)
+
+package com.secondmind.minimal
+
+
             Spacer(Modifier.height(12.dp))
             com.secondmind.minimal.feature.wiki.WikiBrainFoodCard()
             Spacer(Modifier.height(12.dp))
             com.secondmind.minimal.feature.youtube.YtWatchLaterCard()
-import com.secondmind.minimal.home.NotifDiagRow
-import com.secondmind.minimal.home.HomeCarousel
-import androidx.compose.foundation.layout.Arrangement
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
