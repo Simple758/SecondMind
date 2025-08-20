@@ -1,4 +1,7 @@
 package com.secondmind.minimal.feature.wiki
+import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
+import androidx.compose.ui.res.painterResource
 
 import android.content.Intent
 import android.graphics.BitmapFactory
@@ -69,6 +72,18 @@ fun WikiBrainFoodCard(modifier: Modifier = Modifier) {
     }
     var loading by remember { mutableStateOf(false) }
     var tried by remember { mutableStateOf(false) }
+    // --- TTS: safe, remembered engine ---
+    val tts = remember { TextToSpeech(ctx) { /* status ignored */ } }
+    var speaking by remember { mutableStateOf(false) }
+    DisposableEffect(tts) { onDispose { runCatching { tts.stop(); tts.shutdown() } } }
+    LaunchedEffect(tts) {
+        tts.language = java.util.Locale.getDefault()
+        tts.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+            override fun onStart(utteranceId: String?) { speaking = true }
+            override fun onError(utteranceId: String?) { speaking = false }
+            override fun onDone(utteranceId: String?) { speaking = false }
+        })
+    }
 
     suspend fun fetchAndCache() {
         loading = true
@@ -131,6 +146,17 @@ fun WikiBrainFoodCard(modifier: Modifier = Modifier) {
                                 }
                                 runCatching { ctx.startActivity(i) }
                             }) { Text("Open") }
+                        Spacer(Modifier.weight(1f))
+                        IconButton(onClick = {
+                            val txt = (summary?.title ?: "") + ". " + (summary?.extract ?: "")
+                            if (speaking) {
+                                tts.stop(); speaking = false
+                            } else {
+                                tts.speak(txt, TextToSpeech.QUEUE_FLUSH, null, "wiki-"+System.currentTimeMillis())
+                            }
+                        }) {
+                            Icon(painterResource(id = android.R.drawable.ic_lock_silent_mode_off), contentDescription = "Speak")
+                        }
                         }
                     }
                 }
