@@ -1,3 +1,4 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
 package com.secondmind.minimal
 import android.Manifest
 import android.app.NotificationChannel
@@ -42,15 +43,17 @@ import com.secondmind.minimal.ui.components.QuickNoteCard
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-@file:OptIn(ExperimentalMaterial3Api::class)
-
-package com.secondmind.minimal
-
 
             Spacer(Modifier.height(12.dp))
             com.secondmind.minimal.feature.wiki.WikiBrainFoodCard()
             Spacer(Modifier.height(12.dp))
             com.secondmind.minimal.feature.youtube.YtWatchLaterCard()
+
+
+
+
+
+
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
