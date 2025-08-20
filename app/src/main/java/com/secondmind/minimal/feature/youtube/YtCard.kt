@@ -57,11 +57,13 @@ private fun rememberYtMeta(id: String): State<YtMeta?> {
         if (state.value == null) {
             val url = YtId.canonicalUrl(id)
             val o = YtRepo.fetchOEmbed(url)
-            if (o != null) {
+            val meta = if (o != null)
+                YtMeta(id, o.title, o.author, o.thumbnail)
+            else
+                YtMeta(id, "YouTube video", "", "https://img.youtube.com/vi/"+id+"/hqdefault.jpg")
                 val meta = YtMeta(id, o.title, o.author, o.thumbnail)
-                YtStore.putMeta(ctx, meta)
-                state.value = meta
-            }
+            YtStore.putMeta(ctx, meta)
+            state.value = meta
         }
     }
     return state

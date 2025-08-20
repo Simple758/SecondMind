@@ -56,6 +56,7 @@ fun WikiBrainFoodCard(modifier: Modifier = Modifier) {
         val sdf = SimpleDateFormat("yyyyMMdd", Locale.US)
         "wiki.daily." + sdf.format(Date())
     }
+    var tried by remember { mutableStateOf(false) }
     var summary by remember {
         val cached = JsonPrefs.getObject(ctx, dayKey)?.let {
             WikiRepo.Summary(
@@ -67,6 +68,18 @@ fun WikiBrainFoodCard(modifier: Modifier = Modifier) {
     }
 
     suspend fun fetchAndCache() {
+    suspend fun __doFetch() {
+        tried = true
+        val s = WikiRepo.randomSummary()
+        if (s != null) {
+            summary = s
+            val o = org.json.JSONObject()
+                .put("title", s.title).put("extract", s.extract)
+                .put("url", s.url).put("thumb", s.thumb ?: "")
+            JsonPrefs.put(ctx, dayKey, o)
+        }
+    }
+    suspend fun fetchAndCache() { __doFetch() }
         val s = WikiRepo.randomSummary()
         if (s != null) {
             summary = s
@@ -87,32 +100,3 @@ fun WikiBrainFoodCard(modifier: Modifier = Modifier) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Text("Brain Food (Wikipedia)", style = MaterialTheme.typography.titleLarge)
                 TextButton(onClick = { scope.launch { fetchAndCache() } }) { Text("Refresh") }
-            }
-            Spacer(Modifier.height(8.dp))
-            if (summary == null) {
-                Text("Loading...", style = MaterialTheme.typography.bodyMedium); return@Column
-            }
-            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
-                Column {
-                    if (!summary!!.thumb.isNullOrBlank()) {
-                        NetImage(summary!!.thumb, Modifier.fillMaxWidth().height(140.dp))
-                    }
-                    Column(Modifier.padding(12.dp)) {
-                        Text(summary!!.title, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Spacer(Modifier.height(6.dp))
-                        Text(summary!!.extract, style = MaterialTheme.typography.bodyMedium, maxLines = 5, overflow = TextOverflow.Ellipsis)
-                        Spacer(Modifier.height(8.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            TextButton(onClick = {
-                                val i = Intent(Intent.ACTION_VIEW, Uri.parse(summary!!.url)).apply {
-                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                }
-                                runCatching { ctx.startActivity(i) }
-                            }) { Text("Open") }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}

@@ -11,7 +11,7 @@ object WikiRepo {
         val conn = (URL("https://en.wikipedia.org/api/rest_v1/page/random/summary")
             .openConnection() as HttpURLConnection).apply {
             connectTimeout = timeoutMs; readTimeout = timeoutMs; requestMethod = "GET"
-            setRequestProperty("User-Agent", "SecondMind/1.0")
+            setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Mobile Safari/537.36 SecondMind/1.0")
         }
         conn.inputStream.use {
             val txt = it.readBytes().toString(Charsets.UTF_8)
