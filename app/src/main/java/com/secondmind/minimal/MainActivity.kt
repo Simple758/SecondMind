@@ -44,10 +44,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 
-            Spacer(Modifier.height(12.dp))
-            com.secondmind.minimal.feature.wiki.WikiBrainFoodCard()
-            Spacer(Modifier.height(12.dp))
-            com.secondmind.minimal.feature.youtube.YtWatchLaterCard()
+
 
 
 
@@ -128,6 +125,10 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
     HomeCarousel(modifier = Modifier.padding(top = 8.dp))
+                Spacer(Modifier.height(12.dp))
+                com.secondmind.minimal.feature.wiki.WikiBrainFoodCard()
+                Spacer(Modifier.height(12.dp))
+                com.secondmind.minimal.feature.youtube.YtWatchLaterCard()
 
     NotifDiagRow(modifier = Modifier.padding(bottom = 8.dp))
 
