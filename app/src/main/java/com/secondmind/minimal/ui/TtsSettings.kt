@@ -21,13 +21,14 @@ import com.secondmind.minimal.data.dataStore
 import com.secondmind.minimal.tts.Reader
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import androidx.datastore.preferences.core.edit
 
 @Composable
 fun TtsSettings() {
   val ctx = LocalContext.current
   val scope = rememberCoroutineScope()
 
-  // Persisted selected voice name
+  // Persisted selected voice
   val voiceFlow = remember { ctx.dataStore.data.map { it[Keys.READER_VOICE] ?: "" } }
   val selected by voiceFlow.collectAsState(initial = "")
 
@@ -37,13 +38,16 @@ fun TtsSettings() {
     val google = "com.google.android.tts"
     var tts: TextToSpeech? = null
     try {
-      tts = try { TextToSpeech(ctx.applicationContext, {}, google) }
-            catch (_: Throwable) { TextToSpeech(ctx.applicationContext) }
-      voices = (tts.voices?.toList() ?: emptyList()).sortedBy { it.name }
+      tts = try {
+        TextToSpeech(ctx.applicationContext, TextToSpeech.OnInitListener { _ -> }, google)
+      } catch (_: Throwable) {
+        TextToSpeech(ctx.applicationContext, TextToSpeech.OnInitListener { _ -> })
+      }
+      voices = (tts?.voices?.toList() ?: emptyList()).sortedBy { it.name }
     } catch (_: Throwable) {
       voices = emptyList()
     } finally {
-      try { tts?.shutdown() } catch (_: Throwable) { }
+      try { tts?.shutdown() } catch (_: Throwable) {}
     }
   }
 
@@ -61,7 +65,7 @@ fun TtsSettings() {
           onClick = {
             expanded = false
             scope.launch {
-              ctx.dataStore.edit { it[Keys.READER_VOICE] = v.name }
+              ctx.dataStore.edit { prefs -> prefs[Keys.READER_VOICE] = v.name }
             }
             Reader.updateVoice(v.name, ctx)
           }
