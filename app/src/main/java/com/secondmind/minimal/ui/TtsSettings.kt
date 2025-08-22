@@ -28,11 +28,9 @@ fun TtsSettings() {
   val ctx = LocalContext.current
   val scope = rememberCoroutineScope()
 
-  // Persisted selected voice
   val voiceFlow = remember { ctx.dataStore.data.map { it[Keys.READER_VOICE] ?: "" } }
   val selected by voiceFlow.collectAsState(initial = "")
 
-  // Load installed voices (prefer Google TTS if present)
   var voices by remember { mutableStateOf<List<Voice>>(emptyList()) }
   LaunchedEffect(Unit) {
     val google = "com.google.android.tts"
@@ -64,9 +62,7 @@ fun TtsSettings() {
           text = { Text(v.name) },
           onClick = {
             expanded = false
-            scope.launch {
-              ctx.dataStore.edit { prefs -> prefs[Keys.READER_VOICE] = v.name }
-            }
+            scope.launch { ctx.dataStore.edit { prefs -> prefs[Keys.READER_VOICE] = v.name } }
             Reader.updateVoice(v.name, ctx)
           }
         )
@@ -76,9 +72,7 @@ fun TtsSettings() {
 
   Spacer(Modifier.height(8.dp))
   Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-    OutlinedButton(onClick = {
-      try { ctx.startActivity(Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)) } catch (_: Throwable) {}
-    }) { Text("Install voices") }
+    OutlinedButton(onClick = { try { ctx.startActivity(Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)) } catch (_: Throwable) {} }) { Text("Install voices") }
     OutlinedButton(onClick = {
       try { ctx.startActivity(Intent("com.android.settings.TTS_SETTINGS")) }
       catch (_: Throwable) { try { ctx.startActivity(Intent(Settings.ACTION_SETTINGS)) } catch (_: Throwable) {} }
