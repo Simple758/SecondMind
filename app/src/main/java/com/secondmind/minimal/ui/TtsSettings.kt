@@ -28,11 +28,9 @@ fun TtsSettings() {
   val ctx = LocalContext.current
   val scope = rememberCoroutineScope()
 
-  // Persisted selected voice
   val voiceFlow = remember { ctx.dataStore.data.map { it[Keys.READER_VOICE] ?: "" } }
   val selected by voiceFlow.collectAsState(initial = "")
 
-  // Load installed voices (prefer Google TTS if present)
   var voices by remember { mutableStateOf<List<Voice>>(emptyList()) }
   LaunchedEffect(Unit) {
     val google = "com.google.android.tts"
@@ -79,7 +77,6 @@ fun TtsSettings() {
   }
 
   Spacer(Modifier.height(8.dp))
-  // New: quick test with current settings (rate, pitch, voice)
   OutlinedButton(onClick = { Reader.speak(ctx, "This is a test of your selected voice in SecondMind.") }) {
     Text("Test TTS")
   }
