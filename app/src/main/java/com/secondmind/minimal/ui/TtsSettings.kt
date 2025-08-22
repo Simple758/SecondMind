@@ -28,19 +28,18 @@ fun TtsSettings() {
   val ctx = LocalContext.current
   val scope = rememberCoroutineScope()
 
+  // Persisted selected voice
   val voiceFlow = remember { ctx.dataStore.data.map { it[Keys.READER_VOICE] ?: "" } }
   val selected by voiceFlow.collectAsState(initial = "")
 
+  // Load installed voices (prefer Google TTS if present)
   var voices by remember { mutableStateOf<List<Voice>>(emptyList()) }
   LaunchedEffect(Unit) {
     val google = "com.google.android.tts"
     var tts: TextToSpeech? = null
     try {
-      tts = try {
-        TextToSpeech(ctx.applicationContext, TextToSpeech.OnInitListener { _ -> }, google)
-      } catch (_: Throwable) {
-        TextToSpeech(ctx.applicationContext, TextToSpeech.OnInitListener { _ -> })
-      }
+      tts = try { TextToSpeech(ctx.applicationContext, TextToSpeech.OnInitListener { _ -> }, google) }
+            catch (_: Throwable) { TextToSpeech(ctx.applicationContext, TextToSpeech.OnInitListener { _ -> }) }
       voices = (tts?.voices?.toList() ?: emptyList()).sortedBy { it.name }
     } catch (_: Throwable) {
       voices = emptyList()
@@ -77,5 +76,11 @@ fun TtsSettings() {
       try { ctx.startActivity(Intent("com.android.settings.TTS_SETTINGS")) }
       catch (_: Throwable) { try { ctx.startActivity(Intent(Settings.ACTION_SETTINGS)) } catch (_: Throwable) {} }
     }) { Text("System TTS Settings") }
+  }
+
+  Spacer(Modifier.height(8.dp))
+  // New: quick test with current settings (rate, pitch, voice)
+  OutlinedButton(onClick = { Reader.speak(ctx, "This is a test of your selected voice in SecondMind.") }) {
+    Text("Test TTS")
   }
 }

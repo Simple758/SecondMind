@@ -150,9 +150,9 @@ fun WikiBrainFoodCard(modifier: Modifier = Modifier) {
                         IconButton(onClick = {
                             val txt = (summary?.title ?: "") + ". " + (summary?.extract ?: "")
                             if (speaking) {
-                                tts.stop(); speaking = false
+                                com.secondmind.minimal.tts.Reader.stop(); speaking = false
                             } else {
-                                tts.speak(txt, TextToSpeech.QUEUE_FLUSH, null, "wiki-"+System.currentTimeMillis())
+                                com.secondmind.minimal.tts.Reader.speak(ctx, txt))
                             }
                         }) {
                             Icon(painterResource(id = android.R.drawable.ic_lock_silent_mode_off), contentDescription = "Speak")

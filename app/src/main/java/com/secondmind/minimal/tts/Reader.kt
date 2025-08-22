@@ -75,6 +75,10 @@ object Reader {
     } catch (_: Throwable) {}
   }
 
+  fun stop() {
+    try { tts?.stop() } catch (_: Throwable) {}
+  }
+
   fun shutdown() {
     try { tts?.shutdown() } catch (_: Throwable) {}
     tts = null
