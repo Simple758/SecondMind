@@ -222,6 +222,10 @@ fun SettingsScreen(onBack: () -> Unit) {
 
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
     com.secondmind.minimal.ui.TtsSettings()
+    Spacer(Modifier.height(8.dp))
+    OutlinedButton(onClick = { com.secondmind.minimal.tts.Reader.stop() }) {
+      Text("Stop reading")
+    }
       OutlinedButton(onClick = { Reader.speak(ctx, "This is a test of the SecondMind reader.") }) { Text("Test Read") }
       OutlinedButton(onClick = {
         val i = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
