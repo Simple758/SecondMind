@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 package com.secondmind.minimal
 import android.Manifest
 import android.app.NotificationChannel
@@ -15,6 +15,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -222,21 +224,21 @@ fun SettingsScreen(onBack: () -> Unit) {
       Slider(value = readerPitch, onValueChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_PITCH] = v.coerceIn(0.5f, 1.5f) } } }, valueRange = 0.5f..1.5f, steps = 10)
     }
 
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-    com.secondmind.minimal.ui.TtsSettings()
-      com.secondmind.minimal.ui.XFeedSettings()
-      com.secondmind.minimal.ui.XNitterSettings()
-      com.secondmind.minimal.ui.XProfilesSettings()
-    Spacer(Modifier.height(8.dp))
-    OutlinedButton(onClick = { com.secondmind.minimal.tts.Reader.stop() }) {
-      Text("Stop reading")
-    }
-      OutlinedButton(onClick = { Reader.speak(ctx, "This is a test of the SecondMind reader.") }) { Text("Test Read") }
-      OutlinedButton(onClick = {
-        val i = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-        ctx.startActivity(i)
-      }) { Text("Open Accessibility Settings") }
-    }
+      Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        com.secondmind.minimal.ui.TtsSettings()
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+          OutlinedButton(onClick = { com.secondmind.minimal.tts.Reader.stop() }) { Text("Stop reading") }
+          OutlinedButton(onClick = { Reader.speak(LocalContext.current, "This is a test of the SecondMind reader.") }) { Text("Test Read") }
+          OutlinedButton(onClick = {
+            val i = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+            LocalContext.current.startActivity(i)
+          }) { Text("Open Accessibility Settings") }
+        }
+        Divider()
+        com.secondmind.minimal.ui.XFeedSettings()
+        com.secondmind.minimal.ui.XNitterSettings()
+        com.secondmind.minimal.ui.XProfilesSettings()
+      }
 
     
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
