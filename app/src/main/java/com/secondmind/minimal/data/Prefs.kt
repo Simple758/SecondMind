@@ -7,6 +7,8 @@ import androidx.datastore.preferences.preferencesDataStore
 val Context.dataStore by preferencesDataStore("prefs")
 
 object Keys {
+  val X_PROFILES = stringPreferencesKey("x_profiles")
+  val X_TTS_COUNT = intPreferencesKey("x_tts_count")
   val READER_VOICE = stringPreferencesKey("reader_voice")
   val COUNT = intPreferencesKey("count")
   val THEME = stringPreferencesKey("theme")

@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.secondmind.minimal.tts.Reader
 import kotlinx.coroutines.launch
@@ -37,44 +38,35 @@ fun NewsCard(modifier: Modifier = Modifier) {
 
   Card(modifier = modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
     Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-      Text("News", style = MaterialTheme.typography.titleLarge)
-
-      ScrollableTabRow(selectedTabIndex = tab, edgePadding = 0.dp) {
-        sectors.forEachIndexed { i, s ->
-          Tab(selected = tab == i, onClick = { tab = i; reading = false; Reader.stop() }, text = { Text(s) })
+      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text("News", style = MaterialTheme.typography.titleLarge)
+        IconButton(onClick = {
+          if (reading) { Reader.stop(); reading = false; return@IconButton }
+          if (items.isEmpty()) { fetch(); return@IconButton }
+          val msg = items.take(3).joinToString(". ") { i -> "${i.source}: ${i.title}" }
+            .replace("\\s+".toRegex(), " ").trim().take(1000)
+          Reader.speak(ctx, msg); reading = true
+        }) {
+          Icon(
+            painter = painterResource(id = if (reading) android.R.drawable.ic_lock_silent_mode else android.R.drawable.ic_lock_silent_mode_off),
+            contentDescription = if (reading) "Stop" else "Read"
+          )
         }
       }
 
-      if (loading && items.isEmpty()) {
-        LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+      ScrollableTabRow(selectedTabIndex = tab, edgePadding = 0.dp) {
+        sectors.forEachIndexed { i, s -> Tab(selected = tab == i, onClick = { tab = i; Reader.stop(); reading = false }, text = { Text(s) }) }
       }
 
-      items.take(3).forEachIndexed { idx, it ->
-        Text("${idx+1}. ${it.title} — ${it.source}", style = MaterialTheme.typography.bodyMedium)
-      }
-      if (items.isEmpty() && error == null && !loading) {
-        Text("No headlines yet. Pull Refresh.", style = MaterialTheme.typography.bodySmall)
-      }
-      if (error != null) {
-        Text("Error: $error", style = MaterialTheme.typography.bodySmall)
-      }
-
+      if (loading && items.isEmpty()) LinearProgressIndicator(Modifier.fillMaxWidth())
+      items.take(3).forEachIndexed { idx, it -> Text("${idx+1}. ${it.title} — ${it.source}", style = MaterialTheme.typography.bodyMedium) }
+      if (error != null) Text("Error: $error", style = MaterialTheme.typography.bodySmall)
       Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         OutlinedButton(onClick = {
           items.firstOrNull()?.let { h ->
             try { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(h.link))) } catch (_: Throwable) {}
           }
         }) { Text("Open") }
-
-        OutlinedButton(onClick = {
-          if (reading) { Reader.stop(); reading = false; return@OutlinedButton }
-          if (items.isEmpty()) { fetch(); return@OutlinedButton }
-          val msg = items.take(3).joinToString(". ") { i -> "${i.source}: ${i.title}" }
-            .replace("\\s+".toRegex(), " ").trim().take(1000)
-          Reader.speak(ctx, msg)
-          reading = true
-        }) { Text(if (reading) "Stop" else "Read latest") }
-
         OutlinedButton(onClick = { fetch() }) { Text("Refresh") }
       }
     }
