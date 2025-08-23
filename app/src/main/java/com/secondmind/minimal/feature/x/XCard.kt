@@ -7,40 +7,45 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.secondmind.minimal.data.Keys
 import com.secondmind.minimal.data.dataStore
 import com.secondmind.minimal.tts.Reader
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
+
+// Local keys (same names as global prefs; safe to duplicate)
+private val KEY_FEED_URL = stringPreferencesKey("x_feed_url")
+private val KEY_PROFILES = stringPreferencesKey("x_profiles")
+private val KEY_NITTER   = stringPreferencesKey("x_nitter_base")
+private val KEY_TTS_COUNT = intPreferencesKey("x_tts_count")
 
 @Composable
 fun XCard(modifier: Modifier = Modifier) {
   val ctx = LocalContext.current
   val scope = rememberCoroutineScope()
 
-  // Prefs
   var listUrl by remember { mutableStateOf("") }
   var channelsCsv by remember { mutableStateOf("") }
   var nitter by remember { mutableStateOf("") }
   var readCount by remember { mutableStateOf(3) }
 
   LaunchedEffect(Unit) {
-    val data = ctx.dataStore.data.first()
-    listUrl = data[Keys.X_FEED_URL] ?: ""
-    channelsCsv = data[Keys.X_PROFILES] ?: "Bloomberg, Reuters"
-    nitter = data[Keys.X_NITTER_BASE] ?: ""
-    readCount = data[Keys.X_TTS_COUNT] ?: 3
+    val d = ctx.dataStore.data.first()
+    listUrl = d[KEY_FEED_URL] ?: ""
+    channelsCsv = d[KEY_PROFILES] ?: "Bloomberg, Reuters"
+    nitter = d[KEY_NITTER] ?: ""
+    readCount = d[KEY_TTS_COUNT] ?: 3
   }
 
-  val channels = remember(channelsCsv) {
-    channelsCsv.split(",").map { it.trim() }.filter { it.isNotBlank() }
-  }
-  var active by remember { mutableStateOf(0) }
+  val channels = remember(channelsCsv) { channelsCsv.split(",").map { it.trim() }.filter { it.isNotBlank() } }
   var posts by remember { mutableStateOf(listOf<XPost>()) }
   var error by remember { mutableStateOf<String?>(null) }
   var reading by remember { mutableStateOf(false) }
   var loading by remember { mutableStateOf(false) }
+
+  var tab by remember { mutableStateOf(0) }
+  val tabs = if (listUrl.isNotBlank()) listOf("List", "Profiles") else listOf("Profiles")
 
   fun fetch() {
     loading = true; error = null
@@ -48,7 +53,7 @@ fun XCard(modifier: Modifier = Modifier) {
     scope.launch {
       runCatching {
         when {
-          listUrl.isNotBlank() && active == 0 -> XRepo.fetchList(nitter, listUrl, count = count)
+          listUrl.isNotBlank() && tab == 0 -> XRepo.fetchList(nitter, listUrl, count = count)
           channels.isNotEmpty() -> XRepo.fetchProfiles(nitter, channels, perUser = 2, totalLimit = count)
           else -> XRepo.searchFallback(nitter, "news", count)
         }
@@ -58,7 +63,7 @@ fun XCard(modifier: Modifier = Modifier) {
     }
   }
 
-  LaunchedEffect(active, channelsCsv, listUrl, readCount) { fetch() }
+  LaunchedEffect(tab, channelsCsv, listUrl, readCount) { fetch() }
 
   Card(modifier = modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
     Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -79,13 +84,11 @@ fun XCard(modifier: Modifier = Modifier) {
         }
       }
 
-      // Tabs: List (if configured) + Profiles
-      val tabs = if (listUrl.isNotBlank()) listOf("List", "Profiles") else listOf("Profiles")
-      var tab by remember { mutableStateOf(0) }
       ScrollableTabRow(selectedTabIndex = tab, edgePadding = 0.dp) {
-        tabs.forEachIndexed { i, s -> Tab(selected = tab == i, onClick = { tab = i; Reader.stop(); reading = false }, text = { Text(s) }) }
+        tabs.forEachIndexed { i, s ->
+          Tab(selected = tab == i, onClick = { tab = i; Reader.stop(); reading = false }, text = { Text(s) })
+        }
       }
-      active = tab
 
       if (loading && posts.isEmpty()) LinearProgressIndicator(Modifier.fillMaxWidth())
 
@@ -94,6 +97,7 @@ fun XCard(modifier: Modifier = Modifier) {
       }
 
       if (error != null) Text("Error: $error", style = MaterialTheme.typography.bodySmall)
+
       Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         OutlinedButton(onClick = { fetch() }) { Text("Refresh") }
       }
