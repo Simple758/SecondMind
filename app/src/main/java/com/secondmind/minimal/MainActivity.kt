@@ -177,7 +177,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     Reader.updateConfig(readerEnabled, readerRate, readerPitch, ctx)
   }
 
-  Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+  Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
     Text("Settings", fontSize = 22.sp)
 
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -224,6 +224,9 @@ fun SettingsScreen(onBack: () -> Unit) {
 
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
     com.secondmind.minimal.ui.TtsSettings()
+      com.secondmind.minimal.ui.XFeedSettings()
+      com.secondmind.minimal.ui.XNitterSettings()
+      com.secondmind.minimal.ui.XProfilesSettings()
     Spacer(Modifier.height(8.dp))
     OutlinedButton(onClick = { com.secondmind.minimal.tts.Reader.stop() }) {
       Text("Stop reading")
