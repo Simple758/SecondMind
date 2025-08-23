@@ -13,11 +13,12 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.edit
 
-// Local keys (same names as global prefs; safe to duplicate)
-private val KEY_FEED_URL = stringPreferencesKey("x_feed_url")
-private val KEY_PROFILES = stringPreferencesKey("x_profiles")
-private val KEY_NITTER   = stringPreferencesKey("x_nitter_base")
+// Local keys (safe duplicates of global ones)
+private val KEY_FEED_URL  = stringPreferencesKey("x_feed_url")
+private val KEY_PROFILES  = stringPreferencesKey("x_profiles")
+private val KEY_NITTER    = stringPreferencesKey("x_nitter_base")
 private val KEY_TTS_COUNT = intPreferencesKey("x_tts_count")
 
 @Composable
@@ -44,7 +45,7 @@ fun XCard(modifier: Modifier = Modifier) {
   var reading by remember { mutableStateOf(false) }
   var loading by remember { mutableStateOf(false) }
 
-  var tab by remember { mutableStateOf(0) }
+  var tab by remember { mutableStateOf( if (listUrl.isNotBlank()) 0 else 0 ) }
   val tabs = if (listUrl.isNotBlank()) listOf("List", "Profiles") else listOf("Profiles")
 
   fun fetch() {
@@ -54,16 +55,20 @@ fun XCard(modifier: Modifier = Modifier) {
       runCatching {
         when {
           listUrl.isNotBlank() && tab == 0 -> XRepo.fetchList(nitter, listUrl, count = count)
-          channels.isNotEmpty() -> XRepo.fetchProfiles(nitter, channels, perUser = 2, totalLimit = count)
-          else -> XRepo.searchFallback(nitter, "news", count)
+          channels.isNotEmpty()            -> XRepo.fetchProfiles(nitter, channels, perUser = 2, totalLimit = count)
+          else                             -> emptyList()
         }
-      }.onSuccess { posts = it }
-       .onFailure { e -> error = e.message ?: "Failed to load." }
+      }.onSuccess {
+        posts = it
+        if (it.isEmpty()) error = "No public posts found or all mirrors were unreachable. Try Refresh or set a different Nitter base in Settings."
+      }.onFailure {
+        error = "Could not load feed. Try Refresh or clear custom Nitter base."
+      }
       loading = false
     }
   }
 
-  LaunchedEffect(tab, channelsCsv, listUrl, readCount) { fetch() }
+  LaunchedEffect(tab, channelsCsv, listUrl, readCount, nitter) { fetch() }
 
   Card(modifier = modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
     Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -96,7 +101,17 @@ fun XCard(modifier: Modifier = Modifier) {
         Text("${idx+1}. ${(p.author ?: "X")}: ${p.text}", style = MaterialTheme.typography.bodyMedium)
       }
 
-      if (error != null) Text("Error: $error", style = MaterialTheme.typography.bodySmall)
+      if (error != null) {
+        Text("Error: $error", style = MaterialTheme.typography.bodySmall)
+        // If user set a bad custom base, offer a quick way to clear it
+        if (nitter.isNotBlank()) {
+          OutlinedButton(onClick = {
+            scope.launch { ctx.dataStore.edit { it[KEY_NITTER] = "" } }
+            nitter = ""
+            fetch()
+          }) { Text("Use default mirrors") }
+        }
+      }
 
       Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         OutlinedButton(onClick = { fetch() }) { Text("Refresh") }
