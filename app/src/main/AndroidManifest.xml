@@ -7,7 +7,8 @@
     <package android:name="app.revanced.android.youtube"/>
     <package android:name="com.google.android.youtube"/>
     <intent><action android:name="android.intent.action.VIEW"/></intent>
-  </queries>
+    <intent><action android:name="android.intent.action.SEARCH"/></intent>
+</queries>
   <application
     android:name=".SecondMindApp"
     android:label="SecondMind Compose"
