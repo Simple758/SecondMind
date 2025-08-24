@@ -1,5 +1,10 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 package com.secondmind.minimal
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -85,7 +90,7 @@ fun rememberThemeMode(): State<String> {
 @Composable
 fun AppNav() {
   val nav = rememberNavController()
-  Scaffold(topBar = { CenterAlignedTopAppBar(title = { Text(titleFor(nav)) }) }) { pad ->
+  Scaffold(topBar = { TopBarWithMenu(nav) }) { pad ->
     NavHost(nav, startDestination = "home", modifier = Modifier.padding(pad)) {
       composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }) }
       composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
@@ -236,4 +241,33 @@ fun SettingsScreen(onBack: () -> Unit) {
 
     OutlinedButton(onClick = onBack) { Text("Back") }
   }
+}
+
+@Composable
+fun TopBarWithMenu(nav: NavHostController) {
+  var open by remember { mutableStateOf(false) }
+  CenterAlignedTopAppBar(
+    title = { Text(titleFor(nav)) },
+    navigationIcon = {
+      Box {
+        IconButton(onClick = { open = true }) {
+          Icon(Icons.Filled.Menu, contentDescription = "Menu")
+        }
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+          DropdownMenuItem(text = { Text("Home") }, onClick = {
+            open = false
+            nav.navigate("home") { launchSingleTop = true }
+          })
+          DropdownMenuItem(text = { Text("Inbox") }, onClick = {
+            open = false
+            nav.navigate("inbox")
+          })
+          DropdownMenuItem(text = { Text("Settings") }, onClick = {
+            open = false
+            nav.navigate("settings")
+          })
+        }
+      }
+    }
+  )
 }
