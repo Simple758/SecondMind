@@ -114,40 +114,17 @@ fun titleFor(nav: NavHostController): String {
 
 @Composable
 fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
-  val ctx = LocalContext.current
-  val scope = rememberCoroutineScope()
-  val countFlow = remember { ctx.dataStore.data.map { it[Keys.COUNT] ?: 0 } }
-  val count by countFlow.collectAsState(initial = 0)
-  val notifPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
-  LaunchedEffect(Unit) { if (Build.VERSION.SDK_INT >= 33) notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS) }
-
-  Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-      com.secondmind.minimal.feature.news.NewsCard(modifier = Modifier.padding(top = 8.dp))
-    HomeCarousel(modifier = Modifier.padding(top = 8.dp))
-      com.secondmind.minimal.feature.tg.TelegramCard(Modifier.padding(horizontal = 12.dp))
-      Spacer(Modifier.height(12.dp))
-                Spacer(Modifier.height(12.dp))
-                com.secondmind.minimal.feature.wiki.WikiBrainFoodCard()
-                Spacer(Modifier.height(12.dp))
-                com.secondmind.minimal.feature.youtube.YtWatchLaterCard()
-
-    NotifDiagRow(modifier = Modifier.padding(bottom = 8.dp))
-
-    NotificationAccessBanner(modifier = Modifier.padding(bottom = 12.dp))
-    Text("Tap to leap forward → $count")
-    Button(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.COUNT] = count + 1 } } }) { Text("Increment") }
-    OutlinedButton(onClick = onInbox) { Text("Inbox") }
-    OutlinedButton(onClick = onSettings) { Text("Settings") }
-    OutlinedButton(onClick = { showLocalNotification(ctx) }) { Text("Test Notification") }
-    OutlinedButton(onClick = { ctx.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) }) { Text("Enable Notification Listener") }
+{
+  androidx.compose.foundation.layout.Column(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
+    com.secondmind.minimal.home.HomeCarousel(modifier = androidx.compose.ui.Modifier.weight(1f))
+    androidx.compose.foundation.layout.Row(
+      modifier = androidx.compose.ui.Modifier.fillMaxWidth().padding(16.dp),
+      horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+      OutlinedButton(onClick = onInbox) { Text("Inbox") }
+      OutlinedButton(onClick = onSettings) { Text("Settings") }
+    }
   }
-}
 
 private fun showLocalNotification(ctx: Context) {
   val n = NotificationCompat.Builder(ctx, "sm")
@@ -182,7 +159,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     Reader.updateConfig(readerEnabled, readerRate, readerPitch, ctx)
   }
 
-  Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+  Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
     Text("Settings", fontSize = 22.sp)
 
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
