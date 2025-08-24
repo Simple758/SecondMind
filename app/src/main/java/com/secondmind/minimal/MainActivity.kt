@@ -127,7 +127,6 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
       com.secondmind.minimal.feature.news.NewsCard(modifier = Modifier.padding(top = 8.dp))
-      com.secondmind.minimal.feature.x.XCard()
     HomeCarousel(modifier = Modifier.padding(top = 8.dp))
                 Spacer(Modifier.height(12.dp))
                 com.secondmind.minimal.feature.wiki.WikiBrainFoodCard()
