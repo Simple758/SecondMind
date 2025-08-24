@@ -15,12 +15,12 @@ import androidx.datastore.preferences.core.*
 import android.content.Intent
 import android.net.Uri
 
-private val TG_CHANNELS   = stringPreferencesKey("tg_channels_csv")
-private val TG_PER        = intPreferencesKey("tg_per_channel")
-private val TG_ORDER      = stringPreferencesKey("tg_order")
-private val TG_OPEN       = stringPreferencesKey("tg_open")
-private val TG_PROXY_MODE = stringPreferencesKey("tg_proxy_mode")
-private val TG_TTS_LEN    = intPreferencesKey("tg_tts_len")
+private val TG_CHANNELS     = stringPreferencesKey("tg_channels_csv")
+private val TG_PER          = intPreferencesKey("tg_per_channel")
+private val TG_ORDER        = stringPreferencesKey("tg_order")
+private val TG_OPEN         = stringPreferencesKey("tg_open")
+private val TG_PROXY_MODE   = stringPreferencesKey("tg_proxy_mode")
+private val TG_TTS_LEN      = intPreferencesKey("tg_tts_len")
 private val TG_PREFER_PROXY = booleanPreferencesKey("tg_prefer_proxy")
 
 @Composable
@@ -52,10 +52,24 @@ fun TelegramCard(modifier: Modifier = Modifier) {
     ttsLen = (d[TG_TTS_LEN] ?: 300).coerceIn(140,500)
   }
 
+  fun toDeepLink(url: String?): Uri? {
+    if (url.isNullOrBlank()) return null
+    // https://t.me/(s/)?<handle>/<id>
+    val re = Regex("^https?://t\\.me/(?:s/)?([A-Za-z0-9_]+)/?(\\d+)?")
+    val m = re.find(url) ?: return Uri.parse(url)
+    val handle = m.groupValues.getOrNull(1)?.ifBlank { null } ?: return Uri.parse(url)
+    val id = m.groupValues.getOrNull(2)?.toLongOrNull()
+    return if (id != null) {
+      Uri.parse("tg://resolve?domain=$handle&post=$id")
+    } else {
+      Uri.parse("tg://resolve?domain=$handle")
+    }
+  }
+
   fun openPost(url: String?) {
     if (url.isNullOrBlank()) return
     val intent = if (open == "app") {
-      Intent(Intent.ACTION_VIEW, Uri.parse(url.replace("https://t.me", "tg://resolve?domain")))
+      Intent(Intent.ACTION_VIEW, toDeepLink(url))
     } else {
       Intent(Intent.ACTION_VIEW, Uri.parse(url))
     }
@@ -67,10 +81,13 @@ fun TelegramCard(modifier: Modifier = Modifier) {
     scope.launch {
       runCatching {
         if (handles.isEmpty()) return@runCatching emptyList<TgPost>()
-        val list = TelegramRepo.fetchMany(handles, per, proxy, preferProxy)
-        if (order == "oldest") list else list.reversed()
-      }.onSuccess { items = it }
-       .onFailure { e -> error = e.message ?: "Failed to load." }
+        TelegramRepo.fetchMany(handles, per, mode = proxy, preferProxy = preferProxy)
+      }.onSuccess { list ->
+        // Order per setting (we already sorted newest-first in repo)
+        items = if (order == "oldest") list.asReversed() else list
+      }.onFailure { e ->
+        error = e.message ?: "Failed to load."
+      }
       loading = false
     }
   }
