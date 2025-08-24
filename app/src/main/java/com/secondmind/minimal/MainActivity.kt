@@ -235,9 +235,6 @@ fun SettingsScreen(onBack: () -> Unit) {
           }) { Text("Open Accessibility Settings") }
         }
         Divider()
-        com.secondmind.minimal.ui.XFeedSettings()
-        com.secondmind.minimal.ui.XNitterSettings()
-        com.secondmind.minimal.ui.XProfilesSettings()
       }
 
     
