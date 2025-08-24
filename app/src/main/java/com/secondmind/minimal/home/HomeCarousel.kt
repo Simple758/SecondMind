@@ -1,16 +1,15 @@
 package com.secondmind.minimal.home
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.Arrangement
 
 @Composable
 fun HomeCarousel(modifier: Modifier = Modifier) {
@@ -26,18 +25,20 @@ fun HomeCarousel(modifier: Modifier = Modifier) {
       com.secondmind.minimal.feature.news.NewsCard(Modifier.fillMaxWidth())
     }
     // Row 2 — Quick Note + Brain Food
-    item {
-      com.secondmind.minimal.ui.components.QuickNoteCard()
-    }
-    item {
-      com.secondmind.minimal.feature.wiki.WikiBrainFoodCard()
-    }
+    item { com.secondmind.minimal.ui.components.QuickNoteCard() }
+    item { com.secondmind.minimal.feature.wiki.WikiBrainFoodCard() }
+
     // Row 3 — Telegram + Watch Later
-    item {
-      com.secondmind.minimal.feature.tg.TelegramCard()
+    item { com.secondmind.minimal.feature.tg.TelegramCard() }
+    item { com.secondmind.minimal.feature.youtube.YtWatchLaterCard() }
+
+    // Row 4 — Notif diagnostics (full width)
+    item(span = { GridItemSpan(2) }) {
+      com.secondmind.minimal.home.NotifDiagRow(Modifier.fillMaxWidth())
     }
-    item {
-      com.secondmind.minimal.feature.youtube.YtWatchLaterCard()
+    // Row 5 — Notification access banner (full width)
+    item(span = { GridItemSpan(2) }) {
+      com.secondmind.minimal.ui.components.NotificationAccessBanner(Modifier.fillMaxWidth())
     }
   }
 }
