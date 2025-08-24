@@ -241,6 +241,7 @@ fun SettingsScreen(onBack: () -> Unit) {
 
     OutlinedButton(onClick = onBack) { Text("Back") }
   }
+  }
 }
 
 @Composable
