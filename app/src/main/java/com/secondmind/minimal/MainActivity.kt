@@ -128,6 +128,8 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
             ) {
       com.secondmind.minimal.feature.news.NewsCard(modifier = Modifier.padding(top = 8.dp))
     HomeCarousel(modifier = Modifier.padding(top = 8.dp))
+      com.secondmind.minimal.feature.tg.TelegramCard(Modifier.padding(horizontal = 12.dp))
+      Spacer(Modifier.height(12.dp))
                 Spacer(Modifier.height(12.dp))
                 com.secondmind.minimal.feature.wiki.WikiBrainFoodCard()
                 Spacer(Modifier.height(12.dp))
@@ -225,6 +227,7 @@ fun SettingsScreen(onBack: () -> Unit) {
 
       Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         com.secondmind.minimal.ui.TtsSettings()
+      com.secondmind.minimal.ui.TgChannelsSettings()
         FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
           OutlinedButton(onClick = { com.secondmind.minimal.tts.Reader.stop() }) { Text("Stop reading") }
           OutlinedButton(onClick = { Reader.speak(ctx, "This is a test of the SecondMind reader.") }) { Text("Test Read") }
