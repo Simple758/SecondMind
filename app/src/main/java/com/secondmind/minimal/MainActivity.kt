@@ -113,19 +113,21 @@ fun titleFor(nav: NavHostController): String {
 }
 
 @Composable
+@Composable
 fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
-{
   androidx.compose.foundation.layout.Column(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
     com.secondmind.minimal.home.HomeCarousel(modifier = androidx.compose.ui.Modifier.weight(1f))
     androidx.compose.foundation.layout.Row(
-      modifier = androidx.compose.ui.Modifier.fillMaxWidth().padding(16.dp),
-      horizontalArrangement = Arrangement.spacedBy(12.dp)
+      modifier = androidx.compose.ui.Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 16.dp, vertical = 12.dp),
+      horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
     ) {
-      OutlinedButton(onClick = onInbox) { Text("Inbox") }
-      OutlinedButton(onClick = onSettings) { Text("Settings") }
+      androidx.compose.material3.OutlinedButton(onClick = onInbox) { androidx.compose.material3.Text("Inbox") }
+      androidx.compose.material3.OutlinedButton(onClick = onSettings) { androidx.compose.material3.Text("Settings") }
     }
   }
-
+}
 private fun showLocalNotification(ctx: Context) {
   val n = NotificationCompat.Builder(ctx, "sm")
     .setContentTitle("SecondMind")
