@@ -113,7 +113,6 @@ fun titleFor(nav: NavHostController): String {
 }
 
 @Composable
-@Composable
 fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
   androidx.compose.foundation.layout.Column(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
     com.secondmind.minimal.home.HomeCarousel(modifier = androidx.compose.ui.Modifier.weight(1f))
