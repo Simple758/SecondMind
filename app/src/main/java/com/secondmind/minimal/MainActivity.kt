@@ -96,7 +96,7 @@ fun AppNav() {
   val nav = rememberNavController()
   Scaffold(topBar = { TopBarWithMenu(nav) }) { pad ->
     NavHost(nav, startDestination = "home", modifier = Modifier.padding(pad)) {
-      composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }, onOpenTgSettings = { nav.navigate("tg_settings") }) }
+      composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }, onOpenTgSettings = { nav.navigate("tg_settings") }) }, onInbox = { nav.navigate("inbox") }, onOpenTgSettings = { nav.navigate("tg_settings") }) }
       composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }
         composable("tg_settings") { com.secondmind.minimal.feature.tg.TelegramSettingsScreen(onBack = { nav.popBackStack() }) }) }
       composable("inbox") { InboxScreen() }
@@ -123,7 +123,7 @@ fun titleFor(nav: NavHostController): String {
 }
 
 @Composable
-fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
+fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit, onOpenTgSettings: () -> Unit) {
   androidx.compose.foundation.layout.Column(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
     com.secondmind.minimal.home.HomeCarousel(modifier = androidx.compose.ui.Modifier.weight(1f))
     androidx.compose.foundation.layout.Row(
