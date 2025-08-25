@@ -1,5 +1,10 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 package com.secondmind.minimal
+import com.secondmind.minimal.feature.tg.TelegramSettingsScreen
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenu
@@ -93,7 +98,8 @@ fun AppNav() {
   Scaffold(topBar = { TopBarWithMenu(nav) }) { pad ->
     NavHost(nav, startDestination = "home", modifier = Modifier.padding(pad)) {
       composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }) }
-      composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
+      composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }
+        composable("tg_settings") { com.secondmind.minimal.feature.tg.TelegramSettingsScreen(onBack = { nav.popBackStack() }) }) }
       composable("inbox") { InboxScreen() }
       composable(
         route = "notification/{id}",
@@ -222,7 +228,7 @@ fun SettingsScreen(onBack: () -> Unit) {
       Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         com.secondmind.minimal.ui.TtsSettings()
       Divider()
-      com.secondmind.minimal.ui.TgChannelsSettings()
+      /* moved to TelegramSettingsScreen */
         OutlinedButton(onClick = { com.secondmind.minimal.tts.Reader.stop() }) { Text("Stop reading") }
         OutlinedButton(onClick = { Reader.speak(ctx, "This is a test of the SecondMind reader.") }) { Text("Test Read") }
         OutlinedButton(onClick = {
@@ -279,4 +285,22 @@ fun TopBarWithMenu(nav: NavHostController) {
       }
     }
   )
+
+@Composable
+fun TelegramCardWithGear(
+  modifier: Modifier = Modifier,
+  onOpenSettings: () -> Unit
+) {
+  Box(modifier) {
+    TelegramCardWithGear(modifier = Modifier.padding(horizontal = 12.dp), onOpenSettings = { nav.navigate("tg_settings") }))
+    SmallFloatingActionButton(
+      onClick = onOpenSettings,
+      modifier = Modifier
+        .align(Alignment.TopEnd)
+        .padding(8.dp)
+    ) {
+      Icon(Icons.Outlined.Settings, contentDescription = "Telegram settings")
+    }
+  }
+}
 }
