@@ -1,4 +1,3 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 package com.secondmind.minimal
 import com.secondmind.minimal.feature.tg.TelegramSettingsScreen
 import androidx.compose.material.icons.outlined.Settings
@@ -97,7 +96,7 @@ fun AppNav() {
   val nav = rememberNavController()
   Scaffold(topBar = { TopBarWithMenu(nav) }) { pad ->
     NavHost(nav, startDestination = "home", modifier = Modifier.padding(pad)) {
-      composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }) }
+      composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }, onOpenTgSettings = { nav.navigate("tg_settings") }) }
       composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }
         composable("tg_settings") { com.secondmind.minimal.feature.tg.TelegramSettingsScreen(onBack = { nav.popBackStack() }) }) }
       composable("inbox") { InboxScreen() }
@@ -292,7 +291,7 @@ fun TelegramCardWithGear(
   onOpenSettings: () -> Unit
 ) {
   Box(modifier) {
-    TelegramCardWithGear(modifier = Modifier.padding(horizontal = 12.dp), onOpenSettings = { nav.navigate("tg_settings") }))
+    TelegramCardWithGear(modifier = Modifier.padding(horizontal = 12.dp), onOpenSettings = onOpenTgSettings))
     SmallFloatingActionButton(
       onClick = onOpenSettings,
       modifier = Modifier
