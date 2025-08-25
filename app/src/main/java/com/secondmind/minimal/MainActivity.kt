@@ -221,6 +221,8 @@ fun SettingsScreen(onBack: () -> Unit) {
 
       Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         com.secondmind.minimal.ui.TtsSettings()
+      Divider()
+      com.secondmind.minimal.ui.TgChannelsSettings()
         OutlinedButton(onClick = { com.secondmind.minimal.tts.Reader.stop() }) { Text("Stop reading") }
         OutlinedButton(onClick = { Reader.speak(ctx, "This is a test of the SecondMind reader.") }) { Text("Test Read") }
         OutlinedButton(onClick = {
