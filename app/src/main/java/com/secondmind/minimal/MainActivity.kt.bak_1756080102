@@ -147,107 +147,101 @@ fun SettingsScreen(onBack: () -> Unit) {
   val scope = rememberCoroutineScope()
 
   val themeFlow = remember { ctx.dataStore.data.map { it[Keys.THEME] ?: "system" } }
-  val retentionFlow = remember { ctx.dataStore.data.map { it[Keys.RETENTION_DAYS] ?: 7 } }
-  val enabledFlow = remember { ctx.dataStore.data.map { it[Keys.READER_ENABLED] ?: true } }
-  val rateFlow = remember { ctx.dataStore.data.map { it[Keys.READER_RATE] ?: 1.0f } }
-  val pitchFlow = remember { ctx.dataStore.data.map { it[Keys.READER_PITCH] ?: 1.0f } }
-
   val theme by themeFlow.collectAsState(initial = "system")
+
+  val retentionFlow = remember { ctx.dataStore.data.map { it[Keys.RETENTION_DAYS] ?: 7 } }
   val retention by retentionFlow.collectAsState(initial = 7)
+
+  val enabledFlow = remember { ctx.dataStore.data.map { it[Keys.READER_ENABLED] ?: true } }
   val readerEnabled by enabledFlow.collectAsState(initial = true)
+
+  val rateFlow = remember { ctx.dataStore.data.map { it[Keys.READER_RATE] ?: 1.0f } }
   val readerRate by rateFlow.collectAsState(initial = 1.0f)
+
+  val pitchFlow = remember { ctx.dataStore.data.map { it[Keys.READER_PITCH] ?: 1.0f } }
   val readerPitch by pitchFlow.collectAsState(initial = 1.0f)
 
   LaunchedEffect(readerEnabled, readerRate, readerPitch) {
     Reader.updateConfig(readerEnabled, readerRate, readerPitch, ctx)
   }
 
-  Box(
-    Modifier.fillMaxSize()
-      .verticalScroll(rememberScrollState())
-      .imePadding()
-  ) {
-    Column(
-      Modifier.fillMaxWidth().padding(24.dp),
-      verticalArrangement = Arrangement.spacedBy(16.dp),
-      horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-      Text("Settings", fontSize = 22.sp)
+  Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+    Text("Settings", fontSize = 22.sp)
 
-      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "system" } } }) { Text("System") }
-        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "light" } } }) { Text("Light") }
-        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "dark" } } }) { Text("Dark") }
-      }
-
-      Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text("Retention (days): $retention")
-        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.RETENTION_DAYS] = maxOf(1, retention - 1) } } }) { Text("-") }
-        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.RETENTION_DAYS] = retention + 1 } } }) { Text("+") }
-      }
-
-      Divider()
-      Text("Reader", style = MaterialTheme.typography.titleMedium)
-
-      val idText = remember {
-        android.content.ComponentName(
-          ctx, com.secondmind.minimal.access.SecondMindAccessibilityService::class.java
-        ).flattenToString()
-      }
-      val enabledNow = remember {
-        val v = android.provider.Settings.Secure.getString(
-          ctx.contentResolver,
-          android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-        )
-        v?.contains(idText) == true
-      }
-      Text("Accessibility: " + if (enabledNow) "ON" else "OFF")
-      Text("Service ID: " + idText, fontSize = 12.sp)
-
-      Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Enabled")
-        Switch(checked = readerEnabled, onCheckedChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_ENABLED] = v } } })
-      }
-      Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text("Rate: ${"%.2f".format(readerRate)}")
-        Slider(value = readerRate,
-               onValueChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_RATE] = v.coerceIn(0.5f, 1.5f) } } },
-               valueRange = 0.5f..1.5f, steps = 10)
-        Text("Pitch: ${"%.2f".format(readerPitch)}")
-        Slider(value = readerPitch,
-               onValueChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_PITCH] = v.coerceIn(0.5f, 1.5f) } } },
-               valueRange = 0.5f..1.5f, steps = 10)
-      }
-
-      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        com.secondmind.minimal.ui.TtsSettings()
-        OutlinedButton(onClick = { com.secondmind.minimal.tts.Reader.stop() }) { Text("Stop reading") }
-        OutlinedButton(onClick = { Reader.speak(ctx, "This is a test of the SecondMind reader.") }) { Text("Test Read") }
-        OutlinedButton(onClick = {
-          val i = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-          ctx.startActivity(i)
-        }) { Text("Open Accessibility Settings") }
-      }
-
-      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        OutlinedButton(onClick = {
-          val ctx2 = ctx
-          try {
-            val cn = android.content.ComponentName(ctx2, com.secondmind.minimal.access.SecondMindAccessibilityService::class.java)
-            val i = android.content.Intent("android.settings.ACCESSIBILITY_DETAILS_SETTINGS")
-            i.putExtra("android.provider.extra.EXTRA_ACCESSIBILITY_COMPONENT_NAME", cn.flattenToString())
-            ctx2.startActivity(i)
-          } catch (e: Throwable) {
-            ctx2.startActivity(android.content.Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS))
-          }
-        }) { Text("Toggle My Accessibility") }
-      }
-
-      OutlinedButton(onClick = onBack) { Text("Back") }
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+      OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "system" } } }) { Text("System") }
+      OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "light" } } }) { Text("Light") }
+      OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "dark" } } }) { Text("Dark") }
     }
-  }
-}
 
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+      Text("Retention (days): $retention")
+      OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.RETENTION_DAYS] = maxOf(1, retention - 1) } } }) { Text("-") }
+      OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.RETENTION_DAYS] = retention + 1 } } }) { Text("+") }
+    }
+
+    Divider()
+
+    Text("Reader", style = MaterialTheme.typography.titleMedium)
+
+    val idText = remember {
+      android.content.ComponentName(
+        ctx, com.secondmind.minimal.access.SecondMindAccessibilityService::class.java
+      ).flattenToString()
+    }
+    val enabledNow = remember {
+      val v = android.provider.Settings.Secure.getString(
+        ctx.contentResolver,
+        android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+      )
+      v?.contains(idText) == true
+    }
+    Text("Accessibility: " + if (enabledNow) "ON" else "OFF")
+    Text("Service ID: " + idText, fontSize = 12.sp)
+    
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+      Text("Enabled")
+      Switch(checked = readerEnabled, onCheckedChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_ENABLED] = v } } })
+    }
+    Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+      Text("Rate: ${"%.2f".format(readerRate)}")
+      Slider(value = readerRate, onValueChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_RATE] = v.coerceIn(0.5f, 1.5f) } } }, valueRange = 0.5f..1.5f, steps = 10)
+      Text("Pitch: ${"%.2f".format(readerPitch)}")
+      Slider(value = readerPitch, onValueChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_PITCH] = v.coerceIn(0.5f, 1.5f) } } }, valueRange = 0.5f..1.5f, steps = 10)
+    }
+
+      Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        com.secondmind.minimal.ui.TtsSettings()
+      com.secondmind.minimal.ui.TgChannelsSettings()
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+          OutlinedButton(onClick = { com.secondmind.minimal.tts.Reader.stop() }) { Text("Stop reading") }
+          OutlinedButton(onClick = { Reader.speak(ctx, "This is a test of the SecondMind reader.") }) { Text("Test Read") }
+          OutlinedButton(onClick = {
+            val i = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+            ctx.startActivity(i)
+          }) { Text("Open Accessibility Settings") }
+        }
+        Divider()
+      }
+
+    
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+      OutlinedButton(onClick = {
+        val ctx2 = ctx
+        try {
+          val cn = android.content.ComponentName(ctx2, com.secondmind.minimal.access.SecondMindAccessibilityService::class.java)
+          val i = android.content.Intent("android.settings.ACCESSIBILITY_DETAILS_SETTINGS")
+          i.putExtra("android.provider.extra.EXTRA_ACCESSIBILITY_COMPONENT_NAME", cn.flattenToString())
+          ctx2.startActivity(i)
+        } catch (e: Throwable) {
+          ctx2.startActivity(android.content.Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS))
+        }
+      }) { Text("Toggle My Accessibility") }
+    }
+
+    OutlinedButton(onClick = onBack) { Text("Back") }
+  }
+  }
 }
 
 @Composable
