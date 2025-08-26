@@ -1,16 +1,4 @@
 package com.secondmind.minimal.feature.tg
-import androidx.compose.foundation.clickable
-import androidx.compose.material3.Surface
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.ui.window.DialogProperties
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.Alignment
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -37,8 +25,6 @@ private val TG_PREFER_PROXY = booleanPreferencesKey("tg_prefer_proxy")
 
 @Composable
 fun TelegramCard(modifier: Modifier = Modifier) {
-    var showSettings by remember { mutableStateOf(false) }
-
   val ctx = LocalContext.current
   val scope = rememberCoroutineScope()
 
@@ -112,16 +98,6 @@ fun TelegramCard(modifier: Modifier = Modifier) {
     Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
       Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         Text("Telegram", style = MaterialTheme.typography.titleLarge)
-            Spacer(Modifier.weight(1f))
-            Text(
-                text = "⚙",
-                modifier = Modifier
-                    .padding(start = 8.dp)
-                    .clip(CircleShape)
-                    .clickable { showSettings = true }
-                    .padding(4.dp),
-                style = MaterialTheme.typography.titleMedium
-            )
         IconButton(onClick = {
           if (reading) { Reader.stop(); reading = false; return@IconButton }
           if (items.isEmpty()) { refresh(); return@IconButton }
@@ -156,112 +132,4 @@ fun TelegramCard(modifier: Modifier = Modifier) {
       }
     }
   }
-
-    if (showSettings) {
-        TgChannelsDialog(onClose = { showSettings = false })
-    }
-}
-
-
-@Composable
-private fun TgChannelsDialog(onClose: () -> Unit) {
-    val ctx = LocalContext.current
-    val scope = rememberCoroutineScope()
-
-    val KEY_TG_CHANNELS = remember { stringPreferencesKey("tg_channels") }
-    val KEY_TG_HANDLES  = remember { stringPreferencesKey("tg_handles")  }
-
-    val current by remember {
-        ctx.dataStore.data.map { prefs ->
-            (prefs[KEY_TG_CHANNELS] ?: prefs[KEY_TG_HANDLES] ?: "")
-        }
-    }.collectAsState(initial = "")
-
-    var input by remember(current) { mutableStateOf(current) }
-
-    fun normalize(raw: String): String =
-        raw.split(',', '\n', ' ', '\t')
-            .map { it.trim() }
-            .filter { it.isNotEmpty() }
-            .map {
-                var t = it
-                val slash = t.lastIndexOf('/')
-                if (slash != -1) t = t.substring(slash + 1)
-                if (t.startsWith("@")) t = t.drop(1)
-                t.lowercase()
-            }
-            .distinct()
-            .joinToString(",")
-
-    Dialog(onDismissRequest = onClose, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.BottomCenter
-        ) {
-            Surface(
-                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-                tonalElevation = 6.dp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .navigationBarsPadding()
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .verticalScroll(rememberScrollState())
-                        .padding(16.dp)
-                ) {
-                    Text("Telegram Channels", style = MaterialTheme.typography.titleLarge)
-                    Spacer(Modifier.height(12.dp))
-
-                    OutlinedTextField(
-                        value = input,
-                        onValueChange = { input = it },
-                        label = { Text("Paste @handle or t.me link (comma/newline separated)") },
-                        minLines = 3,
-                        maxLines = 6,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(Modifier.height(10.dp))
-
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        OutlinedButton(onClick = { input = normalize(input) }) { Text("Normalize") }
-                        Button(
-                            onClick = {
-                                val v = normalize(input)
-                                scope.launch {
-                                    ctx.dataStore.edit { p ->
-                                        p[KEY_TG_CHANNELS] = v
-                                        p[KEY_TG_HANDLES]  = v
-                                    }
-                                    onClose()
-                                }
-                            },
-                            enabled = input.isNotBlank()
-                        ) { Text("Save") }
-
-                        OutlinedButton(
-                            onClick = {
-                                scope.launch {
-                                    ctx.dataStore.edit { p ->
-                                        p.remove(KEY_TG_CHANNELS)
-                                        p.remove(KEY_TG_HANDLES)
-                                    }
-                                    onClose()
-                                }
-                            }
-                        ) { Text("Clear") }
-                    }
-
-                    Spacer(Modifier.height(6.dp))
-                    Text(
-                        "Tip: separate multiple with comma or newlines. Links like https://t.me/xyz are accepted.",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Spacer(Modifier.height(8.dp))
-                }
-            }
-        }
-    }
 }
