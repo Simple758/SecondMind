@@ -1,8 +1,4 @@
 package com.secondmind.minimal.feature.tg
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
-import androidx.compose.runtime.produceState
-import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.clickable
 import androidx.compose.material3.Surface
 import androidx.compose.foundation.shape.CircleShape
@@ -175,11 +171,11 @@ private fun TgChannelsDialog(onClose: () -> Unit) {
     val KEY_TG_CHANNELS = remember { stringPreferencesKey("tg_channels") }
     val KEY_TG_HANDLES  = remember { stringPreferencesKey("tg_handles")  }
 
-    val current by produceState(initialValue = "") {
-    ctx.dataStore.data
-        .map { prefs -> (prefs[KEY_TG_CHANNELS] ?: prefs[KEY_TG_HANDLES] ?: "") }
-        .collect { value = it }
-}
+    val current by remember {
+        ctx.dataStore.data.map { prefs ->
+            (prefs[KEY_TG_CHANNELS] ?: prefs[KEY_TG_HANDLES] ?: "")
+        }
+    }.collectAsState(initial = "")
 
     var input by remember(current) { mutableStateOf(current) }
 
@@ -218,7 +214,9 @@ private fun TgChannelsDialog(onClose: () -> Unit) {
                     Text("Telegram Channels", style = MaterialTheme.typography.titleLarge)
                     Spacer(Modifier.height(12.dp))
 
-                    OutlinedTextField(value = input, onValueChange = { input = it },
+                    OutlinedTextField(
+                        value = input,
+                        onValueChange = { input = it },
                         label = { Text("Paste @handle or t.me link (comma/newline separated)") },
                         minLines = 3,
                         maxLines = 6,

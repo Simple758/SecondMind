@@ -14,12 +14,15 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun HomeCarousel(modifier: Modifier = Modifier) {
-  LazyVerticalGrid(columns = GridCells.Fixed(2),
+  LazyVerticalGrid(modifier = Modifier.heightIn(min = 0.dp, max = 520.dp),
+    
+    userScrollEnabled = false,
+    columns = GridCells.Fixed(2),
     horizontalArrangement = Arrangement.spacedBy(16.dp),
-    verticalArrangement   = Arrangement.spacedBy(16.dp),
-    contentPadding        = PaddingValues(16.dp),
-    modifier              = Modifier.heightIn(min = 0.dp, max = 520.dp),
-    userScrollEnabled     = false) {
+    verticalArrangement = Arrangement.spacedBy(16.dp),
+    contentPadding = PaddingValues(16.dp),
+    modifier = modifier.fillMaxSize()
+  ) {
     // Row 1 — News (full width)
     item(span = { GridItemSpan(2) }) {
       com.secondmind.minimal.feature.news.NewsCard(Modifier.fillMaxWidth())
