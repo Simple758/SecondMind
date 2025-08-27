@@ -1,7 +1,5 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 package com.secondmind.minimal
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.ExperimentalMaterial3Api
 import com.secondmind.minimal.future.ui.FutureBoot
@@ -101,30 +99,17 @@ fun rememberThemeMode(): State<String> {
 fun AppNav() {
   val nav = rememberNavController()
   Scaffold(topBar = { TopBarWithMenu(nav) }) { pad ->
-    NavHost(navController = nav, startDestination = "home", modifier = Modifier.padding(pad)) {
-      composable("home") {
-        HomeScreen(
-          onPulse   = { nav.navigate("pulse") },
-          onAddSeed = { nav.navigate("seed/new") },
-          onSettings= { nav.navigate("settings") },
-          onInbox   = { nav.navigate("inbox") }
-        )
-      }
+    NavHost(nav, startDestination = "home", modifier = Modifier.padding(pad)) {
+        composable("home") {
+          HomeScreen(
+            onPulse = { nav.navigate("pulse") },
+            onAddSeed = { nav.navigate("seed/new") },
+            onSettings = { nav.navigate("settings") },
+            onInbox = { nav.navigate("inbox") }
+          )
+        }
       composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
       composable("inbox") { InboxScreen() }
-
-      // Safe placeholders so navigation never crashes
-      composable("pulse") {
-        androidx.compose.material3.Text(
-          "Pulse (placeholder)", modifier = Modifier.padding(24.dp)
-        )
-      }
-      composable("seed/new") {
-        androidx.compose.material3.Text(
-          "Seed Editor (placeholder)", modifier = Modifier.padding(24.dp)
-        )
-      }
-
       composable(
         route = "notification/{id}",
         arguments = listOf(navArgument("id"){ type = NavType.LongType })
@@ -148,7 +133,7 @@ fun titleFor(nav: NavHostController): String {
 }
 
 @Composable
-fun HomeScreen(onPulse: () -> Unit, onAddSeed: () -> Unit, onSettings: () -> Unit, onInbox: () -> Unit) {
+fun HomeScreen(onPulse: ()->Unit, onAddSeed: ()->Unit, onSettings: ()->Unit, onInbox: ()->Unit) {
   androidx.compose.foundation.layout.Column(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
     ModeChipBar(onPulse={ nav.navigate("pulse") }, onAddSeed={ nav.navigate("seed/new") }, modifier = androidx.compose.ui.Modifier.padding(horizontal = 12.dp));
       FutureBoot();
