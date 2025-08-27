@@ -1,11 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 package com.secondmind.minimal
-import com.secondmind.minimal.future.ui.FutureBoot
-import com.secondmind.minimal.future.ui.SeedEditorScreen
-import com.secondmind.minimal.future.ui.PulseScreen
-import com.secondmind.minimal.future.ui.ModeChipBar
-import androidx.work.WorkManager
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenu
@@ -27,6 +21,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -125,9 +120,7 @@ fun titleFor(nav: NavHostController): String {
 @Composable
 fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
   androidx.compose.foundation.layout.Column(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
-    ModeChipBar(onPulse={ nav.navigate("pulse") }, onAddSeed={ nav.navigate("seed/new") }, modifier = androidx.compose.ui.Modifier.padding(horizontal = 12.dp));
-      FutureBoot();
-      com.secondmind.minimal.home.HomeCarousel(modifier = androidx.compose.ui.Modifier.weight(1f))
+    com.secondmind.minimal.home.HomeCarousel(modifier = androidx.compose.ui.Modifier.weight(1f))
     androidx.compose.foundation.layout.Row(
       modifier = androidx.compose.ui.Modifier
         .fillMaxWidth()
