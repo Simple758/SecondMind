@@ -100,14 +100,14 @@ fun AppNav() {
   val nav = rememberNavController()
   Scaffold(topBar = { TopBarWithMenu(nav) }) { pad ->
     NavHost(nav, startDestination = "home", modifier = Modifier.padding(pad)) {
-        composable("home") {
-          HomeScreen(
-            onPulse = { nav.navigate("pulse") },
-            onAddSeed = { nav.navigate("seed/new") },
-            onSettings = { nav.navigate("settings") },
-            onInbox = { nav.navigate("inbox") }
-          )
-        }
+      composable("home") {
+  HomeScreen(
+    onPulse   = { nav.navigate("pulse") },
+    onAddSeed = { nav.navigate("seed/new") },
+    onSettings= { nav.navigate("settings") },
+    onInbox   = { nav.navigate("inbox") }
+  )
+}, onInbox = { nav.navigate("inbox") }) }
       composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
       composable("inbox") { InboxScreen() }
       composable(
