@@ -100,14 +100,7 @@ fun AppNav() {
   val nav = rememberNavController()
   Scaffold(topBar = { TopBarWithMenu(nav) }) { pad ->
     NavHost(nav, startDestination = "home", modifier = Modifier.padding(pad)) {
-      composable("home") {
-  HomeScreen(
-    onPulse   = { nav.navigate("pulse") },
-    onAddSeed = { nav.navigate("seed/new") },
-    onSettings= { nav.navigate("settings") },
-    onInbox   = { nav.navigate("inbox") }
-  )
-}, onInbox = { nav.navigate("inbox") }) }
+      composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }) }
       composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
       composable("inbox") { InboxScreen() }
       composable(
@@ -133,7 +126,7 @@ fun titleFor(nav: NavHostController): String {
 }
 
 @Composable
-fun HomeScreen(onPulse: ()->Unit, onAddSeed: ()->Unit, onSettings: ()->Unit, onInbox: ()->Unit) {
+fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
   androidx.compose.foundation.layout.Column(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
     ModeChipBar(onPulse={ nav.navigate("pulse") }, onAddSeed={ nav.navigate("seed/new") }, modifier = androidx.compose.ui.Modifier.padding(horizontal = 12.dp));
       FutureBoot();
