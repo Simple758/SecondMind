@@ -1,31 +1,125 @@
 package com.secondmind.minimal.future.ui
-import androidx.compose.foundation.layout.*; import androidx.compose.material3.*; import androidx.compose.runtime.*; import androidx.compose.ui.Modifier; import androidx.compose.ui.platform.LocalContext; import androidx.compose.ui.unit.dp; import androidx.navigation.NavController
-import com.secondmind.minimal.future.db.*
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+
 @Composable
-fun SeedEditorScreen(nav:NavController){
-  val ctx=LocalContext.current
-  var text by remember{ mutableStateOf("") }
-  var type by remember{ mutableStateOf("time") }
-  var operator by remember{ mutableStateOf(">=") }
-  var value by remember{ mutableStateOf("") }
-  var keyword by remember{ mutableStateOf("") }
-  var deadline by remember{ mutableStateOf("") }
-  Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement=Arrangement.spacedBy(10.dp)){
-    Text("New Seed", style=MaterialTheme.typography.titleLarge)
-    OutlinedTextField(text, {text=it}, Modifier.fillMaxWidth(), label={ Text("Note (text)") })
-    Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){
-      val sel=(type=="time"); (if(sel) Button(onClick={}) else OutlinedButton(onClick={ type="time" })){ Text("Time") }
-      val sel2=(type=="price_manual"); (if(sel2) Button(onClick={}) else OutlinedButton(onClick={ type="price_manual" })){ Text("Price") }
-      val sel3=(type=="keyword"); (if(sel3) Button(onClick={}) else OutlinedButton(onClick={ type="keyword" })){ Text("Keyword") }
-      val sel4=(type=="context"); (if(sel4) Button(onClick={}) else OutlinedButton(onClick={ type="context" })){ Text("Context") }
+fun SeedEditorScreen(
+    onBack: () -> Unit = {},
+    onSave: (text: String, type: String, value: String, keyword: String, deadline: Long?) -> Unit = { _,_,_,_,_ -> }
+) {
+    var noteText by remember { mutableStateOf("") }
+    var type by remember { mutableStateOf("time") } // time | price_manual | keyword | context
+    var value by remember { mutableStateOf("") }    // numeric for price_manual or generic value
+    var keyword by remember { mutableStateOf("") }
+    var deadlineStr by remember { mutableStateOf("") }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Seed Editor") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, contentDescription = "Back") }
+                }
+            )
+        }
+    ) { pad ->
+        Column(
+            modifier = Modifier
+                .padding(pad)
+                .padding(16.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            OutlinedTextField(
+                value = noteText,
+                onValueChange = { noteText = it },
+                label = { Text("Note") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Type chooser (stable buttons, no experimental APIs)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TypeButton(current = type, mine = "time", label = "Time") { type = "time" }
+                TypeButton(current = type, mine = "price_manual", label = "Price") { type = "price_manual" }
+                TypeButton(current = type, mine = "keyword", label = "Keyword") { type = "keyword" }
+                TypeButton(current = type, mine = "context", label = "Context") { type = "context" }
+            }
+
+            when (type) {
+                "time" -> {
+                    OutlinedTextField(
+                        value = deadlineStr,
+                        onValueChange = { deadlineStr = it },
+                        label = { Text("Deadline (epoch ms)") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                "price_manual" -> {
+                    OutlinedTextField(
+                        value = value,
+                        onValueChange = { value = it },
+                        label = { Text("Target price (number)") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                "keyword" -> {
+                    OutlinedTextField(
+                        value = keyword,
+                        onValueChange = { keyword = it },
+                        label = { Text("Keyword to watch for") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                "context" -> {
+                    OutlinedTextField(
+                        value = value,
+                        onValueChange = { value = it },
+                        label = { Text("Context value (e.g., WIFI, HOME)") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedButton(onClick = onBack) { Text("Cancel") }
+                Button(onClick = {
+                    val deadline = deadlineStr.toLongOrNull()
+                    onSave(noteText, type, value, keyword, deadline)
+                    onBack()
+                }) { Text("Save") }
+            }
+        }
     }
-    if(type=="price_manual"){ OutlinedTextField(operator,{operator=it}, label={Text("Operator (>=, <=, >, <, ==)")}); OutlinedTextField(value,{value=it}, label={Text("Target (number)")}) }
-    if(type=="keyword"){ OutlinedTextField(keyword,{keyword=it}, label={Text("Keyword")}) }
-    if(type=="time"){ OutlinedTextField(deadline,{deadline=it}, label={Text("Deadline (epoch millis)")}) }
-    Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){
-      Button(onClick={ val id=FutureNoteRepo.add(ctx,text=isSeedText(text),isSeed=true); val dl=deadline.toLongOrNull(); FutureSeedRepo.addSeed(ctx,id,type,operator,value,keyword,dl,"PENDING"); nav.popBackStack() }){ Text("Save") }
-      OutlinedButton(onClick={ nav.popBackStack() }){ Text("Cancel") }
-    }
-  }
 }
-private fun isSeedText(t:String)= if(t.isBlank()) "(seed)" else t
+
+@Composable
+private fun TypeButton(
+    current: String,
+    mine: String,
+    label: String,
+    onClick: () -> Unit
+) {
+    val selected = current == mine
+    if (selected) {
+        FilledTonalButton(onClick = onClick) { Text(label) }
+    } else {
+        OutlinedButton(onClick = onClick) { Text(label) }
+    }
+}
