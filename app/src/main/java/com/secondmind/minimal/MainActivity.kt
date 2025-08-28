@@ -1,11 +1,14 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 package com.secondmind.minimal
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Arrangement
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Text
-import androidx.navigation.NavHostController
 import com.secondmind.minimal.future.ui.PulseScreen
 import com.secondmind.minimal.future.ui.SeedEditorScreen
 import androidx.compose.foundation.layout.imePadding
@@ -27,7 +30,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.rememberScrollState
@@ -44,7 +46,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.preferences.core.edit
-import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
@@ -102,7 +103,7 @@ fun AppNav() {
     NavHost(nav, startDestination = "home", modifier = Modifier.padding(pad)) {
       composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }) }
         composable("pulse") { PulseScreen(nav) }
-        composable("seed\/new") { SeedEditorScreen(nav) }
+        composable("seed/new") { SeedEditorScreen(nav) }
       composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
       composable("inbox") { InboxScreen() }
       composable(
