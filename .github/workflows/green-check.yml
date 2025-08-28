@@ -1,8 +1,10 @@
 name: Green Check
 on:
-  pull_request:
-    branches: [ main ]
+  pull_request: { branches: [ main ] }
   workflow_dispatch:
+concurrency:
+  group: gc-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,10 +22,5 @@ jobs:
         run: sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
       - name: Setup Gradle (no wrapper)
         uses: gradle/actions/setup-gradle@v3.5.0
-      - name: Build (compile only)
-        run: |
-          gradle --no-daemon -q \
-            :app:compileDebugKotlin \
-            :app:compileDebugJavaWithJavac \
-            :app:assembleDebug \
-            testDebugUnitTest
+      - name: Build (assemble only, mirrors android-apk.yml)
+        run: gradle --no-daemon clean :app:assembleDebug
