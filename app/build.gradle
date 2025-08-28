@@ -11,8 +11,8 @@ android {
     applicationId "com.secondmind.minimal"
     minSdk 24
     targetSdk 34
-versionCode 200
-    versionName "1.0.200"
+versionCode 140
+    versionName "1.0.140"
   }
   buildTypes {
     release {
