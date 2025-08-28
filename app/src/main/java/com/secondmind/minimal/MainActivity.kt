@@ -1,11 +1,10 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 package com.secondmind.minimal
+import androidx.navigation.compose.rememberNavController
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Text
-import androidx.navigation.NavHostController
 import com.secondmind.minimal.future.ui.PulseScreen
 import com.secondmind.minimal.future.ui.SeedEditorScreen
 import androidx.compose.foundation.layout.imePadding
@@ -27,7 +26,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.rememberScrollState
@@ -44,7 +42,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.preferences.core.edit
-import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
@@ -102,7 +99,7 @@ fun AppNav() {
     NavHost(nav, startDestination = "home", modifier = Modifier.padding(pad)) {
       composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }) }
         composable("pulse") { PulseScreen(nav) }
-        composable("seed\/new") { SeedEditorScreen(nav) }
+        composable("seed/new") { SeedEditorScreen(nav) }
       composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
       composable("inbox") { InboxScreen() }
       composable(
@@ -117,7 +114,7 @@ fun AppNav() {
 }
 
 @Composable
-fun titleFor(nav: NavHostController): String {
+fun titleFor(nav: androidx.navigation.NavHostController): String {
   val e by nav.currentBackStackEntryAsState()
   return when (e?.destination?.route?.substringBefore("/")) {
     "settings" -> "Settings"
@@ -179,18 +176,18 @@ fun SettingsScreen(onBack: () -> Unit) {
   ) {
     Column(
       Modifier.fillMaxWidth().padding(24.dp),
-      verticalArrangement = Arrangement.spacedBy(16.dp),
+      verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(16.dp),
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
       Text("Settings", fontSize = 22.sp)
 
-      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+      Row(horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)) {
         OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "system" } } }) { Text("System") }
         OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "light" } } }) { Text("Light") }
         OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "dark" } } }) { Text("Dark") }
       }
 
-      Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+      Row(horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
         Text("Retention (days): $retention")
         OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.RETENTION_DAYS] = maxOf(1, retention - 1) } } }) { Text("-") }
         OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.RETENTION_DAYS] = retention + 1 } } }) { Text("+") }
@@ -214,11 +211,11 @@ fun SettingsScreen(onBack: () -> Unit) {
       Text("Accessibility: " + if (enabledNow) "ON" else "OFF")
       Text("Service ID: " + idText, fontSize = 12.sp)
 
-      Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+      Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)) {
         Text("Enabled")
         Switch(checked = readerEnabled, onCheckedChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_ENABLED] = v } } })
       }
-      Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+      Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp)) {
         Text("Rate: ${"%.2f".format(readerRate)}")
         Slider(value = readerRate,
                onValueChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_RATE] = v.coerceIn(0.5f, 1.5f) } } },
@@ -229,7 +226,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                valueRange = 0.5f..1.5f, steps = 10)
       }
 
-      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+      Row(horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)) {
         com.secondmind.minimal.ui.TtsSettings()
         OutlinedButton(onClick = { com.secondmind.minimal.tts.Reader.stop() }) { Text("Stop reading") }
         OutlinedButton(onClick = { Reader.speak(ctx, "This is a test of the SecondMind reader.") }) { Text("Test Read") }
@@ -239,7 +236,7 @@ fun SettingsScreen(onBack: () -> Unit) {
         }) { Text("Open Accessibility Settings") }
       }
 
-      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+      Row(horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)) {
         OutlinedButton(onClick = {
           val ctx2 = ctx
           try {
@@ -261,7 +258,7 @@ fun SettingsScreen(onBack: () -> Unit) {
 
 
 @Composable
-fun TopBarWithMenu(nav: NavHostController) {
+fun TopBarWithMenu(nav: androidx.navigation.NavHostController) {
   var open by remember { mutableStateOf(false) }
   CenterAlignedTopAppBar(
     title = { Text(titleFor(nav)) },
@@ -290,8 +287,8 @@ fun TopBarWithMenu(nav: NavHostController) {
 }
 
 @Composable
-fun QuickFab(nav: NavHostController) {
-  Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+fun QuickFab(nav: androidx.navigation.NavHostController) {
+  Column(verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)) {
     FloatingActionButton(onClick = { nav.navigate("seed/new") }) { Text("Seed") }
     FloatingActionButton(onClick = { nav.navigate("pulse") }) { Text("Pulse") }
   }
