@@ -1,13 +1,5 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 package com.secondmind.minimal
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.ui.unit.dp
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Text
-import androidx.navigation.NavHostController
-import com.secondmind.minimal.future.ui.PulseScreen
-import com.secondmind.minimal.future.ui.SeedEditorScreen
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenu
@@ -98,11 +90,9 @@ fun rememberThemeMode(): State<String> {
 @Composable
 fun AppNav() {
   val nav = rememberNavController()
-  Scaffold(topBar = { TopBarWithMenu(nav) }, floatingActionButton = { QuickFab(nav) }) { pad ->
+  Scaffold(topBar = { TopBarWithMenu(nav) }) { pad ->
     NavHost(nav, startDestination = "home", modifier = Modifier.padding(pad)) {
       composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }) }
-        composable("pulse") { PulseScreen(nav) }
-        composable("seed\/new") { SeedEditorScreen(nav) }
       composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
       composable("inbox") { InboxScreen() }
       composable(
@@ -287,12 +277,4 @@ fun TopBarWithMenu(nav: NavHostController) {
       }
     }
   )
-}
-
-@Composable
-fun QuickFab(nav: NavHostController) {
-  Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-    FloatingActionButton(onClick = { nav.navigate("seed/new") }) { Text("Seed") }
-    FloatingActionButton(onClick = { nav.navigate("pulse") }) { Text("Pulse") }
-  }
 }
