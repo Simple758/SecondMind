@@ -5,6 +5,10 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+concurrency:
+  group: android-apk
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,17 +28,15 @@ jobs:
         uses: gradle/actions/setup-gradle@v3.5.0
         with:
           gradle-version: 8.7
-          cache-read-only: false
 
       # Hard-disable wrapper so it cannot be used accidentally
-      - name: Disable Gradle Wrapper (force system gradle)
+      - name: Disable Gradle Wrapper
         run: |
           rm -f gradlew gradlew.bat || true
           rm -rf gradle/wrapper || true
-          echo "Wrapper removed in CI workspace."
-          # Safety check: fail if any workflow references ./gradlew
-          if grep -RIn "./gradlew" .github/workflows | grep -v "Disable Gradle Wrapper" ; then
-            echo "Found a workflow that invokes ./gradlew. Please remove it." >&2
+          # Fail build if any workflow still references ./gradlew
+          if grep -RIn "./gradlew" .github/workflows; then
+            echo "A workflow references ./gradlew. Remove it." >&2
             exit 1
           fi
 
@@ -48,11 +50,9 @@ jobs:
         run: |
           sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
-      # Single build step — system 'gradle' only (no wrapper)
+      # Single build step — system 'gradle' (no wrapper)
       - name: Build Debug APK with Gradle 8.7
-        run: |
-          gradle -v
-          gradle --no-daemon clean :app:assembleDebug
+        run: gradle --no-daemon clean :app:assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
