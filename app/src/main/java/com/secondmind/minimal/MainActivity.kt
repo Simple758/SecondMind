@@ -94,7 +94,7 @@ fun AppNav() {
     NavHost(nav, startDestination = "home", modifier = Modifier.padding(pad)) {
       composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }) }
       composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
-      composable("inbox") { InboxScreen() }
+      composable("inbox") { InboxScreen() }\n      composable("pulse") { com.secondmind.minimal.v01.ui.pulse.PulseScreen() }\n      composable("v01home") { com.secondmind.minimal.v01.ui.home.V01HomeScreen() }
       composable(
         route = "notification/{id}",
         arguments = listOf(navArgument("id"){ type = NavType.LongType })
@@ -127,7 +127,7 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
         .padding(horizontal = 16.dp, vertical = 12.dp),
       horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
     ) {
-      androidx.compose.material3.OutlinedButton(onClick = onInbox) { androidx.compose.material3.Text("Inbox") }
+      androidx.compose.material3.OutlinedButton(onClick = onInbox) { androidx.compose.material3.Text("Inbox") }\n      androidx.compose.material3.OutlinedButton(onClick = onPulse) { androidx.compose.material3.Text("Pulse") }\n      androidx.compose.material3.OutlinedButton(onClick = onV01) { androidx.compose.material3.Text("V0.1") }
       androidx.compose.material3.OutlinedButton(onClick = onSettings) { androidx.compose.material3.Text("Settings") }
     }
   }
