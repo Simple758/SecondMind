@@ -35,7 +35,7 @@ jobs:
           rm -f gradlew gradlew.bat || true
           rm -rf gradle/wrapper || true
           # Fail build if any workflow still references ./gradlew
-          if grep -RIn "./gradlew" .github/workflows; then
+          if grep -RIn "./gradlew" .github/workflows | grep -v "android-apk.yml" ; then
             echo "A workflow references ./gradlew. Remove it." >&2
             exit 1
           fi
