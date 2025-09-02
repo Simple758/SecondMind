@@ -45,6 +45,7 @@
             <action android:name="android.service.notification.NotificationListenerService" />
         </intent-filter>
     </service>
-</application>
+    <activity android:name="com.secondmind.minimal.feature.news.NewsActivity" android:exported="false" />
+    </application>
 </manifest>
 
