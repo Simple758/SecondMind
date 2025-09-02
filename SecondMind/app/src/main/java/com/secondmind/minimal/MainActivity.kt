@@ -127,6 +127,19 @@ fun titleFor(nav: NavHostController): String {
 
 @Composable
 fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit, onNews: () -> Unit) {
+    // NEWS_BUILD_MARK
+    androidx.compose.material3.ElevatedCard(
+      modifier = androidx.compose.ui.Modifier
+        .fillMaxWidth()
+        .padding(16.dp)
+    ) {
+      androidx.compose.material3.Text(
+        "NEWS BUILD • FAB • 2025-09-03 00:47",
+        modifier = androidx.compose.ui.Modifier.padding(12.dp),
+        style = androidx.compose.material3.MaterialTheme.typography.labelLarge
+      )
+    }
+
   androidx.compose.foundation.layout.Column(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
     com.secondmind.minimal.home.HomeCarousel(modifier = androidx.compose.ui.Modifier.weight(1f))
     androidx.compose.foundation.layout.Row(
