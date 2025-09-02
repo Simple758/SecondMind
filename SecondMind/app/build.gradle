@@ -52,3 +52,8 @@ dependencies {
   implementation "androidx.appcompat:appcompat:1.7.0"
 
 }
+
+/** helper for CI */
+tasks.register("printVersionName") {
+    doLast { println(android.defaultConfig.versionName) }
+}
