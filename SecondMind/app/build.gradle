@@ -11,10 +11,15 @@ android {
     applicationId "com.secondmind.minimal"
     minSdk 24
     targetSdk 34
-versionCode 144
-    versionName "1.0.140-news-fab-vis-ci-20250903-0127"
+versionCode 145
+    versionName "1.0.140-news-fab-vis-ci-20250903-0127-ci-20250903-0144"
   }
   buildTypes {
+        debug {
+            applicationIdSuffix ".dbg"
+            versionNameSuffix "-dbg"
+        }
+
     release {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
