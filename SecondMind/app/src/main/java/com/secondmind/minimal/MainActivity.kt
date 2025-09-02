@@ -90,7 +90,14 @@ fun rememberThemeMode(): State<String> {
 @Composable
 fun AppNav() {
   val nav = rememberNavController()
-  Scaffold(topBar = { TopBarWithMenu(nav) }) { pad ->
+  Scaffold(topBar = { TopBarWithMenu(nav) },
+    floatingActionButton = {
+      androidx.compose.material3.ExtendedFloatingActionButton(onClick = { nav.navigate("news") }) {
+        androidx.compose.material3.Text("News")
+      }
+    },
+    floatingActionButtonPosition = androidx.compose.material3.FabPosition.End
+  ) { pad ->
     NavHost(nav, startDestination = "home", modifier = Modifier.padding(pad)) {
       composable("home") { HomeScreen(onSettings = {
       composable("news") { com.secondmind.minimal.feature.news.NewsHubScreen() } nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }) }
