@@ -27,3 +27,16 @@ config/deepseek.env
 # Backups & accidental nested tree
 SecondMind.bak-*/
 SecondMind/
+SecondMind.bak-*/
+SecondMind/
+.gradle/
+build/
+app/build/
+ci-artifacts/
+artifacts/
+.ops_receipts/
+config/deepseek.env
+*.apk
+*.aab
+.idea/
+*.iml
