@@ -1,11 +1,3 @@
-.gradle/
-build/
-app/build/
-*.apk
-*.aab
-local.properties
-config/deepseek.env
-config/news.env
 # == agent & secrets (added by deepseek-hardening) ==
 config/*.env
 !config/*.env.example
