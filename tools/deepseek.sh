@@ -1,14 +1,10 @@
 #!/usr/bin/env bash
-# Repo-resident DeepSeek agent (auto-apply).
-# Usage:
-#   tools/deepseek.sh "Fix the CI failure"
-#   tools/deepseek.sh "Edit MainActivity.kt: add a Share button"
-#   echo "Explain AccessibilitySettingsActivity.kt" | tools/deepseek.sh
+# Repo-resident DeepSeek agent (auto-apply)
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-# Load config (keep your key here): config/deepseek.env
+# Load API key/config
 [[ -f "$ROOT/config/deepseek.env" ]] && . "$ROOT/config/deepseek.env" || true
 : "${DEEPSEEK_API_KEY:?Missing DEEPSEEK_API_KEY. Put it in config/deepseek.env}"
 : "${DEEPSEEK_BASE_URL:=https://api.deepseek.com}"
@@ -24,7 +20,7 @@ git rev-parse --is-inside-work-tree >/dev/null 2>&1 || err "Not a git repo."
 if [[ $# -gt 0 ]]; then INSTR="$*"; else INSTR="$(cat)"; fi
 
 # System prompt: emit patch for code changes, plain text for explanations
-read -r -d "" SYS <<EOS || true
+read -r -d "" SYS <<'EOS' || true
 You live inside this repository and can change files.
 - If the user asks to MODIFY CODE, return ONLY a single unified git patch starting with lines like:
   diff --git a/<path> b/<path>
@@ -36,10 +32,10 @@ You live inside this repository and can change files.
 - Keep diffs minimal and correct. Prefer tiny, surgical edits.
 EOS
 
-# Call DeepSeek via Python (safe quoting via env)
+# Call DeepSeek -> write response to a temp file
 export DS_SYS="$SYS" DS_USER="$INSTR"
 OUTFILE="$(mktemp)"
-python3 - "$DEEPSEEK_BASE_URL" "$DEEPSEEK_API_KEY" "$DEEPSEEK_MODEL" "$OUTFILE" <<PY
+python3 - "$DEEPSEEK_BASE_URL" "$DEEPSEEK_API_KEY" "$DEEPSEEK_MODEL" "$OUTFILE" > /dev/null <<'PY2'
 import os, sys, json, urllib.request, pathlib
 base, key, model, outfile = sys.argv[1:5]
 system_text = os.environ.get("DS_SYS","")
@@ -61,14 +57,12 @@ with urllib.request.urlopen(req, timeout=180) as r:
     data = json.loads(r.read().decode("utf-8", "replace"))
 text = data["choices"][0]["message"]["content"]
 pathlib.Path(outfile).write_text(text, encoding="utf-8")
-print(outfile)
-PY
-
-MODEL_OUT_PATH="$(cat "$OUTFILE")"
+PY2
+MODEL_OUT_PATH="$OUTFILE"
 
 # Try to extract a unified diff (strip fences; cut from first "diff --git")
 PATCH="$(mktemp)"
-python3 - "$MODEL_OUT_PATH" "$PATCH" <<PY || true
+python3 - "$MODEL_OUT_PATH" "$PATCH" <<'PY3' || true
 import sys, re, pathlib
 src, dest = sys.argv[1], sys.argv[2]
 s = pathlib.Path(src).read_text(encoding="utf-8")
@@ -77,16 +71,14 @@ i = s.find("diff --git ")
 if i == -1:
     raise SystemExit(1)
 pathlib.Path(dest).write_text(s[i:], encoding="utf-8")
-PY
+PY3
 
 if [[ -s "$PATCH" ]] && grep -q "^diff --git " "$PATCH"; then
   SP="safety/$(TS)"; BR="backup/$(TS)"
   git tag -f "$SP" >/dev/null 2>&1 || true
   git checkout -b "$BR" >/dev/null 2>&1 || git checkout "$BR" >/dev/null 2>&1 || true
   say "Safety point: $SP  (branch $BR)"
-  if ! git apply --3way --whitespace=fix "$PATCH"; then
-    err "git apply failed. Patch saved at: $PATCH"
-  fi
+  git apply --3way --whitespace=fix "$PATCH" || err "git apply failed. Patch: $PATCH"
   git add -A
   git commit -m "[deepseek] auto-apply: ${INSTR:0:80}" || true
   git push --set-upstream origin "$BR" || true

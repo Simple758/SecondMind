@@ -3,7 +3,6 @@ package com.secondmind.minimal.access
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import com.secondmind.minimal.MainActivity
 
 class AccessibilitySettingsActivity : Activity() {
   override fun onCreate(savedInstanceState: Bundle?) {
