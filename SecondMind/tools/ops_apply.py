@@ -128,7 +128,7 @@ def main():
     for step in steps:
         path = step["file"]
         if not any(path.startswith(p) for p in [
-            "app/src/", "app/build.gradle", "build.gradle", "settings.gradle",
+            "app/src/", "app/build.gradle", "build.gradle", "settings.gradle", "SecondMind/app/src/", "SecondMind/app/build.gradle", "SecondMind/build.gradle", "SecondMind/settings.gradle",
             "gradle.properties", ".github/workflows/"
         ]):
             raise RuntimeError(f"Path not allowed: {path}")
