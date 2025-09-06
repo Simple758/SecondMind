@@ -4,7 +4,9 @@ plugins {
   id 'org.jetbrains.kotlin.kapt'
 }
 
-android {
+android {    buildFeatures {
+        buildConfig = true
+    }
   namespace "com.secondmind.minimal"
   compileSdk 34
   defaultConfig {
