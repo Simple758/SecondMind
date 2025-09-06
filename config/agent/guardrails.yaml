@@ -1,0 +1,17 @@
+allow_paths:
+  - "app/src/"
+  - "app/build.gradle"
+  - "build.gradle"
+  - "settings.gradle"
+  - "gradle.properties"
+  - ".github/workflows/"
+
+deny_patterns:
+  - "signing"
+  - "keystore"
+  - "google-services.json"
+  - "gradlew"
+  - "gradle/wrapper/"
+
+max_insert_bytes: 20000
+max_plan_steps: 50

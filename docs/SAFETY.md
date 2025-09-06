@@ -1,0 +1,3 @@
+- Safety tag/branch created before writes.
+- Only edits allowlisted paths.
+- Rollback: tools/agentctl rollback last-safety
