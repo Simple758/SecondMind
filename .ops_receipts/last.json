@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "steps": [
+    {
+      "op": "open",
+      "file": "app/src/main/java/com/secondmind/minimal/MainActivity.kt"
+    },
+    {
+      "op": "insert",
+      "file": "app/src/main/java/com/secondmind/minimal/MainActivity.kt",
+      "after": "package com.secondmind.minimal",
+      "text": "\n// TODO(agent): DeepSeek wiring test\n",
+      "guard": "// TODO\\(agent\\): DeepSeek wiring test"
+    }
+  ]
+}

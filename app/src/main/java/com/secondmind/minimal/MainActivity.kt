@@ -1,5 +1,7 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 package com.secondmind.minimal
+// TODO(agent): DeepSeek wiring test
+
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenu
