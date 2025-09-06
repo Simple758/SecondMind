@@ -15,6 +15,22 @@ versionCode 140
     versionName "1.0.140"
   }
   buildTypes {
+        // --- News API key (guarded) ---
+        debug {
+            if (System.getenv("NEWS_API_KEY") != null || project.hasProperty("NEWS_API_KEY")) {
+                buildConfigField("String","NEWS_API_KEY","\"" + (project.findProperty("NEWS_API_KEY") ?: System.getenv("NEWS_API_KEY")) + "\"")
+            } else {
+                buildConfigField("String","NEWS_API_KEY","\"\"")
+            }
+        }
+        release {
+            if (System.getenv("NEWS_API_KEY") != null || project.hasProperty("NEWS_API_KEY")) {
+                buildConfigField("String","NEWS_API_KEY","\"" + (project.findProperty("NEWS_API_KEY") ?: System.getenv("NEWS_API_KEY")) + "\"")
+            } else {
+                buildConfigField("String","NEWS_API_KEY","\"\"")
+            }
+        }
+
     release {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -27,6 +43,15 @@ versionCode 140
 }
 
 dependencies {
+    // --- News feature deps (guarded) ---
+    if (!configurations.findByName("implementation").allDependencies.any{ it.group=="com.squareup.retrofit2" }) {
+        implementation "com.squareup.retrofit2:retrofit:2.9.0"
+        implementation "com.squareup.retrofit2:converter-gson:2.9.0"
+        implementation "com.squareup.okhttp3:okhttp:4.12.0"
+        implementation "com.squareup.okhttp3:logging-interceptor:4.12.0"
+        implementation "io.coil-kt:coil-compose:2.6.0"
+    }
+
     implementation "org.jsoup:jsoup:1.17.2"
   implementation "androidx.compose.material:material-icons-extended"
   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1"

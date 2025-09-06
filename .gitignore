@@ -5,3 +5,4 @@ app/build/
 *.aab
 local.properties
 config/deepseek.env
+config/news.env

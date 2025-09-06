@@ -1,5 +1,100 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 package com.secondmind.minimal
+// --- AGENT: Temporary NewsScreen and fetch using Retrofit ---
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import com.secondmind.minimal.BuildConfig
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.GET
+import retrofit2.http.Query
+
+private data class NewsSource(val id:String?, val name:String?)
+private data class NewsArticle(
+    val source: NewsSource?, val author:String?, val title:String?,
+    val description:String?, val url:String?, val urlToImage:String?, val publishedAt:String?, val content:String?
+)
+private data class TopHeadlinesResponse(val status:String?, val totalResults:Int?, val articles:List<NewsArticle>?)
+
+private interface NewsApi {
+    @GET("/v2/top-headlines")
+    suspend fun top(
+        @Query("category") category:String = "technology",
+        @Query("country") country:String = "us",
+        @Query("apiKey") apiKey:String
+    ): TopHeadlinesResponse
+}
+
+@Composable
+fun NewsScreen() {
+    val apiKey = BuildConfig.NEWS_API_KEY
+    var state by remember { mutableStateOf<Result<List<NewsArticle>>?>(null) }
+
+    LaunchedEffect(apiKey) {
+        state = try {
+            val retrofit = Retrofit.Builder()
+                .baseUrl("https://newsapi.org")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+            val svc = retrofit.create(NewsApi::class.java)
+            val res = withContext(Dispatchers.IO) { svc.top(apiKey = apiKey) }
+            if (res.status == "ok" && !res.articles.isNullOrEmpty()) Result.success(res.articles!!) else Result.failure(Exception("No articles"))
+        } catch (t:Throwable) { Result.failure(t) }
+    }
+
+    val r = state
+    when {
+        r == null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
+        r.isSuccess -> NewsList(r.getOrNull().orEmpty())
+        else -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Failed to load news")
+                Spacer(Modifier.height(8.dp))
+                Button({ state = null }) { Text("Retry") }
+            }
+        }
+    }
+}
+
+@Composable private fun NewsList(items: List<NewsArticle>) {
+    LazyColumn(contentPadding = PaddingValues(16.dp)) {
+        items(items) { a ->
+            Card(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(16.dp)) {
+                    if (a.urlToImage != null) {
+                        AsyncImage(model=a.urlToImage, contentDescription=null, modifier=Modifier.fillMaxWidth().height(180.dp))
+                        Spacer(Modifier.height(8.dp))
+                    }
+                    Text(a.title ?: "(no title)", style=MaterialTheme.typography.titleMedium)
+                    Spacer(Modifier.height(4.dp))
+                    Text(a.source?.name ?: "", style=MaterialTheme.typography.bodySmall)
+                    Spacer(Modifier.height(8.dp))
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                        val url=a.url
+                        Button(enabled = url!=null, onClick = { url?.let { it1 ->
+                            val ctx = androidx.compose.ui.platform.LocalContext.current
+                            ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it1)))
+                        } }) { Text("Open") }
+                    }
+                }
+            }
+            Spacer(Modifier.height(12.dp))
+        }
+    }
+}
+// --- AGENT END ---
+
 // TODO(agent): DeepSeek wiring test
 
 import androidx.compose.foundation.layout.imePadding
