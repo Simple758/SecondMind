@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# Load env if present
+[[ -f "$ROOT/config/deepseek.env" ]] && source "$ROOT/config/deepseek.env"
+
+DS_URL="${DEEPSEEK_BASE_URL:-https://api.deepseek.com}"
+DS_MODEL="${DEEPSEEK_MODEL:-deepseek-chat}"
+HEADERS=(-H "Authorization: Bearer ${DEEPSEEK_API_KEY:-}" -H "Content-Type: application/json")
+
+guard_safety() {
+  STAMP=$(date -u +'%Y%m%d-%H%M%S')
+  git tag "safety/$STAMP" || true
+  git branch "backup/$STAMP" || true
+  git push origin --tags || true
+  git push origin "backup/$STAMP" || true
+  echo "Safety point: safety/$STAMP"
+}
+
+case "${1:-}" in
+  plan)
+    shift
+    INSTR="$*"
+    [[ -z "$DEEPSEEK_API_KEY" ]] && { echo "Missing DEEPSEEK_API_KEY"; exit 2; }
+    # minimal context: provide current git status and recent CI tail
+    CI_TAIL=$(gh run list --workflow "${CI_WORKFLOW_NAME:-Android APK}" -L 1 --json databaseId --jq '.[0].databaseId' 2>/dev/null | \
+      xargs -I{} gh run view {} --log 2>/dev/null | tail -n 80 || true)
+    SYS=$(cat "$ROOT/agents/deepseek/system.md")
+    PROMPT=$(cat "$ROOT/agents/deepseek/prompts/plan.md")
+    jq -n --arg sys "$SYS" --arg prm "$PROMPT" --arg instr "$INSTR" --arg citail "$CI_TAIL" '
+      {
+        "model": env.DEEPSEEK_MODEL // "deepseek-chat",
+        "messages": [
+          {"role":"system","content":$sys},
+          {"role":"user","content":($prm + "\n\nInstruction:\n" + $instr + "\n\nRecent CI tail (may be empty):\n" + $citail)}
+        ]
+      }' > /tmp/agent_req.json
+    curl -sS "${HEADERS[@]}" -X POST "$DS_URL/chat/completions" --data @/tmp/agent_req.json \
+      | jq -r '.choices[0].message.content' > /tmp/plan.json
+    echo "Plan at /tmp/plan.json"
+    cat /tmp/plan.json
+    ;;
+
+  apply)
+    guard_safety
+    PLAN="${2:-/tmp/plan.json}"
+    [[ ! -f "$PLAN" ]] && { echo "Plan not found: $PLAN"; exit 2; }
+    python3 "$ROOT/tools/ops_apply.py" "$PLAN"
+    echo "---- GIT DIFF ----"
+    git --no-pager diff --staged || true
+    echo "Review changes above. Continue? [y/N]"
+    read -r ans
+    [[ "$ans" != "y" ]] && { echo "Aborting apply."; exit 1; }
+    ;;
+
+  verify)
+    "$ROOT/tools/ops_verify.sh"
+    ;;
+
+  push)
+    shift
+    MSG="${*:-"[agent] changes"}"
+    git add -A
+    git commit -m "$MSG" || true
+    git push origin main
+    ;;
+
+  rollback)
+    TARGET="${2:-}"
+    if [[ "$TARGET" == "last-safety" || -z "$TARGET" ]]; then
+      TARGET=$(git tag --list 'safety/*' --sort=-creatordate | head -n1)
+    fi
+    git fetch --all --tags
+    git reset --hard "$TARGET"
+    git push origin main --force
+    ;;
+
+  repo)
+    sub="${2:-}"
+    case "$sub" in
+      hard-reset)
+        TARGET="${3:-}"
+        [[ -z "$TARGET" ]] && { echo "Usage: agentctl repo hard-reset <SHA_OR_TAG>"; exit 2; }
+        guard_safety
+        git fetch --all --tags
+        git reset --hard "$TARGET"
+        git push origin main --force
+        ;;
+      *) echo "Usage: agentctl repo {hard-reset <SHA_OR_TAG>}"; exit 2;;
+    esac
+    ;;
+
+  ci)
+    shift
+    "$ROOT/tools/ci.sh" "$@"
+    ;;
+
+  *)
+    cat <<USAGE
+Usage:
+  tools/agentctl plan "Your instruction"
+  tools/agentctl apply --review
+  tools/agentctl verify
+  tools/agentctl push "[agent] message"
+  tools/agentctl rollback [last-safety|<tag>]
+  tools/agentctl repo hard-reset <SHA_OR_TAG>
+  tools/agentctl ci recent|view|artifact
+USAGE
+    exit 2;;
+esac

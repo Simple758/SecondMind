@@ -1,0 +1,29 @@
+# Agent/Secrets
+config/deepseek.env
+artifacts/
+.ops_receipts/
+SecondMind.bak-*/
+artifacts/
+.ops_receipts/
+config/deepseek.env
+# Gradle caches & build outputs
+.gradle/
+build/
+app/build/
+SecondMind/build/
+
+# IDE & misc
+.idea/
+*.iml
+
+# Artifacts & temp
+artifacts/
+ci-artifacts/
+.ops_receipts/
+config/deepseek.env
+*.apk
+*.aab
+
+# Backups & accidental nested tree
+SecondMind.bak-*/
+SecondMind/
