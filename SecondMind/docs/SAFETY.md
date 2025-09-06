@@ -1,0 +1,4 @@
+- Always creates safety tag/branch before writes.
+- Only edits allowlisted paths.
+- No push if verify fails (unless you push manually).
+- Rollback: tools/agentctl rollback last-safety

@@ -1,0 +1,8 @@
+# Agent/Secrets
+config/deepseek.env
+artifacts/
+.ops_receipts/
+SecondMind.bak-*/
+artifacts/
+.ops_receipts/
+config/deepseek.env
