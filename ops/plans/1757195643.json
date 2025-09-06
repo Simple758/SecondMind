@@ -1,0 +1,20 @@
+```json
+{
+    "plan": [
+        {
+            "op": "replace",
+            "path": "app/src/main/java/com/secondmind/minimal/MainActivity.kt",
+            "old": "@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)",
+            "new": "@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)",
+            "guard": "@file:OptIn\\(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class\\)"
+        },
+        {
+            "op": "replace",
+            "path": "app/src/main/java/com/secondmind/minimal/access/AccessibilitySettingsActivity.kt",
+            "old": "import com.secondmind.minimal.MainActivity",
+            "new": "import com.secondmind.minimal.MainActivity",
+            "guard": "import com\\.secondmind\\.minimal\\.MainActivity"
+        }
+    ]
+}
+```
