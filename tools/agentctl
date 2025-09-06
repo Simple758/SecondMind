@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+AUTO_YES=${AUTO_YES:-0}
+for arg in "$@"; do [[ "$arg" == "--yes" ]] && AUTO_YES=1; done
+while [[ "${1:-}" == "--yes" ]]; do shift; done
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 [[ -f "$ROOT/config/deepseek.env" ]] && source "$ROOT/config/deepseek.env"
@@ -50,7 +53,11 @@ case "${1:-}" in
     python3 "$ROOT/tools/ops_apply.py" "$PLAN"
     echo "---- GIT DIFF ----"
     git --no-pager diff
-    echo "Review changes above. Continue? [y/N]"
+if [[ "$AUTO_YES" -ne 1 ]]; then
+  echo "Review changes above. Continue? [y/N]"
+  read -r ans
+  [[ "$ans" != "y" ]] && { echo "Aborting apply."; exit 1; }
+fi
     read -r ans; [[ "$ans" != "y" ]] && { echo "Aborting apply."; exit 1; }
     ;;
   verify)

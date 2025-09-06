@@ -1,16 +1,22 @@
 {
-  "version": "1.0",
-  "steps": [
+  "ops": [
     {
-      "op": "open",
-      "file": "app/build.gradle"
+      "op": "replace",
+      "path": "app/src/main/java/com/secondmind/minimal/MainActivity.kt",
+      "guard": {
+        "pattern": "@file:OptIn\\(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class\\)"
+      },
+      "oldValue": "@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)",
+      "newValue": "@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)"
     },
     {
-      "op": "insert",
-      "file": "app/build.gradle",
-      "after": "android {",
-      "text": "    buildFeatures {\n        buildConfig = true\n    }",
-      "guard": "buildFeatures\\s*{\\s*buildConfig\\s*=\\s*true"
+      "op": "replace",
+      "path": "app/src/main/java/com/secondmind/minimal/access/AccessibilitySettingsActivity.kt",
+      "guard": {
+        "pattern": "import com\\.secondmind\\.minimal\\.MainActivity"
+      },
+      "oldValue": "import com.secondmind.minimal.MainActivity",
+      "newValue": "import com.secondmind.minimal.MainActivity"
     }
   ]
 }
