@@ -1,6 +1,7 @@
 package com.secondmind.minimal.access
 
 import android.app.Activity
+import com.secondmind.minimal.MainActivity
 import android.content.Intent
 import android.os.Bundle
 
