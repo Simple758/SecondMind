@@ -1,5 +1,5 @@
 @file:OptIn(
-    ExperimentalMaterial3Api::class,
+    androidx.compose.material3.ExperimentalMaterial3Api::class,
     androidx.compose.foundation.ExperimentalFoundationApi::class
 )
 package com.secondmind.minimal
