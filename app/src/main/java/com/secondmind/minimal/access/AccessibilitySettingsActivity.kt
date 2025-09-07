@@ -1,5 +1,5 @@
 package com.secondmind.minimal.access
-import com.secondmind.minimal.MainActivity
+import 'com.secondmind.minimal'.MainActivity
 
 import android.app.Activity
 import android.content.Intent
