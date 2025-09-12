@@ -44,8 +44,6 @@ import com.secondmind.minimal.data.Keys
 import com.secondmind.minimal.data.dataStore
 import com.secondmind.minimal.home.HomeCarousel
         
-        // Inserted NewsPanel
-        NewsPanel(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp))
         
 import com.secondmind.minimal.home.NotifDiagRow
 import com.secondmind.minimal.tts.Reader
