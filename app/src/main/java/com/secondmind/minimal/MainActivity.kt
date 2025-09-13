@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
-import com.secondmind.minimal.news.NewsPanel
 package com.secondmind.minimal
+import com.secondmind.minimal.news.NewsPanel
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenu
@@ -44,8 +44,6 @@ import androidx.navigation.navArgument
 import com.secondmind.minimal.data.Keys
 import com.secondmind.minimal.data.dataStore
 import com.secondmind.minimal.home.HomeCarousel
-        
-        
 import com.secondmind.minimal.home.NotifDiagRow
 import com.secondmind.minimal.tts.Reader
 import com.secondmind.minimal.ui.DetailsScreen
@@ -56,6 +54,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 
+        
+        
 
 
 
@@ -64,24 +64,8 @@ import kotlinx.coroutines.launch
 
 
 
-class MainActivity : ComponentActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    ensureChannel()
-    setContent {
-      val mode by rememberThemeMode()
-      val dark = when (mode) { "dark" -> true; "light" -> false; else -> isSystemInDarkTheme() }
-      val scheme = if (dark) darkColorScheme() else lightColorScheme()
-      MaterialTheme(colorScheme = scheme) { AppNav() }
-    }
-  }
-  private fun ensureChannel() {
-    if (Build.VERSION.SDK_INT >= 26) {
-      val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-      nm.createNotificationChannel(NotificationChannel("sm", "SecondMind", NotificationManager.IMPORTANCE_DEFAULT))
-    }
-  }
-}
+
+
 
 @Composable
 fun rememberThemeMode(): State<String> {
