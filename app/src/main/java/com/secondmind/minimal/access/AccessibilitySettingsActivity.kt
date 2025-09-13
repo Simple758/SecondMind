@@ -8,7 +8,7 @@ import com.secondmind.minimal.MainActivity
 class AccessibilitySettingsActivity : Activity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    startActivity(Intent(this, MainActivity::class.java))
+    startActivity(Intent(this, com.secondmind.minimal.MainActivity::class.java))
     finish()
   }
 }
