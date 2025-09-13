@@ -120,7 +120,7 @@ fun titleFor(nav: NavHostController): String {
 
 @Composable
 fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
-  androidx.compose.foundation.layout.Column(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
+  androidx.compose.foundation.layout.Column(modifier = androidx.compose.ui.Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
     com.secondmind.minimal.home.HomeCarousel(modifier = androidx.compose.ui.Modifier.weight(1f))
       // Inserted NewsPanel
       NewsPanel(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp))
