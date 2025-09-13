@@ -1,6 +1,5 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 package com.secondmind.minimal
-import com.secondmind.minimal.news.NewsPanel
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenu
@@ -52,11 +51,7 @@ import com.secondmind.minimal.ui.components.NotificationAccessBanner
 import com.secondmind.minimal.ui.components.QuickNoteCard
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-
-
-
-        
-        
+import com.secondmind.minimal.news.NewsPanel
 
 
 
@@ -67,6 +62,24 @@ import kotlinx.coroutines.launch
 
 
 
+class MainActivity : ComponentActivity() {
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    ensureChannel()
+    setContent {
+      val mode by rememberThemeMode()
+      val dark = when (mode) { "dark" -> true; "light" -> false; else -> isSystemInDarkTheme() }
+      val scheme = if (dark) darkColorScheme() else lightColorScheme()
+      MaterialTheme(colorScheme = scheme) { AppNav() }
+    }
+  }
+  private fun ensureChannel() {
+    if (Build.VERSION.SDK_INT >= 26) {
+      val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+      nm.createNotificationChannel(NotificationChannel("sm", "SecondMind", NotificationManager.IMPORTANCE_DEFAULT))
+    }
+  }
+}
 
 @Composable
 fun rememberThemeMode(): State<String> {
@@ -109,10 +122,8 @@ fun titleFor(nav: NavHostController): String {
 fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
   androidx.compose.foundation.layout.Column(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
     com.secondmind.minimal.home.HomeCarousel(modifier = androidx.compose.ui.Modifier.weight(1f))
-      
       // Inserted NewsPanel
       NewsPanel(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp))
-      
     androidx.compose.foundation.layout.Row(
       modifier = androidx.compose.ui.Modifier
         .fillMaxWidth()
