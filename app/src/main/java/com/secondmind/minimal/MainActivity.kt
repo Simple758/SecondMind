@@ -118,81 +118,7 @@ fun titleFor(nav: NavHostController): String {
     else -> "SecondMind"
   }
 }
-
-
-private fun showLocalNotification(
-fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
-@Composable
-fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
-  androidx.compose.foundation.lazy.LazyColumn(
-    modifier = androidx.compose.ui.Modifier.fillMaxSize(),
-    verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
-  ) {
-    item {
-      com.secondmind.minimal.home.HomeCarousel(
-        modifier = androidx.compose.ui.Modifier.fillMaxWidth()
-      )
-    }
-    item {
-      // Inserted NewsPanel
-      com.secondmind.minimal.news.NewsPanel(
-        modifier = androidx.compose.ui.Modifier
-          .fillMaxWidth()
-          .padding(horizontal = 16.dp)
-      )
-    }
-    item {
-      androidx.compose.foundation.layout.Row(
-        modifier = androidx.compose.ui.Modifier
-          .fillMaxWidth()
-          .padding(horizontal = 16.dp, vertical = 12.dp),
-        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
-      ) {
-        androidx.compose.material3.OutlinedButton(onClick = onInbox) {
-          androidx.compose.material3.Text("Inbox")
-        }
-        androidx.compose.material3.OutlinedButton(onClick = onSettings) {
-          androidx.compose.material3.Text("Settings")
-        }
-      }
-    }
-  }
-}
-  androidx.compose.foundation.lazy.LazyColumn(
-    modifier = androidx.compose.ui.Modifier.fillMaxSize(),
-    verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
-  ) {
-    item {
-      com.secondmind.minimal.home.HomeCarousel(
-        modifier = androidx.compose.ui.Modifier.fillMaxWidth()
-      )
-    }
-    item {
-      // Inserted NewsPanel
-      com.secondmind.minimal.news.NewsPanel(
-        modifier = androidx.compose.ui.Modifier
-          .fillMaxWidth()
-          .padding(horizontal = 16.dp)
-      )
-    }
-    item {
-      androidx.compose.foundation.layout.Row(
-        modifier = androidx.compose.ui.Modifier
-          .fillMaxWidth()
-          .padding(horizontal = 16.dp, vertical = 12.dp),
-        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
-      ) {
-        androidx.compose.material3.OutlinedButton(onClick = onInbox) {
-          androidx.compose.material3.Text("Inbox")
-        }
-        androidx.compose.material3.OutlinedButton(onClick = onSettings) {
-          androidx.compose.material3.Text("Settings")
-        }
-      }
-    }
-  }
-}
-  ctx: Context) {
+private fun showLocalNotification(ctx: Context) {
   val n = NotificationCompat.Builder(ctx, "sm")
     .setContentTitle("SecondMind")
     .setContentText("Hello from your app")
@@ -202,6 +128,41 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
 }
 
 @Composable
+fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
+  androidx.compose.foundation.lazy.LazyColumn(
+    modifier = androidx.compose.ui.Modifier.fillMaxSize(),
+    verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
+  ) {
+    item {
+      com.secondmind.minimal.home.HomeCarousel(
+        modifier = androidx.compose.ui.Modifier.fillMaxWidth()
+      )
+    }
+    item {
+      // Inserted NewsPanel
+      com.secondmind.minimal.news.NewsPanel(
+        modifier = androidx.compose.ui.Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 16.dp)
+      )
+    }
+    item {
+      androidx.compose.foundation.layout.Row(
+        modifier = androidx.compose.ui.Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
+      ) {
+        androidx.compose.material3.OutlinedButton(onClick = onInbox) {
+          androidx.compose.material3.Text("Inbox")
+        }
+        androidx.compose.material3.OutlinedButton(onClick = onSettings) {
+          androidx.compose.material3.Text("Settings")
+        }
+      }
+    }
+  }
+}
 fun SettingsScreen(onBack: () -> Unit) {
   val ctx = LocalContext.current
   val scope = rememberCoroutineScope()
@@ -337,4 +298,12 @@ fun TopBarWithMenu(nav: NavHostController) {
       }
     }
   )
+}
+private fun showLocalNotification(ctx: Context) {
+  val n = NotificationCompat.Builder(ctx, "sm")
+    .setContentTitle("SecondMind")
+    .setContentText("Hello from your app")
+    .setSmallIcon(android.R.drawable.ic_dialog_info)
+    .build()
+  NotificationManagerCompat.from(ctx).notify(1, n)
 }
