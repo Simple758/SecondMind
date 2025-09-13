@@ -3,12 +3,11 @@ package com.secondmind.minimal.access
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import com.secondmind.minimal.MainActivity
 
 class AccessibilitySettingsActivity : Activity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    startActivity(Intent(this, com.secondmind.minimal.MainActivity::class.java))
+    startActivity(Intent().setComponent(android.content.ComponentName("com.secondmind.minimal", "com.secondmind.minimal.MainActivity")))
     finish()
   }
 }
