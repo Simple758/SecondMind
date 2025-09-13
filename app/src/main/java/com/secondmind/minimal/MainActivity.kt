@@ -108,6 +108,7 @@ fun AppNav() {
   }
 }
 
+@Composable
 fun titleFor(nav: NavHostController): String {
   val e by nav.currentBackStackEntryAsState()
   return when (e?.destination?.route?.substringBefore("/")) {
@@ -162,6 +163,7 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
     }
   }
 }
+@Composable
 fun SettingsScreen(onBack: () -> Unit) {
   val ctx = LocalContext.current
   val scope = rememberCoroutineScope()
