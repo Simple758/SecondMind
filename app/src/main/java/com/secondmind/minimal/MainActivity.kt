@@ -135,11 +135,15 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
     modifier = androidx.compose.ui.Modifier.fillMaxSize(),
     verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
   ) {
-    item {
-      com.secondmind.minimal.home.HomeCarousel(
-        modifier = androidx.compose.ui.Modifier.fillMaxWidth()
-      )
-    }
+    
+  item {
+    com.secondmind.minimal.home.HomeCarousel(
+      modifier = androidx.compose.ui.Modifier
+        .fillMaxWidth()
+        .heightIn(min = 160.dp, max = 280.dp)
+    )
+  }
+
     
     item {
       androidx.compose.foundation.layout.Box(
