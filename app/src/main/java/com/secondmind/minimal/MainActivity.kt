@@ -140,14 +140,20 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
         modifier = androidx.compose.ui.Modifier.fillMaxWidth()
       )
     }
+    
     item {
-      // Inserted NewsPanel
-      com.secondmind.minimal.news.NewsPanel(
+      androidx.compose.foundation.layout.Box(
         modifier = androidx.compose.ui.Modifier
           .fillMaxWidth()
+          .heightIn(min = 120.dp, max = 360.dp)
           .padding(horizontal = 16.dp)
-      )
+      ) {
+        com.secondmind.minimal.news.NewsPanel(
+          modifier = androidx.compose.ui.Modifier.fillMaxSize()
+        )
+      }
     }
+  
     item {
       androidx.compose.foundation.layout.Row(
         modifier = androidx.compose.ui.Modifier
