@@ -1,4 +1,5 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+import com.secondmind.minimal.news.NewsPanel
 package com.secondmind.minimal
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.DropdownMenuItem
