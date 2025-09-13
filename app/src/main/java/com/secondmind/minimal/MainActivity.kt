@@ -52,6 +52,7 @@ import com.secondmind.minimal.ui.components.QuickNoteCard
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import com.secondmind.minimal.news.NewsPanel
+import androidx.compose.foundation.lazy.LazyColumn
 
 
 
@@ -119,23 +120,46 @@ fun titleFor(nav: NavHostController): String {
 }
 
 @Composable
-fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
-  androidx.compose.foundation.layout.Column(modifier = androidx.compose.ui.Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-    com.secondmind.minimal.home.HomeCarousel(modifier = androidx.compose.ui.Modifier.weight(1f))
-      // Inserted NewsPanel
-      NewsPanel(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp))
-    androidx.compose.foundation.layout.Row(
-      modifier = androidx.compose.ui.Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 16.dp, vertical = 12.dp),
-      horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
-    ) {
-      androidx.compose.material3.OutlinedButton(onClick = onInbox) { androidx.compose.material3.Text("Inbox") }
-      androidx.compose.material3.OutlinedButton(onClick = onSettings) { androidx.compose.material3.Text("Settings") }
+
+    fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
+  
+      q{    LazyColumn(
+          modifier = androidx.compose.ui.Modifier.fillMaxSize(),
+          verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
+        ) {
+          item {
+            com.secondmind.minimal.home.HomeCarousel(
+              modifier = androidx.compose.ui.Modifier.fillMaxWidth()
+            )
+          }
+          item {
+            // Inserted NewsPanel
+            NewsPanel(
+              modifier = androidx.compose.ui.Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+            )
+          }
+          item {
+            androidx.compose.foundation.layout.Row(
+              modifier = androidx.compose.ui.Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+              horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
+            ) {
+              androidx.compose.material3.OutlinedButton(onClick = onInbox) {
+                androidx.compose.material3.Text("Inbox")
+              }
+              androidx.compose.material3.OutlinedButton(onClick = onSettings) {
+                androidx.compose.material3.Text("Settings")
+              }
+            }
+          }
+        }
     }
-  }
-}
-private fun showLocalNotification(ctx: Context) {
+    }
+private fun showLocalNotification(
+  ctx: Context) {
   val n = NotificationCompat.Builder(ctx, "sm")
     .setContentTitle("SecondMind")
     .setContentText("Hello from your app")
