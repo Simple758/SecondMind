@@ -1,24 +1,37 @@
 package com.secondmind.minimal.home
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.heightIn
 
 @Composable
 fun HomeCarousel(modifier: Modifier = Modifier) {
   LazyVerticalGrid(
+    modifier = androidx.compose.ui.Modifier.heightIn(max = 280.dp), 
+    userScrollEnabled = false, 
+    userScrollEnabled = false, 
     columns = GridCells.Fixed(2),
     horizontalArrangement = Arrangement.spacedBy(16.dp),
     verticalArrangement = Arrangement.spacedBy(16.dp),
     contentPadding = PaddingValues(16.dp),
-    modifier = modifier.fillMaxSize()
+    modifier = \1.heightIn(max = 280.dp))
   ) {
     // Row 1 — News (full width)
     item(span = { GridItemSpan(2) }) {

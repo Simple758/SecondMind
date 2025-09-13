@@ -43,7 +43,7 @@ import androidx.navigation.navArgument
 import com.secondmind.minimal.data.Keys
 import com.secondmind.minimal.data.dataStore
 import com.secondmind.minimal.home.HomeCarousel
-import com.secondmind.minimal.home.NotifDiagRow
+import com.secondmind.minimal.home.HomeCarousel
 import com.secondmind.minimal.tts.Reader
 import com.secondmind.minimal.ui.DetailsScreen
 import com.secondmind.minimal.ui.InboxScreen
@@ -120,6 +120,7 @@ fun titleFor(nav: NavHostController): String {
     else -> "SecondMind"
   }
 }
+@Composable
 private fun showLocalNotification(ctx: Context) {
   val n = NotificationCompat.Builder(ctx, "sm")
     .setContentTitle("SecondMind")
@@ -135,29 +136,19 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
     modifier = androidx.compose.ui.Modifier.fillMaxSize(),
     verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
   ) {
-    
-  item {
-    com.secondmind.minimal.home.HomeCarousel(
-      modifier = androidx.compose.ui.Modifier
-        .fillMaxWidth()
-        .heightIn(min = 160.dp, max = 280.dp)
-    )
-  }
-
-    
-  
-      item {
-        androidx.compose.foundation.layout.Box(
-          modifier = androidx.compose.ui.Modifier
-            .fillMaxWidth()
-            .heightIn(min = 120.dp, max = 360.dp)
-            .padding(horizontal = 16.dp)
-        ) {
-          com.secondmind.minimal.news.NewsPanel(
-            modifier = androidx.compose.ui.Modifier.fillMaxSize()
-          )
-        }
-      }
+    item {
+      com.secondmind.minimal.home.HomeCarousel(
+        modifier = androidx.compose.ui.Modifier.fillMaxWidth()
+      )
+    }
+    item {
+      // Inserted NewsPanel
+      com.secondmind.minimal.news.NewsPanel(
+        modifier = androidx.compose.ui.Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 16.dp)
+      )
+    }
     item {
       androidx.compose.foundation.layout.Row(
         modifier = androidx.compose.ui.Modifier
@@ -175,7 +166,6 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
     }
   }
 }
-@Composable
 fun SettingsScreen(onBack: () -> Unit) {
   val ctx = LocalContext.current
   val scope = rememberCoroutineScope()
