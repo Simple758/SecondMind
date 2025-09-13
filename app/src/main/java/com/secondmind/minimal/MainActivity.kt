@@ -166,6 +166,7 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
     }
   }
 }
+@Composable
 fun SettingsScreen(onBack: () -> Unit) {
   val ctx = LocalContext.current
   val scope = rememberCoroutineScope()

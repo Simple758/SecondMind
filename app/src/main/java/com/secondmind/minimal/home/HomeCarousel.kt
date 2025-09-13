@@ -3,29 +3,18 @@ package com.secondmind.minimal.home
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.Composable
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.heightIn
-
 @Composable
 fun HomeCarousel(modifier: Modifier = Modifier) {
   LazyVerticalGrid(
     modifier = androidx.compose.ui.Modifier.heightIn(max = 280.dp), 
-    userScrollEnabled = false, 
     userScrollEnabled = false, 
     columns = GridCells.Fixed(2),
     horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -44,12 +33,8 @@ fun HomeCarousel(modifier: Modifier = Modifier) {
     item { com.secondmind.minimal.feature.tg.TelegramCard() }
     item { com.secondmind.minimal.feature.youtube.YtWatchLaterCard() }
     // Row 4 — Notif diag (full width)
-    item(span = { GridItemSpan(2) }) {
       com.secondmind.minimal.home.NotifDiagRow(Modifier.fillMaxWidth())
-    }
     // Row 5 — Notification access banner (full width)
-    item(span = { GridItemSpan(2) }) {
       com.secondmind.minimal.ui.components.NotificationAccessBanner(Modifier.fillMaxWidth())
-    }
   }
 }
