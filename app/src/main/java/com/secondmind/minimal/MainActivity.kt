@@ -108,7 +108,6 @@ fun AppNav() {
   }
 }
 
-@Composable
 fun titleFor(nav: NavHostController): String {
   val e by nav.currentBackStackEntryAsState()
   return when (e?.destination?.route?.substringBefore("/")) {
@@ -298,12 +297,4 @@ fun TopBarWithMenu(nav: NavHostController) {
       }
     }
   )
-}
-private fun showLocalNotification(ctx: Context) {
-  val n = NotificationCompat.Builder(ctx, "sm")
-    .setContentTitle("SecondMind")
-    .setContentText("Hello from your app")
-    .setSmallIcon(android.R.drawable.ic_dialog_info)
-    .build()
-  NotificationManagerCompat.from(ctx).notify(1, n)
 }
