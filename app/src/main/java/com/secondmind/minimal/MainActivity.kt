@@ -124,6 +124,10 @@ fun titleFor(nav: NavHostController): String {
 fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
   androidx.compose.foundation.layout.Column(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
     com.secondmind.minimal.home.HomeCarousel(modifier = androidx.compose.ui.Modifier.weight(1f))
+      
+      // Inserted NewsPanel
+      NewsPanel(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp))
+      
     androidx.compose.foundation.layout.Row(
       modifier = androidx.compose.ui.Modifier
         .fillMaxWidth()
