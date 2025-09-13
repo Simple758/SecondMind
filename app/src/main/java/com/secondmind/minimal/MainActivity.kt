@@ -93,7 +93,9 @@ fun rememberThemeMode(): State<String> {
 fun AppNav() {
   val nav = rememberNavController()
   Scaffold(topBar = { TopBarWithMenu(nav) }) { pad ->
-    NavHost(nav, startDestination = "home", modifier = Modifier.padding(pad)) {
+    
+  NavHost(nav, startDestination = "home", modifier = Modifier.padding(pad).fillMaxSize())
+ {
       composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }) }
       composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
       composable("inbox") { InboxScreen() }
