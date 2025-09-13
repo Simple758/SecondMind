@@ -119,7 +119,6 @@ fun titleFor(nav: NavHostController): String {
   }
 }
 
-@Composable
 
 private fun showLocalNotification(
 fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
