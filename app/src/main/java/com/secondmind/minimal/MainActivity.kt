@@ -68,7 +68,8 @@ class MainActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     ensureChannel()
     setContent {
-      val mode by rememberThemeMode()
+    SecondMindMinimalTheme {
+val mode by rememberThemeMode()
       val dark = when (mode) { "dark" -> true; "light" -> false; else -> isSystemInDarkTheme() }
       val scheme = if (dark) darkColorScheme() else lightColorScheme()
       MaterialTheme(colorScheme = scheme) { AppNav() }
@@ -140,7 +141,7 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
     com.secondmind.minimal.home.HomeCarousel(
       modifier = androidx.compose.ui.Modifier
         .fillMaxWidth()
-        .heightIn(min = 160.dp, max = 280.dp)
+        
     )
   }
 
@@ -150,7 +151,7 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
         androidx.compose.foundation.layout.Box(
           modifier = androidx.compose.ui.Modifier
             .fillMaxWidth()
-            .heightIn(min = 120.dp, max = 360.dp)
+            
             .padding(horizontal = 16.dp)
         ) {
           com.secondmind.minimal.news.NewsPanel(
@@ -311,4 +312,5 @@ fun TopBarWithMenu(nav: NavHostController) {
       }
     }
   )
+    }
 }

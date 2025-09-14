@@ -126,7 +126,7 @@ private fun NewsHeroCard(article: NewsArticle, onOpen: (String?) -> Unit, onRefr
             Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedButton(onClick = { onOpen(article.url) }) { Text("Open") }
-                OutlinedButton(onClick = onRefresh, enabled = false) { Text("Refresh") }
+                OutlinedButton(onClick = onRefresh,) { Text("Refresh") }
             }
             Spacer(Modifier.height(4.dp))
             Text(article.source?.name ?: "", style = MaterialTheme.typography.labelMedium)
