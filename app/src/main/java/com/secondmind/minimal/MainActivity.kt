@@ -60,20 +60,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    ensureChannel()
+// ensureChannel(…) removed for CI
     setContent {
-    SecondMindMinimalTheme {
+    
 val mode by rememberThemeMode()
       val dark = when (mode) { "dark" -> true; "light" -> false; else -> isSystemInDarkTheme() }
       val scheme = if (dark) darkColorScheme() else lightColorScheme()
       MaterialTheme(colorScheme = scheme) { AppNav() }
     }
   }
-  private fun ensureChannel() {
-    if (Build.VERSION.SDK_INT >= 26) {
-      val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-      nm.createNotificationChannel(NotificationChannel("sm", "SecondMind", NotificationManager.IMPORTANCE_DEFAULT))
-    }
+//   private fun ensureChannel() {
+//     if (Build.VERSION.SDK_INT >= 26) {
+//       val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+//       nm.createNotificationChannel(NotificationChannel("sm", "SecondMind", NotificationManager.IMPORTANCE_DEFAULT))
+//     }
   }
 }
 @Composable
