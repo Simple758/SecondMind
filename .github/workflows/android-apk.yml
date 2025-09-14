@@ -1,61 +1,23 @@
 name: Android APK
-
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
-
-concurrency:
-  group: android-apk
-  cancel-in-progress: true
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: '17'
           cache: gradle
-
-      # Use system Gradle ONLY (pin to 8.7)
-      - name: Set up Gradle (system 8.7)
-        uses: gradle/actions/setup-gradle@v3.5.0
+      - run: chmod +x ./gradlew
+      - run: ./gradlew --no-daemon clean :app:assembleDebug
+      - uses: actions/upload-artifact@v4
         with:
-          gradle-version: 8.7
-
-      # Hard-disable wrapper so it cannot be used accidentally
-      - name: Disable Gradle Wrapper
-        run: |
-          rm -f gradlew gradlew.bat || true
-          rm -rf gradle/wrapper || true
-          # Fail build if any workflow still references ./gradlew
-          if grep -RIn "./gradlew" .github/workflows | grep -v "android-apk.yml" ; then
-            echo "A workflow references ./gradlew. Remove it." >&2
-            exit 1
-          fi
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Accept SDK licenses
-        run: yes | sdkmanager --licenses
-
-      - name: Install required SDK packages
-        run: |
-          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
-
-      # Single build step — system 'gradle' (no wrapper)
-      - name: Build Debug APK with Gradle 8.7
-        run: gradle --no-daemon clean :app:assembleDebug
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-debug
+          name: app-debug-${{ github.sha }}
           path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
