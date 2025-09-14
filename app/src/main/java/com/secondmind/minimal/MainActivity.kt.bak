@@ -1,10 +1,10 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 package com.secondmind.minimal
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-
-
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -19,7 +19,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,23 +42,34 @@ import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 import com.secondmind.minimal.data.Keys
 import com.secondmind.minimal.data.dataStore
+import com.secondmind.minimal.home.HomeCarousel
+import com.secondmind.minimal.home.NotifDiagRow
+import com.secondmind.minimal.tts.Reader
 import com.secondmind.minimal.ui.DetailsScreen
 import com.secondmind.minimal.ui.InboxScreen
-import com.secondmind.minimal.tts.Reader
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import com.secondmind.minimal.ui.components.NotificationAccessBanner
 import com.secondmind.minimal.ui.components.QuickNoteCard
-import com.secondmind.minimal.home.NotifDiagRow
-import com.secondmind.minimal.home.HomeCarousel
-import androidx.compose.foundation.layout.Arrangement
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import com.secondmind.minimal.news.NewsPanel
+import androidx.compose.foundation.lazy.LazyColumn
+
+
+
+
+
+
+
+
+
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     ensureChannel()
     setContent {
-      val mode by rememberThemeMode()
+    SecondMindMinimalTheme {
+val mode by rememberThemeMode()
       val dark = when (mode) { "dark" -> true; "light" -> false; else -> isSystemInDarkTheme() }
       val scheme = if (dark) darkColorScheme() else lightColorScheme()
       MaterialTheme(colorScheme = scheme) { AppNav() }
@@ -75,8 +93,10 @@ fun rememberThemeMode(): State<String> {
 @Composable
 fun AppNav() {
   val nav = rememberNavController()
-  Scaffold(topBar = { CenterAlignedTopAppBar(title = { Text(titleFor(nav)) }) }) { pad ->
-    NavHost(nav, startDestination = "home", modifier = Modifier.padding(pad)) {
+  Scaffold(topBar = { TopBarWithMenu(nav) }) { pad ->
+    
+  NavHost(nav, startDestination = "home", modifier = Modifier.padding(pad).fillMaxSize())
+ {
       composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }) }
       composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
       composable("inbox") { InboxScreen() }
@@ -101,37 +121,6 @@ fun titleFor(nav: NavHostController): String {
     else -> "SecondMind"
   }
 }
-
-@Composable
-fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
-  val ctx = LocalContext.current
-  val scope = rememberCoroutineScope()
-  val countFlow = remember { ctx.dataStore.data.map { it[Keys.COUNT] ?: 0 } }
-  val count by countFlow.collectAsState(initial = 0)
-  val notifPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
-  LaunchedEffect(Unit) { if (Build.VERSION.SDK_INT >= 33) notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS) }
-
-  Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-    HomeCarousel(modifier = Modifier.padding(top = 8.dp))
-
-    NotifDiagRow(modifier = Modifier.padding(bottom = 8.dp))
-
-    NotificationAccessBanner(modifier = Modifier.padding(bottom = 12.dp))
-    Text("Tap to leap forward → $count")
-    Button(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.COUNT] = count + 1 } } }) { Text("Increment") }
-    OutlinedButton(onClick = onInbox) { Text("Inbox") }
-    OutlinedButton(onClick = onSettings) { Text("Settings") }
-    OutlinedButton(onClick = { showLocalNotification(ctx) }) { Text("Test Notification") }
-    OutlinedButton(onClick = { ctx.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) }) { Text("Enable Notification Listener") }
-  }
-}
-
 private fun showLocalNotification(ctx: Context) {
   val n = NotificationCompat.Builder(ctx, "sm")
     .setContentTitle("SecondMind")
@@ -142,97 +131,186 @@ private fun showLocalNotification(ctx: Context) {
 }
 
 @Composable
+fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
+  androidx.compose.foundation.lazy.LazyColumn(
+    modifier = androidx.compose.ui.Modifier.fillMaxSize(),
+    verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
+  ) {
+    
+  item {
+    com.secondmind.minimal.home.HomeCarousel(
+      modifier = androidx.compose.ui.Modifier
+        .fillMaxWidth()
+        
+    )
+  }
+
+    
+  
+      item {
+        androidx.compose.foundation.layout.Box(
+          modifier = androidx.compose.ui.Modifier
+            .fillMaxWidth()
+            
+            .padding(horizontal = 16.dp)
+        ) {
+          com.secondmind.minimal.news.NewsPanel(
+            modifier = androidx.compose.ui.Modifier.fillMaxSize()
+          )
+        }
+      }
+    item {
+      androidx.compose.foundation.layout.Row(
+        modifier = androidx.compose.ui.Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
+      ) {
+        androidx.compose.material3.OutlinedButton(onClick = onInbox) {
+          androidx.compose.material3.Text("Inbox")
+        }
+        androidx.compose.material3.OutlinedButton(onClick = onSettings) {
+          androidx.compose.material3.Text("Settings")
+        }
+      }
+    }
+  }
+}
+@Composable
 fun SettingsScreen(onBack: () -> Unit) {
   val ctx = LocalContext.current
   val scope = rememberCoroutineScope()
 
   val themeFlow = remember { ctx.dataStore.data.map { it[Keys.THEME] ?: "system" } }
-  val theme by themeFlow.collectAsState(initial = "system")
-
   val retentionFlow = remember { ctx.dataStore.data.map { it[Keys.RETENTION_DAYS] ?: 7 } }
-  val retention by retentionFlow.collectAsState(initial = 7)
-
   val enabledFlow = remember { ctx.dataStore.data.map { it[Keys.READER_ENABLED] ?: true } }
-  val readerEnabled by enabledFlow.collectAsState(initial = true)
-
   val rateFlow = remember { ctx.dataStore.data.map { it[Keys.READER_RATE] ?: 1.0f } }
-  val readerRate by rateFlow.collectAsState(initial = 1.0f)
-
   val pitchFlow = remember { ctx.dataStore.data.map { it[Keys.READER_PITCH] ?: 1.0f } }
+
+  val theme by themeFlow.collectAsState(initial = "system")
+  val retention by retentionFlow.collectAsState(initial = 7)
+  val readerEnabled by enabledFlow.collectAsState(initial = true)
+  val readerRate by rateFlow.collectAsState(initial = 1.0f)
   val readerPitch by pitchFlow.collectAsState(initial = 1.0f)
 
   LaunchedEffect(readerEnabled, readerRate, readerPitch) {
     Reader.updateConfig(readerEnabled, readerRate, readerPitch, ctx)
   }
 
-  Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-    Text("Settings", fontSize = 22.sp)
+  Box(
+    Modifier.fillMaxSize()
+      
+      .imePadding()
+  ) {
+    Column(
+      Modifier.fillMaxWidth().padding(24.dp),
+      verticalArrangement = Arrangement.spacedBy(16.dp),
+      horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+      Text("Settings", fontSize = 22.sp)
 
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-      OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "system" } } }) { Text("System") }
-      OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "light" } } }) { Text("Light") }
-      OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "dark" } } }) { Text("Dark") }
-    }
+      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "system" } } }) { Text("System") }
+        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "light" } } }) { Text("Light") }
+        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "dark" } } }) { Text("Dark") }
+      }
 
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-      Text("Retention (days): $retention")
-      OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.RETENTION_DAYS] = maxOf(1, retention - 1) } } }) { Text("-") }
-      OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.RETENTION_DAYS] = retention + 1 } } }) { Text("+") }
-    }
+      Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text("Retention (days): $retention")
+        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.RETENTION_DAYS] = maxOf(1, retention - 1) } } }) { Text("-") }
+        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.RETENTION_DAYS] = retention + 1 } } }) { Text("+") }
+      }
 
-    Divider()
+      Divider()
+      Text("Reader", style = MaterialTheme.typography.titleMedium)
 
-    Text("Reader", style = MaterialTheme.typography.titleMedium)
+      val idText = remember {
+        android.content.ComponentName(
+          ctx, com.secondmind.minimal.access.SecondMindAccessibilityService::class.java
+        ).flattenToString()
+      }
+      val enabledNow = remember {
+        val v = android.provider.Settings.Secure.getString(
+          ctx.contentResolver,
+          android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+        )
+        v?.contains(idText) == true
+      }
+      Text("Accessibility: " + if (enabledNow) "ON" else "OFF")
+      Text("Service ID: " + idText, fontSize = 12.sp)
 
-    val idText = remember {
-      android.content.ComponentName(
-        ctx, com.secondmind.minimal.access.SecondMindAccessibilityService::class.java
-      ).flattenToString()
-    }
-    val enabledNow = remember {
-      val v = android.provider.Settings.Secure.getString(
-        ctx.contentResolver,
-        android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-      )
-      v?.contains(idText) == true
-    }
-    Text("Accessibility: " + if (enabledNow) "ON" else "OFF")
-    Text("Service ID: " + idText, fontSize = 12.sp)
-    
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-      Text("Enabled")
-      Switch(checked = readerEnabled, onCheckedChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_ENABLED] = v } } })
-    }
-    Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-      Text("Rate: ${"%.2f".format(readerRate)}")
-      Slider(value = readerRate, onValueChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_RATE] = v.coerceIn(0.5f, 1.5f) } } }, valueRange = 0.5f..1.5f, steps = 10)
-      Text("Pitch: ${"%.2f".format(readerPitch)}")
-      Slider(value = readerPitch, onValueChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_PITCH] = v.coerceIn(0.5f, 1.5f) } } }, valueRange = 0.5f..1.5f, steps = 10)
-    }
+      Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text("Enabled")
+        Switch(checked = readerEnabled, onCheckedChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_ENABLED] = v } } })
+      }
+      Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text("Rate: ${"%.2f".format(readerRate)}")
+        Slider(value = readerRate,
+               onValueChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_RATE] = v.coerceIn(0.5f, 1.5f) } } },
+               valueRange = 0.5f..1.5f, steps = 10)
+        Text("Pitch: ${"%.2f".format(readerPitch)}")
+        Slider(value = readerPitch,
+               onValueChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_PITCH] = v.coerceIn(0.5f, 1.5f) } } },
+               valueRange = 0.5f..1.5f, steps = 10)
+      }
 
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-      OutlinedButton(onClick = { Reader.speak(ctx, "This is a test of the SecondMind reader.") }) { Text("Test Read") }
-      OutlinedButton(onClick = {
-        val i = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-        ctx.startActivity(i)
-      }) { Text("Open Accessibility Settings") }
-    }
+      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        com.secondmind.minimal.ui.TtsSettings()
+        OutlinedButton(onClick = { com.secondmind.minimal.tts.Reader.stop() }) { Text("Stop reading") }
+        OutlinedButton(onClick = { Reader.speak(ctx, "This is a test of the SecondMind reader.") }) { Text("Test Read") }
+        OutlinedButton(onClick = {
+          val i = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+          ctx.startActivity(i)
+        }) { Text("Open Accessibility Settings") }
+      }
 
-    
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-      OutlinedButton(onClick = {
-        val ctx2 = ctx
-        try {
-          val cn = android.content.ComponentName(ctx2, com.secondmind.minimal.access.SecondMindAccessibilityService::class.java)
-          val i = android.content.Intent("android.settings.ACCESSIBILITY_DETAILS_SETTINGS")
-          i.putExtra("android.provider.extra.EXTRA_ACCESSIBILITY_COMPONENT_NAME", cn.flattenToString())
-          ctx2.startActivity(i)
-        } catch (e: Throwable) {
-          ctx2.startActivity(android.content.Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS))
-        }
-      }) { Text("Toggle My Accessibility") }
-    }
+      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        OutlinedButton(onClick = {
+          val ctx2 = ctx
+          try {
+            val cn = android.content.ComponentName(ctx2, com.secondmind.minimal.access.SecondMindAccessibilityService::class.java)
+            val i = android.content.Intent("android.settings.ACCESSIBILITY_DETAILS_SETTINGS")
+            i.putExtra("android.provider.extra.EXTRA_ACCESSIBILITY_COMPONENT_NAME", cn.flattenToString())
+            ctx2.startActivity(i)
+          } catch (e: Throwable) {
+            ctx2.startActivity(android.content.Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS))
+          }
+        }) { Text("Toggle My Accessibility") }
+      }
 
-    OutlinedButton(onClick = onBack) { Text("Back") }
+      OutlinedButton(onClick = onBack) { Text("Back") }
+    }
   }
+}
+
+
+
+@Composable
+fun TopBarWithMenu(nav: NavHostController) {
+  var open by remember { mutableStateOf(false) }
+  CenterAlignedTopAppBar(
+    title = { Text(titleFor(nav)) },
+    navigationIcon = {
+      Box {
+        IconButton(onClick = { open = true }) {
+          Icon(Icons.Filled.Menu, contentDescription = "Menu")
+        }
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+          DropdownMenuItem(text = { Text("Home") }, onClick = {
+            open = false
+            nav.navigate("home") { launchSingleTop = true }
+          })
+          DropdownMenuItem(text = { Text("Inbox") }, onClick = {
+            open = false
+            nav.navigate("inbox")
+          })
+          DropdownMenuItem(text = { Text("Settings") }, onClick = {
+            open = false
+            nav.navigate("settings")
+          })
+        }
+      }
+    }
+  )
+    }
 }
