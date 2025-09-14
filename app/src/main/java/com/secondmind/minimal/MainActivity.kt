@@ -199,7 +199,7 @@ fun SettingsScreen(onBack: () -> Unit) {
 
   Box(
     Modifier.fillMaxSize()
-      .verticalScroll(rememberScrollState())
+      
       .imePadding()
   ) {
     Column(
