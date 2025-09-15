@@ -67,7 +67,6 @@ val mode by rememberThemeMode()
       val dark = when (mode) { "dark" -> true; "light" -> false; else -> isSystemInDarkTheme() }
       val scheme = if (dark) darkColorScheme() else lightColorScheme()
       MaterialTheme(colorScheme = scheme) { AppNav() }
-    }
   }
 //   private fun ensureChannel() {
 //     if (Build.VERSION.SDK_INT >= 26) {
@@ -287,4 +286,3 @@ fun TopBarWithMenu(nav: NavHostController) {
     }
   )
     }
-}
