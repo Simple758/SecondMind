@@ -85,6 +85,8 @@ fun rememberThemeMode(): State<String> {
 fun AppNav() {
   val nav = rememberNavController()
   Scaffold(topBar = { TopBarWithMenu(nav) }) { pad ->
+
+Box(Modifier.fillMaxSize().padding(pad)) {
     
   NavHost(nav, startDestination = "home", modifier = Modifier.padding(pad).fillMaxSize())
  {
