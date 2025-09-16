@@ -88,8 +88,7 @@ fun AppNav() {
 
 Box(Modifier.fillMaxSize().padding(pad)) {
     
-  NavHost(nav, startDestination = "home", modifier = Modifier.padding(pad).fillMaxSize())
- {
+NavHost(nav, startDestination = "home", modifier = Modifier.fillMaxSize()) {
       composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }) }
       composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
       composable("inbox") { InboxScreen() }
