@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun HomeCarousel(modifier: Modifier = Modifier) {
   LazyVerticalGrid(
+    modifier = modifier.fillMaxSize(),
     columns = GridCells.Fixed(2),
     horizontalArrangement = Arrangement.spacedBy(16.dp),
     verticalArrangement = Arrangement.spacedBy(16.dp),
