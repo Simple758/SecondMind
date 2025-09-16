@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,7 +58,7 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(16.dp)
     ) {
-        Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text("News", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f))
         }
         Spacer(Modifier.height(8.dp))
@@ -76,7 +77,7 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
         Spacer(Modifier.height(12.dp))
 
         if (isLoading) {
-            Box(Modifier.fillMaxSize().height(140.dp), contentAlignment = Alignment.Center) {
+            Box(Modifier.fillMaxWidth().height(140.dp), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
             return@Column
@@ -96,7 +97,7 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
         }
 
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 0.dp, max = 480.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(bottom = 4.dp)
         ) {
@@ -110,7 +111,7 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
 
 @Composable
 private fun NewsHeroCard(article: NewsArticle, onOpen: (String?) -> Unit, onRefresh: () -> Unit) {
-    Card(modifier = Modifier.fillMaxSize(), shape = RoundedCornerShape(16.dp)) {
+    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
         Column(Modifier.padding(12.dp)) {
             if (!article.urlToImage.isNullOrBlank()) {
                 AsyncImage(
@@ -136,7 +137,7 @@ private fun NewsHeroCard(article: NewsArticle, onOpen: (String?) -> Unit, onRefr
 
 @Composable
 private fun NewsCompactCard(article: NewsArticle, onOpen: (String?) -> Unit) {
-    Card(modifier = Modifier.fillMaxSize().clickable { onOpen(article.url) }, shape = RoundedCornerShape(14.dp)) {
+    Card(modifier = Modifier.fillMaxWidth().clickable { onOpen(article.url) }, shape = RoundedCornerShape(14.dp)) {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(article.title ?: "(no title)", style = MaterialTheme.typography.bodyLarge,
@@ -150,7 +151,7 @@ private fun NewsCompactCard(article: NewsArticle, onOpen: (String?) -> Unit) {
                     AsyncImage(model = article.urlToImage, contentDescription = null,
                                contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
                 } else {
-                    Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)))
+                    Box(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)))
                 }
             }
         }
@@ -159,7 +160,7 @@ private fun NewsCompactCard(article: NewsArticle, onOpen: (String?) -> Unit) {
 
 @Composable
 private fun MarketsStrip() {
-    Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         listOf("AAPL +1.2%", "NVDA +0.8%", "MSFT -0.3%", "TSLA +2.4%", "GOOGL +0.1%").forEach { t ->
             Surface(shape = RoundedCornerShape(12.dp), tonalElevation = 1.dp) {
                 Text(t, modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
