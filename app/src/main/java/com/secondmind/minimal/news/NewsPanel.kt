@@ -57,7 +57,7 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(16.dp)
     ) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
             Text("News", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f))
         }
         Spacer(Modifier.height(8.dp))
@@ -76,7 +76,7 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
         Spacer(Modifier.height(12.dp))
 
         if (isLoading) {
-            Box(Modifier.fillMaxWidth().height(140.dp), contentAlignment = Alignment.Center) {
+            Box(Modifier.fillMaxSize().height(140.dp), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
             return@Column
@@ -96,7 +96,7 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
         }
 
         LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(bottom = 4.dp)
         ) {
@@ -110,13 +110,13 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
 
 @Composable
 private fun NewsHeroCard(article: NewsArticle, onOpen: (String?) -> Unit, onRefresh: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
+    Card(modifier = Modifier.fillMaxSize(), shape = RoundedCornerShape(16.dp)) {
         Column(Modifier.padding(12.dp)) {
             if (!article.urlToImage.isNullOrBlank()) {
                 AsyncImage(
                     model = article.urlToImage,
                     contentDescription = null,
-                    modifier = Modifier.fillMaxWidth().height(140.dp).clip(RoundedCornerShape(12.dp)),
+                    modifier = Modifier.fillMaxSize().height(140.dp).clip(RoundedCornerShape(12.dp)),
                     contentScale = ContentScale.Crop
                 )
                 Spacer(Modifier.height(10.dp))
@@ -136,7 +136,7 @@ private fun NewsHeroCard(article: NewsArticle, onOpen: (String?) -> Unit, onRefr
 
 @Composable
 private fun NewsCompactCard(article: NewsArticle, onOpen: (String?) -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth().clickable { onOpen(article.url) }, shape = RoundedCornerShape(14.dp)) {
+    Card(modifier = Modifier.fillMaxSize().clickable { onOpen(article.url) }, shape = RoundedCornerShape(14.dp)) {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(article.title ?: "(no title)", style = MaterialTheme.typography.bodyLarge,
@@ -159,7 +159,7 @@ private fun NewsCompactCard(article: NewsArticle, onOpen: (String?) -> Unit) {
 
 @Composable
 private fun MarketsStrip() {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         listOf("AAPL +1.2%", "NVDA +0.8%", "MSFT -0.3%", "TSLA +2.4%", "GOOGL +0.1%").forEach { t ->
             Surface(shape = RoundedCornerShape(12.dp), tonalElevation = 1.dp) {
                 Text(t, modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
