@@ -102,6 +102,7 @@ NavHost(nav, startDestination = "home", modifier = Modifier.fillMaxSize()) {
     }
   }
 }
+}
 @Composable
 fun titleFor(nav: NavHostController): String {
   val e by nav.currentBackStackEntryAsState()
