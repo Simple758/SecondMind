@@ -19,7 +19,6 @@ fun HomeCarousel(modifier: Modifier = Modifier) {
     horizontalArrangement = Arrangement.spacedBy(16.dp),
     verticalArrangement = Arrangement.spacedBy(16.dp),
     contentPadding = PaddingValues(16.dp),
-    modifier = modifier.fillMaxSize()
     ) {
     // Row 1 — News (full width)
     item(span = { GridItemSpan(2) }) {
