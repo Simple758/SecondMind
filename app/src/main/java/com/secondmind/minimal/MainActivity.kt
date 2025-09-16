@@ -142,7 +142,8 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
           modifier = androidx.compose.ui.Modifier
             .fillMaxWidth()
             
-            .padding(horizontal = 16.dp)
+                .heightIn(min = 0.dp, max = 600.dp)
+.padding(horizontal = 16.dp)
         ) {
           com.secondmind.minimal.news.NewsPanel(
             modifier = androidx.compose.ui.Modifier.fillMaxSize()
