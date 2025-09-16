@@ -133,6 +133,7 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
     com.secondmind.minimal.home.HomeCarousel(
       modifier = androidx.compose.ui.Modifier
         .fillMaxWidth()
+        .heightIn(min = 0.dp, max = 500.dp)
         
     )
   }
