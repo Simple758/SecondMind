@@ -1,3 +1,4 @@
+import androidx.compose.foundation.shape.RoundedCornerShape
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 package com.secondmind.minimal
 import androidx.compose.runtime.getValue
@@ -93,7 +94,15 @@ NavHost(nav, startDestination = "home", modifier = Modifier.fillMaxSize()) {
       composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }) }
       composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
       composable("inbox") { InboxScreen() }
-      composable(
+      
+        composable("news") {
+          com.secondmind.minimal.news.NewsPanel(
+            modifier = androidx.compose.ui.Modifier
+              .fillMaxSize()
+              .padding(horizontal = 16.dp)
+          )
+        }
+  composable(
         route = "notification/{id}",
         arguments = listOf(navArgument("id"){ type = NavType.LongType })
       ) { back ->
@@ -123,6 +132,39 @@ private fun showLocalNotification(ctx: Context) {
   NotificationManagerCompat.from(ctx).notify(1, n)
 }
 @Composable
+fun CompactNewsCard(onOpenFull: () -> Unit, onRead: () -> Unit) {
+  androidx.compose.material3.Card(
+    modifier = androidx.compose.ui.Modifier
+      .fillMaxWidth()
+      .heightIn(min = 0.dp, max = 240.dp),
+    shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+  ) {
+    androidx.compose.foundation.layout.Row(
+      modifier = androidx.compose.ui.Modifier
+        .fillMaxWidth()
+        .padding(16.dp),
+      verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+      horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween
+    ) {
+      androidx.compose.material3.Text(
+        "News",
+        style = androidx.compose.material3.MaterialTheme.typography.titleLarge
+      )
+      androidx.compose.foundation.layout.Row(
+        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
+      ) {
+        androidx.compose.material3.TextButton(onClick = onRead) {
+          androidx.compose.material3.Text("Read")
+        }
+        androidx.compose.material3.OutlinedButton(onClick = onOpenFull) {
+          androidx.compose.material3.Text("See all")
+        }
+      }
+    }
+  }
+}
+
+
 fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
   androidx.compose.foundation.lazy.LazyColumn(
     modifier = androidx.compose.ui.Modifier.fillMaxSize(),
