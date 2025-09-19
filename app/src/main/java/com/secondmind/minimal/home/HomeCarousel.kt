@@ -29,7 +29,7 @@ LazyVerticalGrid(
     item(span = { GridItemSpan(2) }) {
       com.secondmind.minimal.feature.news.NewsCard(
         Modifier.fillMaxWidth(),
-        onOpen = { sheetOpen.value = true }
+        onOpen = { sheetOpen = true }
       )
     }
     // Row 2 — Quick Note + Brain Food
