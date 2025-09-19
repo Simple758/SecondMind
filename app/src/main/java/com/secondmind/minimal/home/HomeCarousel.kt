@@ -10,8 +10,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
@@ -26,8 +24,10 @@ fun HomeCarousel(modifier: Modifier = Modifier, onOpenNews: () -> Unit = {}) {
     ) {
     // Row 1 — News (full width)
     item(span = { GridItemSpan(2) }) {
-      com.secondmind.minimal.feature.news.NewsCard(Modifier.fillMaxWidth(,
-        onOpen = { sheetOpen.value = true }), onOpen = onOpenNews)
+      com.secondmind.minimal.feature.news.NewsCard(
+        Modifier.fillMaxWidth(),
+        onOpen = { sheetOpen.value = true }
+      ), onOpen = onOpenNews)
     }
     // Row 2 — Quick Note + Brain Food
     item { com.secondmind.minimal.ui.components.QuickNoteCard() }
