@@ -27,11 +27,13 @@ fun NewsCard(
       .clickable { onOpen() },
     shape = RoundedCornerShape(16.dp)
   ) {
-    Row(
+    
+Row(
       Modifier.fillMaxSize().padding(horizontal = 16.dp),
       verticalAlignment = Alignment.CenterVertically
     ) {
-      Column(Modifier.weight(1f)) {
+            val ctx = LocalContext.current
+Column(Modifier.weight(1f)) {
         Text("News", style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(4.dp))
         // Simple teaser so the card is not empty; full headlines are inside the sheet.
@@ -43,7 +45,7 @@ fun NewsCard(
         )
       }
       // Play uses default TRS settings (Reader) – speaks a short prompt
-      IconButton(onClick = { Reader.speak(LocalContext.current, "Opening news feed") }) {
+      IconButton(onClick = { Reader.speak(ctx,  "Opening news feed") }) {
         Icon(Icons.Filled.PlayArrow, contentDescription = "Read")
       }
       Icon(Icons.Filled.ArrowForward, contentDescription = "Open news")

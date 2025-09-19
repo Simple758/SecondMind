@@ -27,6 +27,8 @@ fun HomeCarousel(modifier: Modifier = Modifier, onOpenNews: () -> Unit = {}) {
       com.secondmind.minimal.feature.news.NewsCard(
         Modifier.fillMaxWidth(),
         onOpen = { sheetOpen.value = true }
+      ),
+        onOpen = { sheetOpen.value = true }
       )
     }
     // Row 2 — Quick Note + Brain Food

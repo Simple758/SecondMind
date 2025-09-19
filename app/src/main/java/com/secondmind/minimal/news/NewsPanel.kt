@@ -126,9 +126,10 @@ private fun NewsHeroCard(article: NewsArticle, onOpen: (String?) -> Unit, onRefr
                 )
                 Spacer(Modifier.height(10.dp))
             }
+            val ctx = LocalContext.current
             Text(article.title ?: "(no title)", style = MaterialTheme.typography.titleMedium,
                  maxLines = 3, overflow = TextOverflow.Ellipsis)
-            IconButton(onClick = { Reader.speak(LocalContext.current, article.title ?: "") }) { Icon(Icons.Filled.PlayArrow, contentDescription = "Read") }
+            IconButton(onClick = { Reader.speak(ctx,  article.title ?: "") }) { Icon(Icons.Filled.PlayArrow, contentDescription = "Read") }
 Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedButton(onClick = { onOpen(article.url) }) { Text("Open") }
