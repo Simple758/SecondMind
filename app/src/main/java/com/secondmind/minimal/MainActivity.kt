@@ -129,8 +129,6 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit, onOpenNews: () -> Un
     modifier = androidx.compose.ui.Modifier.fillMaxSize(),
     verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
   ) {
-    
-        }
     item {
       androidx.compose.foundation.layout.Row(
         modifier = androidx.compose.ui.Modifier
