@@ -31,6 +31,7 @@ versionCode 140
 }
 
 dependencies {
+    implementation "androidx.compose.runtime:runtime-saveable"
     implementation "org.jsoup:jsoup:1.17.2"
   implementation "androidx.compose.material:material-icons-extended"
   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1"
