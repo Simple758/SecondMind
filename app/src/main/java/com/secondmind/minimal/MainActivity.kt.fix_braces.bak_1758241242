@@ -90,10 +90,9 @@ fun AppNav() {
 Box(Modifier.fillMaxSize().padding(pad)) {
     
 NavHost(nav, startDestination = "home", modifier = Modifier.fillMaxSize()) {
-      composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }, onOpenNews = { nav.navigate("news") }) }
+      composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }) }
       composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
       composable("inbox") { InboxScreen() }
-      composable("news") { com.secondmind.minimal.news.NewsPanel(modifier = Modifier.fillMaxSize()) }
       composable(
         route = "notification/{id}",
         arguments = listOf(navArgument("id"){ type = NavType.LongType })
@@ -124,7 +123,7 @@ private fun showLocalNotification(ctx: Context) {
   NotificationManagerCompat.from(ctx).notify(1, n)
 }
 @Composable
-fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit, onOpenNews: () -> Unit) {
+fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit) {
   androidx.compose.foundation.lazy.LazyColumn(
     modifier = androidx.compose.ui.Modifier.fillMaxSize(),
     verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
@@ -138,20 +137,8 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit, onOpenNews: () -> Un
         
     )
   }
-    
-  
-      item {
-        androidx.compose.foundation.layout.Box(
-          modifier = androidx.compose.ui.Modifier
-            .fillMaxWidth()
-            
-                .heightIn(min = 0.dp, max = 600.dp)
-.padding(horizontal = 16.dp)
-        ) {
-          com.secondmind.minimal.news.NewsPanel(
-            modifier = androidx.compose.ui.Modifier.fillMaxSize()
-          )
-        }
+      // Removed duplicate NewsPanel block (auto by script)
+
       }
     item {
       androidx.compose.foundation.layout.Row(
