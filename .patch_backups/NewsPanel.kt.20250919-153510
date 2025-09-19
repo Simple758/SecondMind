@@ -22,10 +22,6 @@ import coil.compose.AsyncImage
 import com.secondmind.minimal.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
-import com.secondmind.minimal.tts.Reader
 
 @Composable
 fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {

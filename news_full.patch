@@ -1,0 +1,194 @@
+--- a/app/src/main/java/com/secondmind/minimal/home/HomeCarousel.kt
++++ b/app/src/main/java/com/secondmind/minimal/home/HomeCarousel.kt
+@@ -8,12 +8,16 @@
+ import androidx.compose.foundation.lazy.grid.GridItemSpan
+ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+ import androidx.compose.runtime.Composable
++import androidx.compose.runtime.remember
++import androidx.compose.runtime.mutableStateOf
+ import androidx.compose.ui.Modifier
+ import androidx.compose.ui.unit.dp
+ 
+ @Composable
+ fun HomeCarousel(modifier: Modifier = Modifier) {
+-  LazyVerticalGrid(
++  val sheetOpen = remember { mutableStateOf(false) }
++  if (sheetOpen.value) { com.secondmind.minimal.home.HomeSheetNews(onDismiss = { sheetOpen.value = false }) }
++  LazyVerticalGrid(
+     modifier = modifier.fillMaxSize(),
+     columns = GridCells.Fixed(2),
+     horizontalArrangement = Arrangement.spacedBy(16.dp),
+@@ -22,7 +26,7 @@
+     ) {
+     // Row 1 — News (full width)
+     item(span = { GridItemSpan(2) }) {
+-      com.secondmind.minimal.feature.news.NewsCard(Modifier.fillMaxWidth())
++      com.secondmind.minimal.feature.news.NewsCard(Modifier.fillMaxWidth(), onOpen = { sheetOpen.value = true })
+     }
+     // Row 2 — Quick Note + Brain Food
+     item { com.secondmind.minimal.ui.components.QuickNoteCard() }
+--- a/app/src/main/java/com/secondmind/minimal/feature/news/NewsCard.kt
++++ b/app/src/main/java/com/secondmind/minimal/feature/news/NewsCard.kt
+@@ -1,17 +1,56 @@
+-package com.secondmind.minimal.feature.news
+-
+-// (placeholder stub)
+-
++package com.secondmind.minimal.feature.news
++
++import androidx.compose.runtime.Composable
++import androidx.compose.ui.Modifier
++import androidx.compose.foundation.layout.*
++import androidx.compose.material3.*
++import androidx.compose.ui.unit.dp
++import androidx.compose.material.icons.Icons
++import androidx.compose.material.icons.filled.ArrowForward
++import androidx.compose.foundation.clickable
++import androidx.compose.foundation.shape.RoundedCornerShape
++import androidx.compose.ui.Alignment
++
++@Composable
++fun NewsCard(modifier: Modifier = Modifier, onOpen: () -> Unit = {}) {
++  Card(
++    modifier = modifier
++      .fillMaxWidth()
++      .padding(horizontal = 16.dp)
++      .heightIn(min = 64.dp, max = 96.dp)
++      .clickable { onOpen() },
++    shape = RoundedCornerShape(16.dp)
++  ) {
++    Row(
++      Modifier.fillMaxSize().padding(horizontal = 16.dp),
++      verticalAlignment = Alignment.CenterVertically
++    ) {
++      Column(Modifier.weight(1f)) {
++        Text("News", style = MaterialTheme.typography.titleMedium)
++        Spacer(Modifier.height(4.dp))
++        Text(
++          "Tap to open full feed",
++          style = MaterialTheme.typography.bodySmall,
++          color = MaterialTheme.colorScheme.onSurfaceVariant,
++          maxLines = 1
++        )
++      }
++      Icon(Icons.Filled.ArrowForward, contentDescription = "Open news")
++    }
++  }
++}
+--- a/app/src/main/java/com/secondmind/minimal/MainActivity.kt
++++ b/app/src/main/java/com/secondmind/minimal/MainActivity.kt
+@@ -1,293 +1,280 @@
+ @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+ package com.secondmind.minimal
+@@
+-        ) {
+-          com.secondmind.minimal.news.NewsPanel(
+-            modifier = androidx.compose.ui.Modifier.fillMaxSize()
+-          )
+-        }
+-      }
+-    item {
++        ) {
++          // (duplicate NewsPanel block removed)
++        }
++      }
++    item {
+       androidx.compose.foundation.layout.Row(
+         modifier = androidx.compose.ui.Modifier
+           .fillMaxWidth()
+           .padding(horizontal = 16.dp,
+@@
+   )
+     }
+ 
+--- a/app/src/main/java/com/secondmind/minimal/news/NewsPanel.kt
++++ b/app/src/main/java/com/secondmind/minimal/news/NewsPanel.kt
+@@ -1,171 +1,187 @@
+ package com.secondmind.minimal.news
+ 
+ import android.content.Intent
+ import android.net.Uri
+ import androidx.compose.foundation.background
+ import androidx.compose.foundation.clickable
+ import androidx.compose.foundation.layout.*
+ import androidx.compose.foundation.layout.heightIn
+ import androidx.compose.foundation.lazy.LazyColumn
+ import androidx.compose.foundation.lazy.itemsIndexed
+ import androidx.compose.foundation.shape.RoundedCornerShape
+ import androidx.compose.material3.*
+ import androidx.compose.runtime.*
+ import androidx.compose.ui.Alignment
+ import androidx.compose.ui.Modifier
++import androidx.compose.ui.platform.LocalContext
+ import androidx.compose.ui.draw.clip
+ import androidx.compose.ui.graphics.Color
+ import androidx.compose.ui.layout.ContentScale
+ import androidx.compose.ui.text.style.TextOverflow
+ import androidx.compose.ui.unit.dp
+ import coil.compose.AsyncImage
+ import kotlinx.coroutines.Dispatchers
+ import kotlinx.coroutines.withContext
++import androidx.compose.material.icons.Icons
++import androidx.compose.material.icons.filled.PlayArrow
++import com.secondmind.minimal.tts.Reader
+@@
+-            Text(article.title ?: "(no title)", style = MaterialTheme.typography.titleMedium,
+-                 maxLines = 3, overflow = TextOverflow.Ellipsis)
++            Text(article.title ?: "(no title)", style = MaterialTheme.typography.titleMedium,
++                 maxLines = 3, overflow = TextOverflow.Ellipsis)
++            IconButton(onClick = { Reader.speak(LocalContext.current, article.title ?: "") }) {
++                Icon(Icons.Filled.PlayArrow, contentDescription = "Read")
++            }
+             Spacer(Modifier.height(8.dp))
+             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                 OutlinedButton(onClick = { onOpen(article.url) }) { Text("Open") }
+                 OutlinedButton(onClick = onRefresh) { Text("Refresh") }
+             }
+@@
+-                Text(article.title ?: "(no title)", style = MaterialTheme.typography.bodyLarge,
+-                     maxLines = 2, overflow = TextOverflow.Ellipsis)
++                Text(article.title ?: "(no title)", style = MaterialTheme.typography.bodyLarge,
++                     maxLines = 2, overflow = TextOverflow.Ellipsis)
++                IconButton(onClick = { Reader.speak(LocalContext.current, article.title ?: "") }) {
++                    Icon(Icons.Filled.PlayArrow, contentDescription = "Read")
++                }
+                 Spacer(Modifier.height(4.dp))
+                 Text((article.source?.name ?: ""), style = MaterialTheme.typography.labelMedium,
+                      maxLines = 1, overflow = TextOverflow.Ellipsis)
+             }
+         }
+     }
+ }
++
+--- /dev/null
++++ b/app/src/main/java/com/secondmind/minimal/home/HomeSheetNews.kt
+@@ -0,0 +1,20 @@
++package com.secondmind.minimal.home
++
++import androidx.compose.material3.*
++import androidx.compose.runtime.Composable
++import androidx.compose.ui.Modifier
++import androidx.compose.foundation.layout.fillMaxSize
++import com.secondmind.minimal.news.NewsPanel
++
++@OptIn(ExperimentalMaterial3Api::class)
++@Composable
++fun HomeSheetNews(onDismiss: () -> Unit) {
++  ModalBottomSheet(onDismissRequest = onDismiss) {
++    NewsPanel(modifier = Modifier.fillMaxSize())
++  }
++}
+\PATCH
+
+# 2) Apply patch
+git apply news_full.patch
+
+# 3) Preview diff to verify
+git --no-pager diff
+
+# 4) Commit & push
+git add -A
+git commit -m "home/news: compact top card opens full feed (bottom sheet); remove lower duplicate; TTS Play wired to Reader/TRS"
+git push --force-with-lease origin main
+
+echo "Done."
