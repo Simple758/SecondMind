@@ -1,4 +1,5 @@
 package com.secondmind.minimal.home
+import androidx.compose.runtime.*
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,7 +16,9 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun HomeCarousel(modifier: Modifier = Modifier, onOpenNews: () -> Unit = {}) {
-  LazyVerticalGrid(
+  
+    var sheetOpen by rememberSaveable { mutableStateOf(false) }
+LazyVerticalGrid(
     modifier = modifier.fillMaxSize(),
     columns = GridCells.Fixed(2),
     horizontalArrangement = Arrangement.spacedBy(16.dp),
