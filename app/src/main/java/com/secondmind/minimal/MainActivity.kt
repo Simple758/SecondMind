@@ -130,29 +130,7 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit, onOpenNews: () -> Un
     verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
   ) {
     
-  item {
-    com.secondmind.minimal.home.HomeCarousel(
-      modifier = androidx.compose.ui.Modifier
-        .fillMaxWidth()
-        .heightIn(min = 0.dp, max = 500.dp)
-        
-    )
-  }
-    
-  
-      item {
-        androidx.compose.foundation.layout.Box(
-          modifier = androidx.compose.ui.Modifier
-            .fillMaxWidth()
-            
-                .heightIn(min = 0.dp, max = 600.dp)
-.padding(horizontal = 16.dp)
-        ) {
-          com.secondmind.minimal.news.NewsPanel(
-            modifier = androidx.compose.ui.Modifier.fillMaxSize()
-          )
         }
-      }
     item {
       androidx.compose.foundation.layout.Row(
         modifier = androidx.compose.ui.Modifier
