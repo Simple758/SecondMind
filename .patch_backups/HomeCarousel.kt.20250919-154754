@@ -26,8 +26,7 @@ fun HomeCarousel(modifier: Modifier = Modifier, onOpenNews: () -> Unit = {}) {
     ) {
     // Row 1 — News (full width)
     item(span = { GridItemSpan(2) }) {
-      com.secondmind.minimal.feature.news.NewsCard(Modifier.fillMaxWidth(,
-        onOpen = { sheetOpen.value = true }), onOpen = onOpenNews)
+      com.secondmind.minimal.feature.news.NewsCard(Modifier.fillMaxWidth(), onOpen = onOpenNews)
     }
     // Row 2 — Quick Note + Brain Food
     item { com.secondmind.minimal.ui.components.QuickNoteCard() }
