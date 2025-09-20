@@ -48,4 +48,8 @@ LazyVerticalGrid(
       com.secondmind.minimal.ui.components.NotificationAccessBanner(Modifier.fillMaxWidth())
     }
   }
+  if (sheetOpen) {
+    HomeSheetNews(onDismiss = { sheetOpen = false })
+  }
+
 }
