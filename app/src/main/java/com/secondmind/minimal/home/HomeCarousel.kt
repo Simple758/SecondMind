@@ -13,13 +13,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun HomeCarousel(modifier: Modifier = Modifier, onOpenNews: () -> Unit = {}) {
     var sheetOpen by rememberSaveable { mutableStateOf(false) }
 
-    Box(modifier = modifier.fillMaxSize()) { mutableStateOf(false) }
+    Box(modifier = modifier.fillMaxSize()) {
 LazyVerticalGrid(
     modifier = modifier.fillMaxSize(),
     columns = GridCells.Fixed(2),
@@ -52,5 +53,7 @@ LazyVerticalGrid(
         if (sheetOpen) {
             HomeSheetNews(onDismiss = { sheetOpen = false })
   }
+    }
+
 
 }
