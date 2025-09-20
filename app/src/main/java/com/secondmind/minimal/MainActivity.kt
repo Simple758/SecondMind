@@ -62,53 +62,55 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import com.secondmind.minimal.news.NewsPanel
 import androidx.compose.foundation.lazy.LazyColumn
+
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-// ensureChannel(…) removed for CI
+    // ensureChannel(…) removed for CI
     setContent {
-    
-val mode by rememberThemeMode()
+      val mode by rememberThemeMode()
       val dark = when (mode) { "dark" -> true; "light" -> false; else -> isSystemInDarkTheme() }
       val scheme = if (dark) darkColorScheme() else lightColorScheme()
       MaterialTheme(colorScheme = scheme) { AppNav() }
-  }
-//   private fun ensureChannel() {
-//     if (Build.VERSION.SDK_INT >= 26) {
-//       val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-//       nm.createNotificationChannel(NotificationChannel("sm", "SecondMind", NotificationManager.IMPORTANCE_DEFAULT))
-//     }
+    }
+    //   private fun ensureChannel() {
+    //     if (Build.VERSION.SDK_INT >= 26) {
+    //       val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    //       nm.createNotificationChannel(NotificationChannel("sm", "SecondMind", NotificationManager.IMPORTANCE_DEFAULT))
+    //     }
+    //   }
   }
 }
+
 @Composable
 fun rememberThemeMode(): State<String> {
   val ctx = LocalContext.current
   val flow = remember { ctx.dataStore.data.map { it[Keys.THEME] ?: "system" } }
   return flow.collectAsState(initial = "system")
 }
+
 @Composable
 fun AppNav() {
   val nav = rememberNavController()
   Scaffold(topBar = { TopBarWithMenu(nav) }) { pad ->
-
-Box(Modifier.fillMaxSize().padding(pad)) {
-    
-NavHost(nav, startDestination = "home", modifier = Modifier.fillMaxSize()) {
-      composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }, onOpenNews = { nav.navigate("news") }) }
-      composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
-      composable("inbox") { InboxScreen() }
-      composable("news") { com.secondmind.minimal.news.NewsPanel(modifier = Modifier.fillMaxSize()) }
-      composable(
-        route = "notification/{id}",
-        arguments = listOf(navArgument("id"){ type = NavType.LongType })
-      ) { back ->
-        val id = back.arguments?.getLong("id") ?: -1L
-        DetailsScreen(id)
+    Box(Modifier.fillMaxSize().padding(pad)) {
+      NavHost(nav, startDestination = "home", modifier = Modifier.fillMaxSize()) {
+        composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }, onOpenNews = { nav.navigate("news") }) }
+        composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
+        composable("inbox") { InboxScreen() }
+        composable("news") { com.secondmind.minimal.news.NewsPanel(modifier = Modifier.fillMaxSize()) }
+        composable(
+          route = "notification/{id}",
+          arguments = listOf(navArgument("id"){ type = NavType.LongType })
+        ) { back ->
+          val id = back.arguments?.getLong("id") ?: -1L
+          DetailsScreen(id)
+        }
       }
     }
   }
 }
-}
+
 @Composable
 fun titleFor(nav: NavHostController): String {
   val e by nav.currentBackStackEntryAsState()
@@ -119,6 +121,7 @@ fun titleFor(nav: NavHostController): String {
     else -> "SecondMind"
   }
 }
+
 private fun showLocalNotification(ctx: Context) {
   val n = NotificationCompat.Builder(ctx, "sm")
     .setContentTitle("SecondMind")
@@ -127,6 +130,7 @@ private fun showLocalNotification(ctx: Context) {
     .build()
   NotificationManagerCompat.from(ctx).notify(1, n)
 }
+
 @Composable
 fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit, onOpenNews: () -> Unit) {
   Column(Modifier.fillMaxSize()) {
@@ -146,8 +150,47 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit, onOpenNews: () -> Un
     HomeCarousel(
       modifier = Modifier
         .fillMaxWidth()
-        .weight(1f), // this makes the grid take up the rest of the screen
+        .weight(1f),
       onOpenNews = onOpenNews
     )
+  }
+}
+
+// --- ADDED: TopBarWithMenu ---
+@Composable
+fun TopBarWithMenu(nav: NavHostController) {
+  TopAppBar(
+    title = { Text(titleFor(nav)) },
+    navigationIcon = {
+      IconButton(onClick = { /* Can open drawer menu if needed */ }) {
+        Icon(Icons.Filled.Menu, contentDescription = "Menu")
+      }
+    }
+  )
+}
+
+// --- ADDED: SettingsScreen ---
+@Composable
+fun SettingsScreen(onBack: () -> Unit) {
+  val ctx = LocalContext.current
+  val scope = rememberCoroutineScope()
+  val themeFlow = remember { ctx.dataStore.data.map { it[Keys.THEME] ?: "system" } }
+  val theme by themeFlow.collectAsState(initial = "system")
+
+  Column(
+    Modifier
+      .fillMaxSize()
+      .padding(24.dp),
+    verticalArrangement = Arrangement.spacedBy(16.dp),
+    horizontalAlignment = Alignment.CenterHorizontally
+  ) {
+    Text("Settings", fontSize = 22.sp)
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+      OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "system" } } }) { Text("System") }
+      OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "dark" } } }) { Text("Dark") }
+      OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "light" } } }) { Text("Light") }
+    }
+    OutlinedButton(onClick = onBack) { Text("Back") }
+    Text("Current theme: $theme")
   }
 }
