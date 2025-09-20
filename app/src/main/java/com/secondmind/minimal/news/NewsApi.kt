@@ -29,6 +29,10 @@ internal interface NewsApi {
         ("q") q: String? = null,
         ("country") country: String = "us",
         ("apiKey") apiKey: String
+    ) category: String? = null,
+        ("q") q: String? = null,
+        ("country") country: String = "us",
+        ("apiKey") apiKey: String
     ): TopHeadlinesResponse
 }
 
