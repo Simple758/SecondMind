@@ -1,4 +1,5 @@
 package com.secondmind.minimal.news
+import androidx.compose.ui.zIndex
 
 import android.content.Intent
 import android.net.Uri
@@ -63,7 +64,7 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
             .padding(16.dp)
     ) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text("News", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f))
+            Text("News", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.zIndex(1f).weight(1f))
         }
         Spacer(Modifier.height(8.dp))
 
@@ -169,7 +170,7 @@ private fun MarketsStrip() {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         listOf("AAPL +1.2%", "NVDA +0.8%", "MSFT -0.3%", "TSLA +2.4%", "GOOGL +0.1%").forEach { t ->
             Surface(shape = RoundedCornerShape(12.dp), tonalElevation = 1.dp) {
-                Text(t, modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                Text(t, modifier = Modifier.zIndex(1f).padding(horizontal = 10.dp, vertical = 6.dp),
                      style = MaterialTheme.typography.labelLarge)
             }
         }
