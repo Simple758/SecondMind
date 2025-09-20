@@ -18,6 +18,10 @@ fun HomeSheetNews(onDismiss: () -> Unit) {
     onDismissRequest = onDismiss,
     sheetState = sheetState
   ) {
-NewsPanel(modifier = Modifier.fillMaxSize())
+androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalContentColor provides androidx.compose.material3.MaterialTheme.colorScheme.onSurface) {
+  androidx.compose.material3.ProvideTextStyle(androidx.compose.material3.MaterialTheme.typography.bodyMedium.copy(color = androidx.compose.material3.MaterialTheme.colorScheme.onSurface)) {
+    NewsPanel(modifier = Modifier.fillMaxSize())
+  }
+}
   }
 }
