@@ -126,32 +126,28 @@ private fun showLocalNotification(ctx: Context) {
 }
 @Composable
 fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit, onOpenNews: () -> Unit) {
-  androidx.compose.foundation.lazy.LazyColumn(
-    modifier = androidx.compose.ui.Modifier.fillMaxSize(),
-    verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
+  androidx.compose.foundation.layout.Column(
+  modifier = androidx.compose.ui.Modifier
+    .fillMaxSize()
+    .padding(16.dp),
+  verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
+) {
+  androidx.compose.foundation.layout.Row(
+    modifier = androidx.compose.ui.Modifier.fillMaxWidth(),
+    horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
   ) {
-    item {
-      androidx.compose.foundation.layout.Row(
-        modifier = androidx.compose.ui.Modifier
-          .fillMaxWidth()
-          .padding(horizontal = 16.dp, vertical = 12.dp),
-        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
-      ) {
-        androidx.compose.material3.OutlinedButton(onClick = onInbox) {
-          androidx.compose.material3.Text("Inbox")
-        }
-        androidx.compose.material3.OutlinedButton(onClick = onSettings) {
-          androidx.compose.material3.Text("Settings")
-        }
-      }
+    androidx.compose.material3.OutlinedButton(onClick = onInbox) {
+      androidx.compose.material3.Text("Inbox")
     }
-  
-    item {
-      com.secondmind.minimal.home.HomeCarousel(
-        modifier = androidx.compose.ui.Modifier.fillMaxWidth(),
-        onOpenNews = onOpenNews
-      )
+    androidx.compose.material3.OutlinedButton(onClick = onSettings) {
+      androidx.compose.material3.Text("Settings")
     }
+  }
+
+  com.secondmind.minimal.home.HomeCarousel(
+    modifier = androidx.compose.ui.Modifier.fillMaxSize(),
+    onOpenNews = onOpenNews
+  )
 }
 }
 @Composable
