@@ -13,7 +13,7 @@ android {
   namespace "com.secondmind.minimal"
   compileSdk 34
   defaultConfig {
-        buildConfigField "String", "NEWS_API_KEY", ""${NEWS_API_KEY}""45b180a1ea0f45018aa89b36c1e49cf1\""
+        buildConfigField "String", "NEWS_API_KEY", """"${NEWS_API_KEY}""45b180a1ea0f45018aa89b36c1e49cf1\""
     applicationId "com.secondmind.minimal"
     minSdk 24
     targetSdk 34
