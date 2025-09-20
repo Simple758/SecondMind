@@ -127,7 +127,6 @@ private fun showLocalNotification(ctx: Context) {
     .build()
   NotificationManagerCompat.from(ctx).notify(1, n)
 }
->>>>>>> c37c46a (fix(kapt): fully-qualify @file:OptIn annotations to avoid NonExistentClass)
 @Composable
 fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit, onOpenNews: () -> Unit) {
   Column(Modifier.fillMaxSize()) {
