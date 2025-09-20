@@ -1,4 +1,8 @@
 package com.secondmind.minimal.news
+import java.util.TimeZone
+import java.util.Locale
+import java.text.SimpleDateFormat
+import android.text.format.DateUtils
 import androidx.compose.material3.CardDefaults
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
@@ -141,7 +145,7 @@ Spacer(Modifier.height(8.dp))
                 OutlinedButton(onClick = onRefresh) { Text("Refresh") }
             }
             Spacer(Modifier.height(4.dp))
-            Text(article.source?.name ?: "", style = MaterialTheme.typography.labelMedium)
+            MetaRow(article.source?.name, null)
         }
     }
 }
@@ -154,7 +158,7 @@ private fun NewsCompactCard(article: NewsArticle, onOpen: (String?) -> Unit) {
                 Text(article.title ?: "(no title)", style = MaterialTheme.typography.bodyLarge,
                      maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Spacer(Modifier.height(4.dp))
-                Text((article.source?.name ?: "").lowercase(), style = MaterialTheme.typography.labelMedium)
+                MetaRow(article.source?.name, null)
             }
             Spacer(Modifier.width(12.dp))
             Box(Modifier.size(56.dp).clip(RoundedCornerShape(10.dp))) {
@@ -191,4 +195,41 @@ private fun Modifier.bottomScrim(): Modifier = this.drawWithContent {
       )
     )
   )
+}
+
+@Composable
+private fun MetaRow(source: String?, publishedAt: String?) {
+  val s = source?.takeIf { it.isNotBlank() }
+  val t = relativeTimeOrNull(publishedAt)
+  val text = listOfNotNull(s, t).joinToString(" • ")
+  if (text.isNotBlank()) {
+    Text(
+      text,
+      style = MaterialTheme.typography.labelMedium,
+      color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+    )
+  }
+}
+
+private fun relativeTimeOrNull(iso: String?): String? {
+  if (iso.isNullOrBlank()) return null
+  val patterns = arrayOf(
+    "yyyy-MM-ddTHH:mm:ssZ",
+    "yyyy-MM-ddTHH:mm:ss.SSSZ",
+    "yyyy-MM-ddTHH:mm:ssXXX",
+    "yyyy-MM-ddTHH:mm:ss.SSSXXX"
+  )
+  for (p in patterns) {
+    try {
+      val sdf = SimpleDateFormat(p, Locale.US).apply {
+        timeZone = TimeZone.getTimeZone("UTC")
+        isLenient = true
+      }
+      val ms = sdf.parse(iso)?.time ?: continue
+      return DateUtils.getRelativeTimeSpanString(
+        ms, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS
+      ).toString()
+    } catch (_: Exception) { }
+  }
+  return null
 }
