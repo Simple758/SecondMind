@@ -58,7 +58,9 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
         try {
             val api = newsApi()
             val res = withContext(Dispatchers.IO) {
-                api.top(category = tabToCategory(tab), apiKey = BuildConfig.NEWS_API_KEY)
+                
+val (cat, query) = tabToParams(tab)
+api.top(category = cat, q = query, apiKey = BuildConfig.NEWS_API_KEY)
             }
             articles = if (res.status == "ok") res.articles.orEmpty() else emptyList()
         } catch (_: Throwable) { articles = emptyList() } finally { isLoading = false }
@@ -235,4 +237,14 @@ private fun relativeTimeOrNull(iso: String?): String? {
     } catch (_: Exception) { }
   }
   return null
+}
+
+private fun tabToParams(tab: Int): Pair<String?, String?> = when (tab) {
+  0 -> "general" to null,     // For you
+  1 -> "technology" to null,  // Tech
+  2 -> "business" to null,    // Markets
+  3 -> "general" to null,     // World
+  4 -> "sports" to null,      // Sports
+  5 -> null to "crypto",      // Crypto via search
+  else -> "general" to null
 }
