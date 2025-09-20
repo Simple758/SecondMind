@@ -73,6 +73,9 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
     ) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text("Noticias destacadas", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.zIndex(1f).weight(1f))
+    val __titles = remember(articles) { articles.count { !((it.title?: "").isBlank()) } }
+    val __descs = remember(articles) { articles.count { !((it.description?: "").isBlank()) } }
+    Text("DEBUG: titles= • descs=", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha=0.7f))
         }
         Spacer(Modifier.height(8.dp))
 
