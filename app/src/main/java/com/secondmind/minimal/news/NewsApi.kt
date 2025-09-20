@@ -25,9 +25,10 @@ internal data class TopHeadlinesResponse(
 internal interface NewsApi {
     @GET("/v2/top-headlines")
     suspend fun top(
-        @Query("category") category: String? = null = null = null? = null,
-        @Query("country") country: String = "us",
-        @Query("apiKey") apiKey: String
+        ("category") category: String? = null,
+        ("q") q: String? = null,
+        ("country") country: String = "us",
+        ("apiKey") apiKey: String
     ): TopHeadlinesResponse
 }
 
