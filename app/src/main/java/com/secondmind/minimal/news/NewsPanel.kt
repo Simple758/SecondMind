@@ -1,5 +1,4 @@
 package com.secondmind.minimal.news
-import androidx.compose.ui.zIndex
 
 import android.content.Intent
 import android.net.Uri
@@ -64,7 +63,7 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
             .padding(16.dp)
     ) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text("News", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f.zIndex(1f)))
+            Text("News", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f))
         }
         Spacer(Modifier.height(8.dp))
 
@@ -102,7 +101,7 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
         }
 
         LazyColumn(
-            modifier = Modifier.fillMaxWidth(.zIndex(1f)).heightIn(min = 0.dp, max = 480.dp),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 0.dp, max = 480.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(bottom = 4.dp)
         ) {
@@ -116,13 +115,13 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
 
 @Composable
 private fun NewsHeroCard(article: NewsArticle, onOpen: (String?) -> Unit, onRefresh: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth(.zIndex(1f)), shape = RoundedCornerShape(16.dp)) {
+    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
         Column(Modifier.padding(12.dp)) {
             if (!article.urlToImage.isNullOrBlank()) {
                 AsyncImage(
                     model = article.urlToImage,
                     contentDescription = null,
-                    modifier = Modifier.fillMaxSize(.zIndex(1f)).height(140.dp).clip(RoundedCornerShape(12.dp)),
+                    modifier = Modifier.fillMaxSize().height(140.dp).clip(RoundedCornerShape(12.dp)),
                     contentScale = ContentScale.Crop
                 )
                 Spacer(Modifier.height(10.dp))
@@ -144,7 +143,7 @@ Spacer(Modifier.height(8.dp))
 
 @Composable
 private fun NewsCompactCard(article: NewsArticle, onOpen: (String?) -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth(.zIndex(1f)).clickable { onOpen(article.url) }, shape = RoundedCornerShape(14.dp)) {
+    Card(modifier = Modifier.fillMaxWidth().clickable { onOpen(article.url) }, shape = RoundedCornerShape(14.dp)) {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(article.title ?: "(no title)", style = MaterialTheme.typography.bodyLarge,
@@ -156,7 +155,7 @@ private fun NewsCompactCard(article: NewsArticle, onOpen: (String?) -> Unit) {
             Box(Modifier.size(56.dp).clip(RoundedCornerShape(10.dp))) {
                 if (!article.urlToImage.isNullOrBlank()) {
                     AsyncImage(model = article.urlToImage, contentDescription = null,
-                               contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize(.zIndex(1f)))
+                               contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
                 } else {
                     Box(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)))
                 }
@@ -170,7 +169,7 @@ private fun MarketsStrip() {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         listOf("AAPL +1.2%", "NVDA +0.8%", "MSFT -0.3%", "TSLA +2.4%", "GOOGL +0.1%").forEach { t ->
             Surface(shape = RoundedCornerShape(12.dp), tonalElevation = 1.dp) {
-                Text(t, modifier = Modifier.padding(horizontal = 10.dp.zIndex(1f), vertical = 6.dp),
+                Text(t, modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                      style = MaterialTheme.typography.labelLarge)
             }
         }
