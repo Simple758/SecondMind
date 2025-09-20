@@ -17,8 +17,9 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun HomeCarousel(modifier: Modifier = Modifier, onOpenNews: () -> Unit = {}) {
-  
     var sheetOpen by rememberSaveable { mutableStateOf(false) }
+
+    Box(modifier = modifier.fillMaxSize()) { mutableStateOf(false) }
 LazyVerticalGrid(
     modifier = modifier.fillMaxSize(),
     columns = GridCells.Fixed(2),
@@ -48,8 +49,8 @@ LazyVerticalGrid(
       com.secondmind.minimal.ui.components.NotificationAccessBanner(Modifier.fillMaxWidth())
     }
   }
-  if (sheetOpen) {
-    HomeSheetNews(onDismiss = { sheetOpen = false })
+        if (sheetOpen) {
+            HomeSheetNews(onDismiss = { sheetOpen = false })
   }
 
 }
