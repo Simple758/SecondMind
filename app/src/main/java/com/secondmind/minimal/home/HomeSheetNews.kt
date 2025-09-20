@@ -1,4 +1,6 @@
 package com.secondmind.minimal.home
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.LaunchedEffect
 
 import androidx.compose.material3.*
