@@ -12,7 +12,12 @@ import com.secondmind.minimal.news.NewsPanel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeSheetNews(onDismiss: () -> Unit) {
-  ModalBottomSheet(onDismissRequest = onDismiss) {
-    NewsPanel(modifier = Modifier.fillMaxSize())
+  val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+  LaunchedEffect(Unit) { sheetState.expand() }
+  ModalBottomSheet(
+    onDismissRequest = onDismiss,
+    sheetState = sheetState
+  ) {
+NewsPanel(modifier = Modifier.fillMaxSize())
   }
 }
