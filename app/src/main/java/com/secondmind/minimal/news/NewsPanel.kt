@@ -1,4 +1,8 @@
 package com.secondmind.minimal.news
+import androidx.compose.material3.CardDefaults
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.zIndex
 
 import android.content.Intent
@@ -64,7 +68,7 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
             .padding(16.dp)
     ) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text("News", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.zIndex(1f).weight(1f))
+            Text("Noticias destacadas", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.zIndex(1f).weight(1f))
         }
         Spacer(Modifier.height(8.dp))
 
@@ -82,7 +86,7 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
         Spacer(Modifier.height(12.dp))
 
         if (isLoading) {
-            Box(Modifier.fillMaxWidth().height(140.dp), contentAlignment = Alignment.Center) {
+            Box(Modifier.fillMaxWidth().height(220.dp), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
             return@Column
@@ -102,7 +106,7 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
         }
 
         LazyColumn(
-            modifier = Modifier.fillMaxWidth().heightIn(min = 0.dp, max = 480.dp),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 220.dp, max = 480.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(bottom = 4.dp)
         ) {
@@ -116,13 +120,13 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
 
 @Composable
 private fun NewsHeroCard(article: NewsArticle, onOpen: (String?) -> Unit, onRefresh: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
+    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
         Column(Modifier.padding(12.dp)) {
             if (!article.urlToImage.isNullOrBlank()) {
                 AsyncImage(
                     model = article.urlToImage,
                     contentDescription = null,
-                    modifier = Modifier.fillMaxSize().height(140.dp).clip(RoundedCornerShape(12.dp)),
+                    modifier = Modifier.fillMaxSize().height(220.dp).clip(RoundedCornerShape(12.dp)),
                     contentScale = ContentScale.Crop
                 )
                 Spacer(Modifier.height(10.dp))
@@ -175,4 +179,16 @@ private fun MarketsStrip() {
             }
         }
     }
+}
+private fun Modifier.bottomScrim(): Modifier = this.drawWithContent {
+  drawContent()
+  drawRect(
+    Brush.verticalGradient(
+      colors = listOf(
+        Color.Black.copy(alpha = 0.00f),
+        Color.Black.copy(alpha = 0.40f),
+        Color.Black.copy(alpha = 0.88f)
+      )
+    )
+  )
 }
