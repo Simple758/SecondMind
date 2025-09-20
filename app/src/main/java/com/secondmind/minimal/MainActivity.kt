@@ -145,7 +145,14 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit, onOpenNews: () -> Un
         }
       }
     }
-  }
+  
+    item(span = { androidx.compose.foundation.lazy.grid.GridItemSpan(2) }) {
+      com.secondmind.minimal.home.HomeCarousel(
+        modifier = androidx.compose.ui.Modifier.fillMaxWidth(),
+        onOpenNews = onOpenNews
+      )
+    }
+}
 }
 @Composable
 fun SettingsScreen(onBack: () -> Unit) {
