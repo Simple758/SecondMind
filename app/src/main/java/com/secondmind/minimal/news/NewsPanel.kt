@@ -141,8 +141,7 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
             contentPadding = PaddingValues(bottom = 4.dp)
         ) {
             val rest = if (articles.size > 1) articles.drop(1) else emptyList()
-            itemsIndexed(rest) { _, a -> NewsCompactCard(a){ url -> com.secondmind.minimal.memory.MemoryStore.recordNewsOpen(ctx,a.title); com.secondmind.minimal.memory.MemoryStore.recordNewsOpen(ctx,a.title);
-                url?.let { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
+            itemsIndexed(rest) { _, a -> NewsCompactCard(a){ url -> com.secondmind.minimal.memory.MemoryStore.recordNewsOpen(ctx,a.title); url?.let { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
             } }
         }
     }
