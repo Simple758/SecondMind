@@ -1,4 +1,5 @@
 package com.secondmind.minimal.news
+import androidx.compose.ui.platform.LocalContext
 import com.secondmind.minimal.tts.Reader
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.Alignment
