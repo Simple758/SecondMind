@@ -46,6 +46,14 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
    }
     val ctx = LocalContext.current
 
+    // Speak all visible headlines in the current tab
+    fun speakAllNews(ctx: android.content.Context, items: List<NewsItem>) {
+        if (items.isEmpty()) return
+        val script = items.joinToString(separator = ". ") { it.title ?: "" }
+        com.secondmind.minimal.tts.Reader.speak(ctx, script)
+    }
+
+
     fun tabToCategory(i: Int): String? = when (i) {
         1 -> "technology"
         2 -> "business"
@@ -70,11 +78,25 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(16.dp)
     ) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        
+      Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text("Noticias destacadas", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.zIndex(1f).weight(1f))
     val __titles = remember(articles) { articles.count { !((it.title?: "").isBlank()) } }
     val __descs = remember(articles) { articles.count { !((""?: "").isBlank()) } }
-        }
+
+            Spacer(Modifier.width(8.dp))
+            androidx.compose.material3.ElevatedButton(
+                onClick = { speakAllNews(ctx, articles) },
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+                modifier = Modifier.zIndex(1f)
+            ) {
+                Icon(Icons.Filled.PlayArrow, contentDescription = "Read all")
+                Spacer(Modifier.width(6.dp))
+                Text("Play all")
+            }
+      
+
+            }
         Spacer(Modifier.height(8.dp))
 
         ScrollableTabRow(
@@ -127,8 +149,9 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
 private fun NewsHeroCard(article: NewsItem, onOpen: (String?) -> Unit, onRefresh: () -> Unit) {
     Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
         Column(Modifier.padding(12.dp)) {
-            if (!article.imageUrl.isNullOrBlank()) {
-                AsyncImage(
+            
+    if (!article.imageUrl.isNullOrBlank()) {
+                    AsyncImage(
                     model = article.imageUrl,
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize().height(220.dp).clip(RoundedCornerShape(12.dp)),
@@ -162,8 +185,10 @@ private fun NewsCompactCard(article: NewsItem, onOpen: (String?) -> Unit) {
                 MetaRow(article.source, null)
             }
             Spacer(Modifier.width(12.dp))
-            Box(Modifier.size(56.dp).clip(RoundedCornerShape(10.dp))) {
-                if (!article.imageUrl.isNullOrBlank()) {
+            
+    Box(Modifier.size(72.dp).clip(RoundedCornerShape(12.dp))) {
+                
+    if (!article.imageUrl.isNullOrBlank()) {
                     AsyncImage(model = article.imageUrl, contentDescription = null,
                                contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
                 } else {
