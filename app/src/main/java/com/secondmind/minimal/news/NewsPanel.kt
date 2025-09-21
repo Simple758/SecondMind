@@ -154,7 +154,7 @@ private fun NewsHeroCard(article: NewsItem, onOpen: (String?) -> Unit, onRefresh
                     AsyncImage(
                     model = article.imageUrl,
                     contentDescription = null,
-                    modifier = Modifier.fillMaxSize().height(220.dp).clip(RoundedCornerShape(12.dp)),
+                    modifier = Modifier.fillMaxWidth().aspectRatio(16f/9f).clip(RoundedCornerShape(12.dp)),
                     contentScale = ContentScale.Crop
                 )
                 Spacer(Modifier.height(10.dp))
