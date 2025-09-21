@@ -1,24 +1,22 @@
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.platform.LocalContext
 package com.secondmind.minimal.home
-import androidx.compose.runtime.*
-
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.*
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.layout.Box
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.runtime.mutableStateOf
+
 
 @Composable
 fun HomeCarousel(modifier: Modifier = Modifier, onOpenNews: () -> Unit = {}) {
@@ -36,9 +34,6 @@ LazyVerticalGrid(
     item(span = { GridItemSpan(2) }) { com.secondmind.minimal.insights.InsightsCard(Modifier.fillMaxWidth()) }
     item { com.secondmind.minimal.knowledge.KnowledgeCard() }
 
-    item(span = { GridItemSpan(2) }) { com.secondmind.minimal.memory.ResumeBanner(Modifier.fillMaxWidth(), onOpenNews = onOpenNews) }
-    item(span = { GridItemSpan(2) }) { com.secondmind.minimal.insights.InsightsCard(Modifier.fillMaxWidth()) }
-    item { com.secondmind.minimal.knowledge.KnowledgeCard() }
 
     // Row 1 — News (full width)
     item(span = { GridItemSpan(2) }) {
