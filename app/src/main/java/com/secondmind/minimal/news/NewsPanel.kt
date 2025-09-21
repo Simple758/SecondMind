@@ -41,7 +41,9 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
     val tabs = listOf("For you", "Tech", "Markets", "World", "Sports", "Crypto")
     var tab by remember { mutableStateOf(initialTab) }
     var isLoading by remember { mutableStateOf(false) }
-    var articles by remember { mutableStateOf<List<NewsArticle>>(emptyList()) }
+    var articles by remember { 
+    mutableStateOf<List<NewsItem>>(emptyList())
+   }
     val ctx = LocalContext.current
 
     fun tabToCategory(i: Int): String? = when (i) {
@@ -56,7 +58,6 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
     LaunchedEffect(tab) {
         isLoading = true
         try {
-            val api = newsApi()
             val res = withContext(Dispatchers.IO) {
                 
 val (cat, query) = tabToParams(tab)
@@ -127,7 +128,7 @@ api.top(category = cat, q = query, apiKey = BuildConfig.NEWS_API_KEY)
 }
 
 @Composable
-private fun NewsHeroCard(article: NewsArticle, onOpen: (String?) -> Unit, onRefresh: () -> Unit) {
+private fun NewsHeroCard(article: NewsItem, onOpen: (String?) -> Unit, onRefresh: () -> Unit) {
     Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
         Column(Modifier.padding(12.dp)) {
             if (!article.urlToImage.isNullOrBlank()) {
@@ -155,7 +156,7 @@ Spacer(Modifier.height(8.dp))
 }
 
 @Composable
-private fun NewsCompactCard(article: NewsArticle, onOpen: (String?) -> Unit) {
+private fun NewsCompactCard(article: NewsItem, onOpen: (String?) -> Unit) {
     Card(modifier = Modifier.fillMaxWidth().clickable { onOpen(article.url) }, shape = RoundedCornerShape(14.dp)) {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
