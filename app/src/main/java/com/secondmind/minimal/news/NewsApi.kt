@@ -2,6 +2,7 @@ package com.secondmind.minimal.news
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.jsoup.parser.Parser
 import java.net.URL
 
 data class NewsItem(
@@ -11,59 +12,69 @@ data class NewsItem(
   val source: String? = null
 )
 
+/**
+ * Reliable RSS-based fetcher:
+ *  - TechCrunch: https://techcrunch.com/feed/
+ *  - Hacker News: https://hnrss.org/frontpage
+ *  - The Verge: https://www.theverge.com/rss/index.xml
+ *
+ * We parse <item><title> and <link>, and try common image carriers:
+ *   - <media:content url="..."> or <media:thumbnail url="...">
+ *   - <enclosure type="image/..."> url
+ * If no image is present, imageUrl stays null (UI handles it).
+ */
 object NewsApi {
-  /**
-   * Very small, network-simple fetcher using Jsoup.
-   * - Pulls a few sources (you can extend).
-   * - Extracts og:image / twitter:image or first image as thumbnail.
-   * NOTE: This runs at runtime; nothing here requires kapt/retrofit.
-   */
   suspend fun fetchTopHeadlines(): List<NewsItem> {
     val sources = listOf(
-      "https://www.theverge.com/",
-      "https://techcrunch.com/",
-      "https://news.ycombinator.com/"
+      "https://techcrunch.com/feed/",
+      "https://hnrss.org/frontpage",
+      "https://www.theverge.com/rss/index.xml"
     )
-    val items = mutableListOf<NewsItem>()
-    for (src in sources) {
+    val all = mutableListOf<NewsItem>()
+    for (feed in sources) {
       try {
-        val doc = Jsoup.connect(src).timeout(8000).get()
-        items += extractFrom(doc, src)
-      } catch (_: Throwable) {
-        // swallow per-source failures
-      }
+        all += fetchRss(feed)
+      } catch (_: Throwable) { /* ignore per-feed errors */ }
     }
-    // de-dup by URL, keep first occurrence
-    return items.distinctBy { it.url }
+    return all
+      .distinctBy { it.url }
+      .take(50)
   }
 
-  private fun extractFrom(doc: Document, src: String): List<NewsItem> {
-    val baseHost = try { URL(src).host } catch (_: Throwable) { null }
-    val results = mutableListOf<NewsItem>()
+  private fun fetchRss(url: String): List<NewsItem> {
+    val doc = Jsoup.connect(url)
+      .timeout(10000)
+      .userAgent("SecondMind/1.0 (+android)")
+      .get()
 
-    // Simple strategy: pick prominent links with titles
-    val anchors = doc.select("a[href]").take(120)
-    for (a in anchors) {
-      val title = (a.attr("title").ifBlank { a.text() }).trim()
-      val href = a.absUrl("href")
-      if (title.length < 24) continue
-      if (!href.startsWith("http")) continue
+    // Re-parse as XML to simplify tag extraction
+    val xml = Jsoup.parse(doc.outerHtml(), "", Parser.xmlParser())
+    val host = try { URL(url).host } catch (_: Throwable) { null }
 
-      val thumb = ogImage(doc) ?: twitterImage(doc)
-      results += NewsItem(
+    val out = mutableListOf<NewsItem>()
+    val items = xml.select("item")
+    for (item in items) {
+      val title = item.selectFirst("title")?.text()?.trim().orEmpty()
+      val link  = item.selectFirst("link")?.text()?.trim().orEmpty()
+      if (title.length < 10) continue
+      if (!link.startsWith("http")) continue
+
+      val media = item.selectFirst("media|content, media|thumbnail")
+      val enclosure = item.selectFirst("enclosure[url]")
+      val image = when {
+        media?.hasAttr("url") == true -> media.attr("url")
+        enclosure?.attr("type")?.startsWith("image/") == true -> enclosure.attr("url")
+        else -> null
+      }?.takeIf { it.startsWith("http") }
+
+      out += NewsItem(
         title = title,
-        url = href,
-        imageUrl = thumb,
-        source = baseHost
+        url = link,
+        imageUrl = image,
+        source = host
       )
-      if (results.size >= 20) break
+      if (out.size >= 20) break
     }
-    return results
+    return out
   }
-
-  private fun ogImage(doc: Document): String? =
-    doc.selectFirst("meta[property=og:image], meta[name=og:image]")?.attr("content")?.takeIf { it.isNotBlank() }
-
-  private fun twitterImage(doc: Document): String? =
-    doc.selectFirst("meta[name=twitter:image], meta[property=twitter:image]")?.attr("content")?.takeIf { it.isNotBlank() }
 }
