@@ -239,11 +239,11 @@ private fun relativeTimeOrNull(iso: String?): String? {
 }
 
 private fun tabToParams(tab: Int): Pair<String?, String?> = when (tab) {
-  0 -> "general" to null,     // For you
-  1 -> "technology" to null,  // Tech
-  2 -> "business" to null,    // Markets
-  3 -> "general" to null,     // World
-  4 -> "sports" to null,      // Sports
-  5 -> null to "crypto",      // Crypto via search
+  0 -> "general" to null,
+  1 -> "technology" to null,
+  2 -> "business" to null,
+  3 -> "general" to null,
+  4 -> "sports" to null,
+  5 -> null to "crypto",
   else -> "general" to null
 }
