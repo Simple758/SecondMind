@@ -1,3 +1,6 @@
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.LaunchedEffect
+import com.secondmind.minimal.ui.SafeImage
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import com.secondmind.minimal.ui.SafeImage
@@ -41,6 +44,9 @@ import com.secondmind.minimal.tts.Reader
 
 @Composable
 fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
+    val ctx = LocalContext.current
+    LaunchedEffect(Unit){ com.secondmind.minimal.memory.MemoryStore.recordPanelOpen(ctx,"News") }
+
     val ctx = LocalContext.current
     androidx.compose.runtime.LaunchedEffect(Unit){ com.secondmind.minimal.memory.MemoryStore.recordPanelOpen(ctx,"News") }
 
@@ -131,7 +137,7 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
         }
 
         if (articles.isNotEmpty()) {
-            NewsHeroCard(articles.first(), onOpen={ url -> com.secondmind.minimal.memory.MemoryStore.recordNewsOpen(ctx,articles.first().title); url?.let { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) } },
+            NewsHeroCard(articles.first(), onOpen={ url -> com.secondmind.minimal.memory.MemoryStore.recordNewsOpen(ctx,articles.first().title); com.secondmind.minimal.memory.MemoryStore.recordNewsOpen(ctx,articles.first().title); url?.let { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) } },
                 onRefresh = { tab = tab }
             )
             Spacer(Modifier.height(12.dp))
@@ -143,7 +149,7 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
             contentPadding = PaddingValues(bottom = 4.dp)
         ) {
             val rest = if (articles.size > 1) articles.drop(1) else emptyList()
-            itemsIndexed(rest) { _, a -> NewsCompactCard(a){ url -> com.secondmind.minimal.memory.MemoryStore.recordNewsOpen(ctx,a.title);
+            itemsIndexed(rest) { _, a -> NewsCompactCard(a){ url -> com.secondmind.minimal.memory.MemoryStore.recordNewsOpen(ctx,a.title); com.secondmind.minimal.memory.MemoryStore.recordNewsOpen(ctx,a.title);
                 url?.let { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
             } }
         }
