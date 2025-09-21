@@ -1,3 +1,5 @@
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
 package com.secondmind.minimal.home
 import androidx.compose.runtime.*
 
@@ -28,6 +30,10 @@ LazyVerticalGrid(
     verticalArrangement = Arrangement.spacedBy(16.dp),
     contentPadding = PaddingValues(16.dp),
     ) {
+    item(span = { GridItemSpan(2) }) { com.secondmind.minimal.memory.ResumeBanner(Modifier.fillMaxWidth(), onOpenNews = onOpenNews) }
+    item(span = { GridItemSpan(2) }) { com.secondmind.minimal.insights.InsightsCard(Modifier.fillMaxWidth()) }
+    item { com.secondmind.minimal.knowledge.KnowledgeCard() }
+
     // Row 1 — News (full width)
     item(span = { GridItemSpan(2) }) {
       com.secondmind.minimal.feature.news.NewsCard(

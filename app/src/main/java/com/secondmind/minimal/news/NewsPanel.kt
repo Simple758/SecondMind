@@ -1,3 +1,6 @@
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
+import com.secondmind.minimal.ui.SafeImage
 package com.secondmind.minimal.news
 import java.util.TimeZone
 import java.util.Locale
@@ -38,6 +41,9 @@ import com.secondmind.minimal.tts.Reader
 
 @Composable
 fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
+    val ctx = LocalContext.current
+    androidx.compose.runtime.LaunchedEffect(Unit){ com.secondmind.minimal.memory.MemoryStore.recordPanelOpen(ctx,"News") }
+
     val tabs = listOf("For you", "Tech", "Markets", "World", "Sports", "Crypto")
     var tab by remember { mutableStateOf(initialTab) }
     var isLoading by remember { mutableStateOf(false) }
@@ -125,8 +131,7 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
         }
 
         if (articles.isNotEmpty()) {
-            NewsHeroCard(articles.first(),
-                onOpen = { url -> url?.let { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) } },
+            NewsHeroCard(articles.first(), onOpen={ url -> com.secondmind.minimal.memory.MemoryStore.recordNewsOpen(ctx,articles.first().title); url?.let { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) } },
                 onRefresh = { tab = tab }
             )
             Spacer(Modifier.height(12.dp))
@@ -138,7 +143,7 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
             contentPadding = PaddingValues(bottom = 4.dp)
         ) {
             val rest = if (articles.size > 1) articles.drop(1) else emptyList()
-            itemsIndexed(rest) { _, a -> NewsCompactCard(a) { url ->
+            itemsIndexed(rest) { _, a -> NewsCompactCard(a){ url -> com.secondmind.minimal.memory.MemoryStore.recordNewsOpen(ctx,a.title);
                 url?.let { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
             } }
         }
@@ -151,7 +156,7 @@ private fun NewsHeroCard(article: NewsItem, onOpen: (String?) -> Unit, onRefresh
         Column(Modifier.padding(12.dp)) {
             
     if (!article.imageUrl.isNullOrBlank()) {
-                    AsyncImage(
+                    SafeImage(
                     model = article.imageUrl,
                     contentDescription = null,
                     modifier = Modifier.fillMaxWidth().aspectRatio(16f/9f).clip(RoundedCornerShape(12.dp)),
@@ -189,7 +194,7 @@ private fun NewsCompactCard(article: NewsItem, onOpen: (String?) -> Unit) {
     Box(Modifier.size(72.dp).clip(RoundedCornerShape(12.dp))) {
                 
     if (!article.imageUrl.isNullOrBlank()) {
-                    AsyncImage(model = article.imageUrl, contentDescription = null,
+                    SafeImage(model = article.imageUrl, contentDescription = null,
                                contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
                 } else {
                     Box(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)))
