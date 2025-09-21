@@ -23,13 +23,15 @@ internal data class TopHeadlinesResponse(
 )
 
 internal interface NewsApi {
-    @GET("/v2/top-headlines")
+    @GET
+    ("/v2/top-headlines")
     suspend fun top(
         ("category") category: String? = null,
         ("q") q: String? = null,
         ("country") country: String = "us",
         ("apiKey") apiKey: String
     ): TopHeadlinesResponse
+  
 }
 
 internal fun newsApi(): NewsApi = Retrofit.Builder()
