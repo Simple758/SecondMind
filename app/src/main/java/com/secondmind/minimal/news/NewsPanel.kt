@@ -1,54 +1,47 @@
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.runtime.LaunchedEffect
-import com.secondmind.minimal.ui.SafeImage
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.platform.LocalContext
-import com.secondmind.minimal.ui.SafeImage
 package com.secondmind.minimal.news
-import java.util.TimeZone
-import java.util.Locale
-import java.text.SimpleDateFormat
-import android.text.format.DateUtils
-import androidx.compose.material3.CardDefaults
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.zIndex
-
-import android.content.Intent
-import android.net.Uri
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import com.secondmind.minimal.BuildConfig
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
 import com.secondmind.minimal.tts.Reader
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.ui.graphics.Color
+import java.util.Locale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import android.net.Uri
+import com.secondmind.minimal.ui.SafeImage
+import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.*
+import java.util.TimeZone
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.material.icons.Icons
+import androidx.compose.ui.Modifier
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.foundation.background
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CardDefaults
+import coil.compose.AsyncImage
+import androidx.compose.ui.zIndex
+import java.text.SimpleDateFormat
+import com.secondmind.minimal.BuildConfig
+import androidx.compose.material3.*
+import androidx.compose.ui.draw.drawWithContent
+import kotlinx.coroutines.withContext
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.clickable
+import kotlinx.coroutines.Dispatchers
+import android.content.Intent
+import android.text.format.DateUtils
+
 
 @Composable
 fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
     val ctx = LocalContext.current
     LaunchedEffect(Unit){ com.secondmind.minimal.memory.MemoryStore.recordPanelOpen(ctx,"News") }
 
-    val ctx = LocalContext.current
-    androidx.compose.runtime.LaunchedEffect(Unit){ com.secondmind.minimal.memory.MemoryStore.recordPanelOpen(ctx,"News") }
 
     val tabs = listOf("For you", "Tech", "Markets", "World", "Sports", "Crypto")
     var tab by remember { mutableStateOf(initialTab) }
@@ -56,7 +49,6 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
     var articles by remember { 
     mutableStateOf<List<NewsItem>>(emptyList())
    }
-    val ctx = LocalContext.current
 
     // Speak all visible headlines in the current tab
     fun speakAllNews(ctx: android.content.Context, items: List<NewsItem>) {
@@ -137,7 +129,7 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
         }
 
         if (articles.isNotEmpty()) {
-            NewsHeroCard(articles.first(), onOpen={ url -> com.secondmind.minimal.memory.MemoryStore.recordNewsOpen(ctx,articles.first().title); com.secondmind.minimal.memory.MemoryStore.recordNewsOpen(ctx,articles.first().title); url?.let { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) } },
+            NewsHeroCard(articles.first(), onOpen={ url -> com.secondmind.minimal.memory.MemoryStore.recordNewsOpen(ctx,articles.first().title); url?.let { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) } },
                 onRefresh = { tab = tab }
             )
             Spacer(Modifier.height(12.dp))
@@ -170,7 +162,6 @@ private fun NewsHeroCard(article: NewsItem, onOpen: (String?) -> Unit, onRefresh
                 )
                 Spacer(Modifier.height(10.dp))
             }
-            val ctx = LocalContext.current
             Text(article.title ?: "(no title)", style = MaterialTheme.typography.titleMedium,
                  maxLines = 3, overflow = TextOverflow.Ellipsis)
             IconButton(onClick = { Reader.speak(ctx,  article.title ?: "") }) { Icon(Icons.Filled.PlayArrow, contentDescription = "Read") }
