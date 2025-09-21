@@ -1,13 +1,4 @@
 package com.secondmind.minimal.news
-import java.util.TimeZone
-import java.util.Locale
-import java.text.SimpleDateFormat
-import android.text.format.DateUtils
-import androidx.compose.material3.CardDefaults
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.zIndex
 
 import android.content.Intent
 import android.net.Uri
@@ -58,9 +49,7 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
         try {
             val api = newsApi()
             val res = withContext(Dispatchers.IO) {
-                
-val (cat, query) = tabToParams(tab)
-api.top(category = cat, q = query, apiKey = BuildConfig.NEWS_API_KEY)
+                api.top(category = tabToCategory(tab), apiKey = BuildConfig.NEWS_API_KEY)
             }
             articles = if (res.status == "ok") res.articles.orEmpty() else emptyList()
         } catch (_: Throwable) { articles = emptyList() } finally { isLoading = false }
@@ -74,9 +63,7 @@ api.top(category = cat, q = query, apiKey = BuildConfig.NEWS_API_KEY)
             .padding(16.dp)
     ) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text("Noticias destacadas", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.zIndex(1f).weight(1f))
-    val __titles = remember(articles) { articles.count { !((it.title?: "").isBlank()) } }
-    val __descs = remember(articles) { articles.count { !((it.description?: "").isBlank()) } }
+            Text("News", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f))
         }
         Spacer(Modifier.height(8.dp))
 
@@ -94,7 +81,7 @@ api.top(category = cat, q = query, apiKey = BuildConfig.NEWS_API_KEY)
         Spacer(Modifier.height(12.dp))
 
         if (isLoading) {
-            Box(Modifier.fillMaxWidth().height(220.dp), contentAlignment = Alignment.Center) {
+            Box(Modifier.fillMaxWidth().height(140.dp), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
             return@Column
@@ -114,7 +101,7 @@ api.top(category = cat, q = query, apiKey = BuildConfig.NEWS_API_KEY)
         }
 
         LazyColumn(
-            modifier = Modifier.fillMaxWidth().heightIn(min = 220.dp, max = 480.dp),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 0.dp, max = 480.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(bottom = 4.dp)
         ) {
@@ -128,28 +115,27 @@ api.top(category = cat, q = query, apiKey = BuildConfig.NEWS_API_KEY)
 
 @Composable
 private fun NewsHeroCard(article: NewsArticle, onOpen: (String?) -> Unit, onRefresh: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
         Column(Modifier.padding(12.dp)) {
             if (!article.urlToImage.isNullOrBlank()) {
                 AsyncImage(
                     model = article.urlToImage,
                     contentDescription = null,
-                    modifier = Modifier.fillMaxSize().height(220.dp).clip(RoundedCornerShape(12.dp)),
+                    modifier = Modifier.fillMaxSize().height(140.dp).clip(RoundedCornerShape(12.dp)),
                     contentScale = ContentScale.Crop
                 )
                 Spacer(Modifier.height(10.dp))
             }
-            val ctx = LocalContext.current
             Text(article.title ?: "(no title)", style = MaterialTheme.typography.titleMedium,
                  maxLines = 3, overflow = TextOverflow.Ellipsis)
-            IconButton(onClick = { Reader.speak(ctx,  article.title ?: "") }) { Icon(Icons.Filled.PlayArrow, contentDescription = "Read") }
+            IconButton(onClick = { Reader.speak(LocalContext.current, article.title ?: "") }) { Icon(Icons.Filled.PlayArrow, contentDescription = "Read") }
 Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedButton(onClick = { onOpen(article.url) }) { Text("Open") }
                 OutlinedButton(onClick = onRefresh) { Text("Refresh") }
             }
             Spacer(Modifier.height(4.dp))
-            MetaRow(article.source?.name, null)
+            Text(article.source?.name ?: "", style = MaterialTheme.typography.labelMedium)
         }
     }
 }
@@ -162,7 +148,7 @@ private fun NewsCompactCard(article: NewsArticle, onOpen: (String?) -> Unit) {
                 Text(article.title ?: "(no title)", style = MaterialTheme.typography.bodyLarge,
                      maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Spacer(Modifier.height(4.dp))
-                MetaRow(article.source?.name, null)
+                Text((article.source?.name ?: "").lowercase(), style = MaterialTheme.typography.labelMedium)
             }
             Spacer(Modifier.width(12.dp))
             Box(Modifier.size(56.dp).clip(RoundedCornerShape(10.dp))) {
@@ -182,68 +168,9 @@ private fun MarketsStrip() {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         listOf("AAPL +1.2%", "NVDA +0.8%", "MSFT -0.3%", "TSLA +2.4%", "GOOGL +0.1%").forEach { t ->
             Surface(shape = RoundedCornerShape(12.dp), tonalElevation = 1.dp) {
-                Text(t, modifier = Modifier.zIndex(1f).padding(horizontal = 10.dp, vertical = 6.dp),
+                Text(t, modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                      style = MaterialTheme.typography.labelLarge)
             }
         }
     }
-}
-private fun Modifier.bottomScrim(): Modifier = this.drawWithContent {
-  drawContent()
-  drawRect(
-    Brush.verticalGradient(
-      colors = listOf(
-        Color.Black.copy(alpha = 0.00f),
-        Color.Black.copy(alpha = 0.40f),
-        Color.Black.copy(alpha = 0.88f)
-      )
-    )
-  )
-}
-
-@Composable
-private fun MetaRow(source: String?, publishedAt: String?) {
-  val s = source?.takeIf { it.isNotBlank() }
-  val t = relativeTimeOrNull(publishedAt)
-  val text = listOfNotNull(s, t).joinToString(" • ")
-  if (text.isNotBlank()) {
-    Text(
-      text,
-      style = MaterialTheme.typography.labelMedium,
-      color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
-    )
-  }
-}
-
-private fun relativeTimeOrNull(iso: String?): String? {
-  if (iso.isNullOrBlank()) return null
-  val patterns = arrayOf(
-    "yyyy-MM-ddTHH:mm:ssZ",
-    "yyyy-MM-ddTHH:mm:ss.SSSZ",
-    "yyyy-MM-ddTHH:mm:ssXXX",
-    "yyyy-MM-ddTHH:mm:ss.SSSXXX"
-  )
-  for (p in patterns) {
-    try {
-      val sdf = SimpleDateFormat(p, Locale.US).apply {
-        timeZone = TimeZone.getTimeZone("UTC")
-        isLenient = true
-      }
-      val ms = sdf.parse(iso)?.time ?: continue
-      return DateUtils.getRelativeTimeSpanString(
-        ms, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS
-      ).toString()
-    } catch (_: Exception) { }
-  }
-  return null
-}
-
-private fun tabToParams(tab: Int): Pair<String?, String?> = when (tab) {
-  0 -> "general" to null,     // For you
-  1 -> "technology" to null,  // Tech
-  2 -> "business" to null,    // Markets
-  3 -> "general" to null,     // World
-  4 -> "sports" to null,      // Sports
-  5 -> null to "crypto",      // Crypto via search
-  else -> "general" to null
 }
