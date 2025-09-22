@@ -1,4 +1,5 @@
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+import androidx.compose.ui.graphics.Color
     
 package com.secondmind.minimal
 import androidx.compose.runtime.getValue
@@ -86,7 +87,7 @@ fun rememberThemeMode(): State<String> {
 @Composable
 fun AppNav() {
   val nav = rememberNavController()
-  Scaffold(topBar = { TopBarWithMenu(nav) }) { pad ->
+  Scaffold(containerColor = Color.Black, topBar = { TopBarWithMenu(nav) }) { pad ->
 
 Box(Modifier.fillMaxSize().padding(pad)) {
     
