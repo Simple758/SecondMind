@@ -36,7 +36,6 @@ import kotlinx.coroutines.Dispatchers
 import android.content.Intent
 import android.text.format.DateUtils
 
-
 @Composable
 private fun String.forceHttpsOrNull(): String? =
   if (isBlank()) null else if (startsWith("http://")) "https://" + substring(7) else this
@@ -44,11 +43,9 @@ private fun String.forceHttpsOrNull(): String? =
 private fun NewsItem.bestImageUrl(): String? =
   (this.imageUrl ?: this.urlToImage ?: this.url)?.forceHttpsOrNull()
 
-
 fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
     val ctx = LocalContext.current
     LaunchedEffect(Unit){ com.secondmind.minimal.memory.MemoryStore.recordPanelOpen(ctx,"News") }
-
 
     val tabs = listOf("For you", "Tech", "Markets", "World", "Sports", "Crypto")
     var tab by remember { mutableStateOf(initialTab) }
@@ -63,7 +60,6 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
         val script = items.joinToString(separator = ". ") { it.title ?: "" }
         com.secondmind.minimal.tts.Reader.speak(ctx, script)
     }
-
 
     fun tabToCategory(i: Int): String? = when (i) {
         1 -> "technology"
