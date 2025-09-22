@@ -41,9 +41,11 @@ private val AppShapes = Shapes(
 
 @Composable
 fun SecondMindMinimalTheme(content: @Composable () -> Unit) {
+  CompositionLocalProvider(LocalAbsoluteTonalElevation provides 0.dp) {
   MaterialTheme(colorScheme = AmoledColorScheme, 
     
     shapes = AppShapes,
     content = content
   )
+  }
 }
