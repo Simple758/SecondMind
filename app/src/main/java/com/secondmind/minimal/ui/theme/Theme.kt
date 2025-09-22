@@ -40,7 +40,7 @@ private val AppShapes = Shapes(
 @Composable
 fun SecondMindMinimalTheme(content: @Composable () -> Unit) {
   MaterialTheme(colorScheme = AmoledColorScheme, 
-    colorScheme = DeepNightColors,
+    
     shapes = AppShapes,
     content = content
   )
