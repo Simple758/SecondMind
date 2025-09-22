@@ -162,7 +162,7 @@ Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colo
         Column(Modifier.padding(12.dp)) {
             
     if (!article.bestImageUrl().isNullOrBlank()) {
-                    SafeImage(model = article.bestImageUrl(), contentDescription = null, modifier = Modifier.fillMaxWidth(), contentScale = ContentScale.Crop),
+                    SafeImage(model = article.bestImageUrl(), contentDescription = null, modifier = Modifier.fillMaxWidth().aspectRatio(16f/9f).clip(RoundedCornerShape(12.dp)), contentScale = ContentScale.Crop)
                     contentScale = ContentScale.Crop
                 )
                 Spacer(Modifier.height(10.dp))
@@ -196,7 +196,7 @@ private fun NewsCompactCard(article: NewsItem, onOpen: (String?) -> Unit) {
     Box(Modifier.size(72.dp).clip(RoundedCornerShape(12.dp))) {
                 
     if (!article.bestImageUrl().isNullOrBlank()) {
-                    SafeImage(model = article.bestImageUrl(), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()))
+                    SafeImage(model = article.bestImageUrl(), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
                 } else {
                     Box(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)))
                 }
