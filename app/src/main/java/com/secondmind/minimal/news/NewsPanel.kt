@@ -24,7 +24,6 @@ import androidx.compose.foundation.background
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
-import coil.compose.AsyncImage
 import androidx.compose.ui.zIndex
 import java.text.SimpleDateFormat
 import com.secondmind.minimal.BuildConfig
@@ -39,6 +38,13 @@ import android.text.format.DateUtils
 
 
 @Composable
+private fun String.forceHttpsOrNull(): String? =
+  if (isBlank()) null else if (startsWith("http://")) "https://" + substring(7) else this
+
+private fun NewsItem.bestImageUrl(): String? =
+  (this.imageUrl ?: this.urlToImage ?: this.url)?.forceHttpsOrNull()
+
+
 fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
     val ctx = LocalContext.current
     LaunchedEffect(Unit){ com.secondmind.minimal.memory.MemoryStore.recordPanelOpen(ctx,"News") }
@@ -71,7 +77,8 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
     LaunchedEffect(tab) {
         isLoading = true
         try {
-            val res = withContext(Dispatchers.IO) { NewsApi.fetchTopHeadlines() }
+            val res = withContext(Dispatchers.IO) { 
+    NewsApi.fetchTopHeadlines(category = tabToCategory(tab), q = if (tab==5) "crypto OR bitcoin OR ethereum" else null) }
             articles = res
         } catch (_: Throwable) { articles = emptyList() } finally { isLoading = false }
     }
@@ -154,11 +161,8 @@ private fun NewsHeroCard(article: NewsItem, onOpen: (String?) -> Unit, onRefresh
 Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
         Column(Modifier.padding(12.dp)) {
             
-    if (!article.imageUrl.isNullOrBlank()) {
-                    SafeImage(
-                    model = article.imageUrl,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxWidth().aspectRatio(16f/9f).clip(RoundedCornerShape(12.dp)),
+    if (!article.bestImageUrl().isNullOrBlank()) {
+                    SafeImage(model = article.bestImageUrl(), contentDescription = null, modifier = Modifier.fillMaxWidth(), contentScale = ContentScale.Crop),
                     contentScale = ContentScale.Crop
                 )
                 Spacer(Modifier.height(10.dp))
@@ -191,9 +195,8 @@ private fun NewsCompactCard(article: NewsItem, onOpen: (String?) -> Unit) {
             
     Box(Modifier.size(72.dp).clip(RoundedCornerShape(12.dp))) {
                 
-    if (!article.imageUrl.isNullOrBlank()) {
-                    SafeImage(model = article.imageUrl, contentDescription = null,
-                               contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+    if (!article.bestImageUrl().isNullOrBlank()) {
+                    SafeImage(model = article.bestImageUrl(), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()))
                 } else {
                     Box(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)))
                 }
