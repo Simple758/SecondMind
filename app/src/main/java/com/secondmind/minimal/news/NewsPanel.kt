@@ -162,7 +162,7 @@ private fun NewsHeroCard(article: NewsItem, onOpen: (String?) -> Unit, onRefresh
                 OutlinedButton(onClick = onRefresh) { Text("Refresh") }
             }
             Spacer(Modifier.height(4.dp))
-            MetaRow(article.source, article.publishedAt)
+            MetaRow(article.source, null)
         }
     }
 }
@@ -178,7 +178,7 @@ private fun NewsCompactCard(article: NewsItem, onOpen: (String?) -> Unit) {
                 Text(article.title ?: "(no title)", style = MaterialTheme.typography.bodyLarge,
                      maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Spacer(Modifier.height(4.dp))
-                MetaRow(article.source, article.publishedAt)
+                MetaRow(article.source, null)
             }
             Spacer(Modifier.width(12.dp))
             Box(Modifier.size(72.dp).clip(RoundedCornerShape(12.dp))) {
@@ -200,7 +200,7 @@ private fun String.forceHttpsOrNull(): String? =
     if (isBlank()) null else if (startsWith("http://")) "https://" + substring(7) else this
 
 private fun NewsItem.bestImageUrl(): String? =
-    (this.imageUrl ?: this.urlToImage ?: this.url).forceHttpsOrNull()
+    (this.imageUrl ?: this.url).forceHttpsOrNull()
 
 @Composable
 private fun MetaRow(source: String?, publishedAt: String?) {
