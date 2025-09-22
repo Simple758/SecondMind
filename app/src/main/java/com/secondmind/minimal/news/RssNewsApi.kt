@@ -116,29 +116,37 @@ object RssNewsApi {
 
   private fun resolveImage(item: Element): String? {
     // media:thumbnail url="..."
-    attrOnFirstNS(item, "*", "thumbnail", "url")?.let { if (it.startsWith("http")) return it }
+    val thumb = attrOnFirstNS(item, "*", "thumbnail", "url")
+    if (thumb != null && thumb.startsWith("http")) return thumb
 
     // media:content type starts with image
-    getByTagNS(item, "*", "content").forEach { e ->
+    val content = getByTagNS(item, "*", "content")
+    for (e in content) {
       val type = e.getAttribute("type") ?: ""
       val url  = e.getAttribute("url") ?: ""
       if (type.lowercase(Locale.ROOT).startsWith("image") && url.startsWith("http")) return url
     }
 
     // enclosure type=image
-    getByTag(item, "enclosure").forEach { e ->
+    val encs = getByTag(item, "enclosure")
+    for (e in encs) {
       val type = e.getAttribute("type") ?: ""
       val url  = e.getAttribute("url") ?: ""
       if (type.lowercase(Locale.ROOT).startsWith("image") && url.startsWith("http")) return url
     }
 
     // description <img src="...">
-    firstText(item, "description")?.let { html ->
-      extractFirstImg(html)?.let { return it }
+    val desc = firstText(item, "description")
+    if (desc != null) {
+      val fromDesc = extractFirstImg(desc)
+      if (fromDesc != null) return fromDesc
     }
+
     // content:encoded (namespaced)
-    firstTextNSLocal(item, "encoded")?.let { html ->
-      extractFirstImg(html)?.let { return it }
+    val enc = firstTextNSLocal(item, "encoded")
+    if (enc != null) {
+      val fromEnc = extractFirstImg(enc)
+      if (fromEnc != null) return fromEnc
     }
 
     return null
@@ -193,10 +201,24 @@ object RssNewsApi {
     return try {
       val url = URL(u)
       val base = url.protocol + "://" + url.host + (if (url.port != -1) ":" + url.port else "") + url.path
-      val q = url.query?.split("&")            ?.filterNot { it.startsWith("utm_") || it.startsWith("gclid") || it.startsWith("fbclid") }            ?.sorted()            ?.joinToString("&")
+      val q = url.query?.split("&")
+        ?.filterNot { it.startsWith("utm_") || it.startsWith("gclid") || it.startsWith("fbclid") }
+        ?.sorted()
+        ?.joinToString("&")
       base + (if (!q.isNullOrBlank()) "?$q" else "")
     } catch (_: Throwable) {
       u
     }
+  }
+
+  // --------------- missing helper (now included) ---------------
+  private fun attrOnFirstNS(parent: Element, ns: String, local: String, attr: String): String? {
+    val nl = parent.getElementsByTagNameNS(ns, local)
+    for (i in 0 until nl.length) {
+      val e = nl.item(i) as? Element ?: continue
+      val v = e.getAttribute(attr) ?: ""
+      if (v.isNotBlank()) return v
+    }
+    return null
   }
 }
