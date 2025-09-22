@@ -1,4 +1,5 @@
 package com.secondmind.minimal.ui.theme
+import com.secondmind.minimal.ui.theme.AmoledColorScheme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -38,7 +39,7 @@ private val AppShapes = Shapes(
 
 @Composable
 fun SecondMindMinimalTheme(content: @Composable () -> Unit) {
-  MaterialTheme(
+  MaterialTheme(colorScheme = AmoledColorScheme, 
     colorScheme = DeepNightColors,
     shapes = AppShapes,
     content = content
