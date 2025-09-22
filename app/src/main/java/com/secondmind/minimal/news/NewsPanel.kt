@@ -1,4 +1,5 @@
 package com.secondmind.minimal.news
+import androidx.compose.ui.graphics.Color
 
 import android.content.Intent
 import android.net.Uri
@@ -57,7 +58,7 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(Color.Black)
             .padding(16.dp)
     ) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -138,7 +139,7 @@ private fun NewsHeroCard(article: NewsItem, onOpen: (String?) -> Unit, onRefresh
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        colors = CardDefaults.cardColors(containerColor = Color.Black)
     ) {
         Column(Modifier.padding(12.dp)) {
             val img = article.bestImageUrl()

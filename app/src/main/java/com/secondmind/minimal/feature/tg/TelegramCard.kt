@@ -1,4 +1,5 @@
 package com.secondmind.minimal.feature.tg
+import androidx.compose.ui.graphics.Color
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -94,7 +95,7 @@ fun TelegramCard(modifier: Modifier = Modifier) {
 
   LaunchedEffect(handles, per, order, proxy, preferProxy) { refresh() }
 
-  Card(modifier = modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+  Card(modifier = modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = Color.Black)) {
     Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
       Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         Text("Telegram", style = MaterialTheme.typography.titleLarge)

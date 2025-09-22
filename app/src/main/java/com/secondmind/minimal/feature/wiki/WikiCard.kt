@@ -1,4 +1,5 @@
 package com.secondmind.minimal.feature.wiki
+import androidx.compose.ui.graphics.Color
 
 import android.content.Intent
 import android.graphics.Bitmap
@@ -43,7 +44,7 @@ fun WikiBrainFoodCard(modifier: Modifier = Modifier) {
 
   Card(
     modifier = modifier.fillMaxWidth(),
-    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    colors = CardDefaults.cardColors(containerColor = Color.Black)
   ) {
     Column(Modifier.fillMaxWidth().padding(16.dp)) {
       Row(
@@ -68,7 +69,7 @@ fun WikiBrainFoodCard(modifier: Modifier = Modifier) {
 
       val s = summary!!
 
-      Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
+      Card(colors = CardDefaults.cardColors(containerColor = Color.Black)) {
         Column(Modifier.fillMaxWidth().padding(12.dp)) {
           if (!s.thumb.isNullOrBlank()) {
             NetImage(url = s.thumb!!, modifier = Modifier.fillMaxWidth().height(140.dp))

@@ -1,4 +1,5 @@
 package com.secondmind.minimal.ui
+import androidx.compose.ui.graphics.Color
 
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -196,7 +197,7 @@ private fun AppIcon(packageName: String, size: Dp = 36.dp) {
         Box(
             Modifier.size(size)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .background(Color.Black)
         )
     }
 }

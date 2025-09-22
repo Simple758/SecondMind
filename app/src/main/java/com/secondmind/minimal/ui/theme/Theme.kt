@@ -1,4 +1,6 @@
 package com.secondmind.minimal.ui.theme
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.material3.LocalAbsoluteTonalElevation
 import com.secondmind.minimal.ui.theme.AmoledColorScheme
 
 import androidx.compose.material3.MaterialTheme

@@ -1,4 +1,5 @@
 package com.secondmind.minimal.feature.youtube
+import androidx.compose.ui.graphics.Color
 
 import android.content.Intent
 import android.graphics.BitmapFactory
@@ -46,7 +47,7 @@ private fun NetImage(url: String?, modifier: Modifier, contentDesc: String?) {
             contentScale = ContentScale.Crop
         )
     } else {
-        Box(modifier.background(MaterialTheme.colorScheme.surfaceVariant))
+        Box(modifier.background(Color.Black))
     }
 }
 
@@ -76,7 +77,7 @@ fun YtWatchLaterCard(modifier: Modifier = Modifier) {
     var itemsState by remember { mutableStateOf(YtStore.list(ctx)) }
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        colors = CardDefaults.cardColors(containerColor = Color.Black)
     ) {
         Column(Modifier.fillMaxWidth().padding(16.dp)) {
             Row(
@@ -100,7 +101,7 @@ fun YtWatchLaterCard(modifier: Modifier = Modifier) {
                     val meta by rememberYtMeta(it.id)
                     Card(
                         modifier = Modifier.width(260.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        colors = CardDefaults.cardColors(containerColor = Color.Black),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Column {
