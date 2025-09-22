@@ -44,7 +44,7 @@ fun WikiBrainFoodCard(modifier: Modifier = Modifier) {
 
   Card(
     modifier = modifier.fillMaxWidth(),
-    colors = CardDefaults.cardColors(containerColor = Color.Black)
+    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
   ) {
     Column(Modifier.fillMaxWidth().padding(16.dp)) {
       Row(
@@ -69,7 +69,7 @@ fun WikiBrainFoodCard(modifier: Modifier = Modifier) {
 
       val s = summary!!
 
-      Card(colors = CardDefaults.cardColors(containerColor = Color.Black)) {
+      Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
         Column(Modifier.fillMaxWidth().padding(12.dp)) {
           if (!s.thumb.isNullOrBlank()) {
             NetImage(url = s.thumb!!, modifier = Modifier.fillMaxWidth().height(140.dp))

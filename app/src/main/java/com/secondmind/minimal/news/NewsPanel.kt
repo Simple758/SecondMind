@@ -139,7 +139,7 @@ private fun NewsHeroCard(article: NewsItem, onOpen: (String?) -> Unit, onRefresh
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Black)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Column(Modifier.padding(12.dp)) {
             val img = article.bestImageUrl()

@@ -77,7 +77,7 @@ fun YtWatchLaterCard(modifier: Modifier = Modifier) {
     var itemsState by remember { mutableStateOf(YtStore.list(ctx)) }
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.Black)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Column(Modifier.fillMaxWidth().padding(16.dp)) {
             Row(
@@ -101,7 +101,7 @@ fun YtWatchLaterCard(modifier: Modifier = Modifier) {
                     val meta by rememberYtMeta(it.id)
                     Card(
                         modifier = Modifier.width(260.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.Black),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Column {

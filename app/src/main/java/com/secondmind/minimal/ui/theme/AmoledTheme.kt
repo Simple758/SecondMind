@@ -15,10 +15,10 @@ val AmoledColorScheme = darkColorScheme(
   background = Color(0xFF000000),
   onBackground = Color(0xFFFFFFFF),
 
-  surface = Color(0xFF000000),
+  surface = Color(0xFF121212),
   onSurface = Color(0xFFFFFFFF),
 
-  surfaceVariant = Color(0xFF000000),
+  surfaceVariant = Color(0xFF1C1C22),
   onSurfaceVariant = Color(0xFFE0E0E0),
 
   error = Color(0xFFCF6679),
