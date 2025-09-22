@@ -163,9 +163,7 @@ Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colo
             
     if (!article.bestImageUrl().isNullOrBlank()) {
                     SafeImage(model = article.bestImageUrl(), contentDescription = null, modifier = Modifier.fillMaxWidth().aspectRatio(16f/9f).clip(RoundedCornerShape(12.dp)), contentScale = ContentScale.Crop)
-                    contentScale = ContentScale.Crop
-                )
-                Spacer(Modifier.height(10.dp))
+Spacer(Modifier.height(10.dp))
             }
             Text(article.title ?: "(no title)", style = MaterialTheme.typography.titleMedium,
                  maxLines = 3, overflow = TextOverflow.Ellipsis)
