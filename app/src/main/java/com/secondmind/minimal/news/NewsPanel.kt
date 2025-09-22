@@ -1,48 +1,34 @@
 package com.secondmind.minimal.news
-import androidx.compose.ui.platform.LocalContext
-import com.secondmind.minimal.tts.Reader
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.draw.clip
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.ui.graphics.Color
-import java.util.Locale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
-import android.net.Uri
-import com.secondmind.minimal.ui.SafeImage
-import androidx.compose.runtime.*
-import androidx.compose.foundation.layout.*
-import java.util.TimeZone
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.material.icons.Icons
-import androidx.compose.ui.Modifier
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.foundation.background
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CardDefaults
-import androidx.compose.ui.zIndex
-import java.text.SimpleDateFormat
-import com.secondmind.minimal.BuildConfig
-import androidx.compose.material3.*
-import androidx.compose.ui.draw.drawWithContent
-import kotlinx.coroutines.withContext
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.clickable
-import kotlinx.coroutines.Dispatchers
+
 import android.content.Intent
+import android.net.Uri
 import android.text.format.DateUtils
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import com.secondmind.minimal.tts.Reader
+import com.secondmind.minimal.ui.SafeImage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.TimeZone
 
 @Composable
-private fun String.forceHttpsOrNull(): String? =
-  if (isBlank()) null else if (startsWith("http://")) "https://" + substring(7) else this
-
-private fun NewsItem.bestImageUrl(): String? =
-  (this.imageUrl ?: this.urlToImage ?: this.url)?.forceHttpsOrNull()
-
 fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
     val ctx = LocalContext.current
     LaunchedEffect(Unit){ com.secondmind.minimal.memory.MemoryStore.recordPanelOpen(ctx,"News") }
@@ -50,33 +36,21 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
     val tabs = listOf("For you", "Tech", "Markets", "World", "Sports", "Crypto")
     var tab by remember { mutableStateOf(initialTab) }
     var isLoading by remember { mutableStateOf(false) }
-    var articles by remember { 
-    mutableStateOf<List<NewsItem>>(emptyList())
-   }
+    var articles by remember { mutableStateOf<List<NewsItem>>(emptyList()) }
 
-    // Speak all visible headlines in the current tab
-    fun speakAllNews(ctx: android.content.Context, items: List<NewsItem>) {
-        if (items.isEmpty()) return
-        val script = items.joinToString(separator = ". ") { it.title ?: "" }
-        com.secondmind.minimal.tts.Reader.speak(ctx, script)
-    }
-
-    fun tabToCategory(i: Int): String? = when (i) {
-        1 -> "technology"
-        2 -> "business"
-        3 -> "general"
-        4 -> "sports"
-        5 -> "science"
-        else -> "general"
-    }
-
+    // Load once per tab; the API here takes no named params — we filter client-side.
     LaunchedEffect(tab) {
         isLoading = true
         try {
-            val res = withContext(Dispatchers.IO) { 
-    NewsApi.fetchTopHeadlines(category = tabToCategory(tab), q = if (tab==5) "crypto OR bitcoin OR ethereum" else null) }
-            articles = res
-        } catch (_: Throwable) { articles = emptyList() } finally { isLoading = false }
+            val res = withContext(Dispatchers.IO) {
+                NewsApi.fetchTopHeadlines()
+            }
+            articles = filterForTab(res, tab)
+        } catch (_: Throwable) {
+            articles = emptyList()
+        } finally {
+            isLoading = false
+        }
     }
 
     Column(
@@ -86,35 +60,23 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(16.dp)
     ) {
-        
-      Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text("Noticias destacadas", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.zIndex(1f).weight(1f))
-    val __titles = remember(articles) { articles.count { !((it.title?: "").isBlank()) } }
-    val __descs = remember(articles) { articles.count { !((""?: "").isBlank()) } }
-
-            Spacer(Modifier.width(8.dp))
-            androidx.compose.material3.ElevatedButton(
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text("Top news", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.weight(1f))
+            ElevatedButton(
                 onClick = { speakAllNews(ctx, articles) },
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
-                modifier = Modifier.zIndex(1f)
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
             ) {
                 Icon(Icons.Filled.PlayArrow, contentDescription = "Read all")
                 Spacer(Modifier.width(6.dp))
                 Text("Play all")
             }
-      
+        }
 
-            }
         Spacer(Modifier.height(8.dp))
 
-        ScrollableTabRow(
-            selectedTabIndex = tab,
-            edgePadding = 0.dp,
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.primary
-        ) {
-            tabs.forEachIndexed { i, label ->
-                Tab(selected = tab == i, onClick = { tab = i }, text = { Text(label) })
+        ScrollableTabRow(selectedTabIndex = tab, edgePadding = 0.dp) {
+            tabs.forEachIndexed { i, t ->
+                Tab(selected = i == tab, onClick = { tab = i }, text = { Text(t) })
             }
         }
 
@@ -127,70 +89,103 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
             return@Column
         }
 
-        if (tab == 2) {
-            MarketsStrip()
-            Spacer(Modifier.height(16.dp))
-        }
-
         if (articles.isNotEmpty()) {
-            NewsHeroCard(articles.first(), onOpen={ url -> com.secondmind.minimal.memory.MemoryStore.recordNewsOpen(ctx,articles.first().title); url?.let { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) } },
+            NewsHeroCard(
+                articles.first(),
+                onOpen = { url ->
+                    com.secondmind.minimal.memory.MemoryStore.recordNewsOpen(ctx, articles.first().title)
+                    url?.let { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
+                },
                 onRefresh = { tab = tab }
             )
             Spacer(Modifier.height(12.dp))
         }
 
         LazyColumn(
-            modifier = Modifier.fillMaxWidth().heightIn(min = 220.dp, max = 480.dp),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 0.dp, max = 480.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(bottom = 4.dp)
         ) {
             val rest = if (articles.size > 1) articles.drop(1) else emptyList()
-            itemsIndexed(rest) { _, a -> NewsCompactCard(a){ url -> com.secondmind.minimal.memory.MemoryStore.recordNewsOpen(ctx,a.title); url?.let { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
-            } }
+            itemsIndexed(rest) { _, a ->
+                NewsCompactCard(a) { url ->
+                    com.secondmind.minimal.memory.MemoryStore.recordNewsOpen(ctx, a.title)
+                    url?.let { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) }
+                }
+            }
         }
     }
 }
 
+private fun filterForTab(items: List<NewsItem>, tab: Int): List<NewsItem> {
+    // crude keyword filters so each tab looks different even if API lacks category args
+    fun List<NewsItem>.byAny(words: List<String>) =
+        filter { it.title?.let { t -> words.any { w -> t.contains(w, ignoreCase = true) } } == true }
+
+    return when (tab) {
+        1 -> items.byAny(listOf("AI","chip","semiconductor","software","tech","android","apple","microsoft","google","meta"))
+        2 -> items.byAny(listOf("stocks","market","fed","earnings","revenue","guidance","dow","nasdaq","s&p","bond"))
+        3 -> items.byAny(listOf("world","europe","asia","middle east","africa","latin","ukraine","china","india"))
+        4 -> items.byAny(listOf("match","team","league","cup","goal","nba","nfl","mlb","premier","olympic","tennis","fifa"))
+        5 -> items.byAny(listOf("crypto","bitcoin","btc","ethereum","eth","web3","blockchain","token","defi","nft"))
+        else -> items
+    }.ifEmpty { items } // fallback so the tab never looks empty
+}
+
 @Composable
 private fun NewsHeroCard(article: NewsItem, onOpen: (String?) -> Unit, onRefresh: () -> Unit) {
-        val ctx = LocalContext.current
-Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+    val ctx = LocalContext.current
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    ) {
         Column(Modifier.padding(12.dp)) {
-            
-    if (!article.bestImageUrl().isNullOrBlank()) {
-                    SafeImage(model = article.bestImageUrl(), contentDescription = null, modifier = Modifier.fillMaxWidth().aspectRatio(16f/9f).clip(RoundedCornerShape(12.dp)), contentScale = ContentScale.Crop)
-Spacer(Modifier.height(10.dp))
+            val img = article.bestImageUrl()
+            if (!img.isNullOrBlank()) {
+                SafeImage(
+                    model = img,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxWidth().aspectRatio(16f/9f).clip(RoundedCornerShape(12.dp)),
+                    contentScale = ContentScale.Crop
+                )
+                Spacer(Modifier.height(10.dp))
             }
             Text(article.title ?: "(no title)", style = MaterialTheme.typography.titleMedium,
                  maxLines = 3, overflow = TextOverflow.Ellipsis)
-            IconButton(onClick = { Reader.speak(ctx,  article.title ?: "") }) { Icon(Icons.Filled.PlayArrow, contentDescription = "Read") }
-Spacer(Modifier.height(8.dp))
+            IconButton(onClick = { Reader.speak(ctx, article.title ?: "") }) {
+                Icon(Icons.Filled.PlayArrow, contentDescription = "Read")
+            }
+            Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedButton(onClick = { onOpen(article.url) }) { Text("Open") }
                 OutlinedButton(onClick = onRefresh) { Text("Refresh") }
             }
             Spacer(Modifier.height(4.dp))
-            MetaRow(article.source, null)
+            MetaRow(article.source, article.publishedAt)
         }
     }
 }
 
 @Composable
 private fun NewsCompactCard(article: NewsItem, onOpen: (String?) -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth().clickable { onOpen(article.url) }, shape = RoundedCornerShape(14.dp)) {
+    Card(
+        modifier = Modifier.fillMaxWidth().clickable { onOpen(article.url) },
+        shape = RoundedCornerShape(14.dp)
+    ) {
         Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(article.title ?: "(no title)", style = MaterialTheme.typography.bodyLarge,
                      maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Spacer(Modifier.height(4.dp))
-                MetaRow(article.source, null)
+                MetaRow(article.source, article.publishedAt)
             }
             Spacer(Modifier.width(12.dp))
-            
-    Box(Modifier.size(72.dp).clip(RoundedCornerShape(12.dp))) {
-                
-    if (!article.bestImageUrl().isNullOrBlank()) {
-                    SafeImage(model = article.bestImageUrl(), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+            Box(Modifier.size(72.dp).clip(RoundedCornerShape(12.dp))) {
+                val img = article.bestImageUrl()
+                if (!img.isNullOrBlank()) {
+                    SafeImage(model = img, contentDescription = null,
+                        contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
                 } else {
                     Box(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)))
                 }
@@ -199,73 +194,53 @@ private fun NewsCompactCard(article: NewsItem, onOpen: (String?) -> Unit) {
     }
 }
 
-@Composable
-private fun MarketsStrip() {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        listOf("AAPL +1.2%", "NVDA +0.8%", "MSFT -0.3%", "TSLA +2.4%", "GOOGL +0.1%").forEach { t ->
-            Surface(shape = RoundedCornerShape(12.dp), tonalElevation = 1.dp) {
-                Text(t, modifier = Modifier.zIndex(1f).padding(horizontal = 10.dp, vertical = 6.dp),
-                     style = MaterialTheme.typography.labelLarge)
-            }
-        }
-    }
-}
-private fun Modifier.bottomScrim(): Modifier = this.drawWithContent {
-  drawContent()
-  drawRect(
-    Brush.verticalGradient(
-      colors = listOf(
-        Color.Black.copy(alpha = 0.00f),
-        Color.Black.copy(alpha = 0.40f),
-        Color.Black.copy(alpha = 0.88f)
-      )
-    )
-  )
-}
+/* ---------- helpers & small UI bits ---------- */
+
+private fun String.forceHttpsOrNull(): String? =
+    if (isBlank()) null else if (startsWith("http://")) "https://" + substring(7) else this
+
+private fun NewsItem.bestImageUrl(): String? =
+    (this.imageUrl ?: this.urlToImage ?: this.url).forceHttpsOrNull()
 
 @Composable
 private fun MetaRow(source: String?, publishedAt: String?) {
-  val s = source?.takeIf { it.isNotBlank() }
-  val t = relativeTimeOrNull(publishedAt)
-  val text = listOfNotNull(s, t).joinToString(" • ")
-  if (text.isNotBlank()) {
-    Text(
-      text,
-      style = MaterialTheme.typography.labelMedium,
-      color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
-    )
-  }
+    val s = source?.takeIf { it.isNotBlank() }
+    val t = relativeTimeOrNull(publishedAt)
+    val text = listOfNotNull(s, t).joinToString(" • ")
+    if (text.isNotBlank()) {
+        Text(
+            text,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+        )
+    }
 }
 
 private fun relativeTimeOrNull(iso: String?): String? {
-  if (iso.isNullOrBlank()) return null
-  val patterns = arrayOf(
-    "yyyy-MM-ddTHH:mm:ssZ",
-    "yyyy-MM-ddTHH:mm:ss.SSSZ",
-    "yyyy-MM-ddTHH:mm:ssXXX",
-    "yyyy-MM-ddTHH:mm:ss.SSSXXX"
-  )
-  for (p in patterns) {
-    try {
-      val sdf = SimpleDateFormat(p, Locale.US).apply {
-        timeZone = TimeZone.getTimeZone("UTC")
-        isLenient = true
-      }
-      val ms = sdf.parse(iso)?.time ?: continue
-      return DateUtils.getRelativeTimeSpanString(
-        ms, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS
-      ).toString()
-    } catch (_: Exception) { }
-  }
-  return null
+    if (iso.isNullOrBlank()) return null
+    val patterns = arrayOf(
+        "yyyy-MM-ddTHH:mm:ssZ",
+        "yyyy-MM-ddTHH:mm:ss.SSSZ",
+        "yyyy-MM-ddTHH:mm:ssXXX",
+        "yyyy-MM-ddTHH:mm:ss.SSSXXX"
+    )
+    for (p in patterns) {
+        try {
+            val sdf = SimpleDateFormat(p, Locale.US).apply {
+                timeZone = TimeZone.getTimeZone("UTC")
+                isLenient = true
+            }
+            val ms = sdf.parse(iso)?.time ?: continue
+            return DateUtils.getRelativeTimeSpanString(
+                ms, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS
+            ).toString()
+        } catch (_: Exception) { }
+    }
+    return null
 }
 
-private fun tabToParams(tab: Int): Pair<String?, String?> = when (tab) {
-  0 -> "general" to null
-  1 -> "technology" to null
-  2 -> "business" to null
-  3 -> "general" to null
-  4 -> "sports" to null
-  5 -> null to "crypto"
-  else -> "general" to null
+private fun speakAllNews(ctx: android.content.Context, items: List<NewsItem>) {
+    if (items.isEmpty()) return
+    val script = items.joinToString(separator = ". ") { it.title ?: "" }
+    Reader.speak(ctx, script)
 }
