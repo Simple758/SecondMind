@@ -35,7 +35,12 @@ object RssNewsApi {
     SourceFeed("Reuters",  "https://feeds.reuters.com/reuters/topNews"),
     SourceFeed("BBC",      "https://feeds.bbci.co.uk/news/rss.xml"),
     SourceFeed("ESPN",     "https://www.espn.com/espn/rss/news"),
-    SourceFeed("CoinDesk", "https://www.coindesk.com/arc/outboundfeeds/rss/")
+    SourceFeed("CoinDesk", "https://www.coindesk.com/arc/outboundfeeds/rss/"),
+    // --- Added market-focused sources (via Google News RSS) ---
+    SourceFeed("CNBC (Markets)", "https://news.google.com/rss/search?q=site:cnbc.com+markets"),
+    SourceFeed("Benzinga",       "https://news.google.com/rss/search?q=site:benzinga.com+markets"),
+    SourceFeed("Yahoo Finance",  "https://news.google.com/rss/search?q=site:finance.yahoo.com+news"),
+    SourceFeed("MarketWatch",    "https://news.google.com/rss/search?q=site:marketwatch.com+markets")
   )
 
   suspend fun fetchTopHeadlines(limit: Int = 80): List<NewsItem> = withContext(Dispatchers.IO) {
