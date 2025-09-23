@@ -104,15 +104,6 @@ fun AppNav() {
   ) {
   Scaffold(containerColor = Color.Black, topBar = { }) { pad ->
 
-  ModalNavigationDrawer(
-    drawerState = drawerState,
-    drawerContent = {
-      com.secondmind.minimal.ui.DrawerContent(
-        selectedRoute = currentRoute,
-        onDestinationClicked = { route -> nav.navigate(route) { launchSingleTop = true } },
-        drawerState = drawerState
-      )
-    }
   ) {
 Box(Modifier.fillMaxSize().padding(pad)) {
     
