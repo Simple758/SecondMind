@@ -61,6 +61,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import com.secondmind.minimal.news.NewsPanel
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.DrawerValue
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -88,8 +91,21 @@ fun rememberThemeMode(): State<String> {
 @Composable
 fun AppNav() {
   val nav = rememberNavController()
-  Scaffold(containerColor = Color.Black, topBar = { TopBarWithMenu(nav) }) { pad ->
+  val drawerState = rememberDrawerState(DrawerValue.Closed)
+  val backstack by nav.currentBackStackEntryAsState()
+  val currentRoute = backstack?.destination?.route?.substringBefore("/") ?: "home"
+  Scaffold(containerColor = Color.Black, topBar = { }) { pad ->
 
+  ModalNavigationDrawer(
+    drawerState = drawerState,
+    drawerContent = {
+      com.secondmind.minimal.ui.DrawerContent(
+        selectedRoute = currentRoute,
+        onDestinationClicked = { route -> nav.navigate(route) { launchSingleTop = true } },
+        drawerState = drawerState
+      )
+    }
+  ) {
 Box(Modifier.fillMaxSize().padding(pad)) {
     
 NavHost(nav, startDestination = "home", modifier = Modifier.fillMaxSize()) {
@@ -105,6 +121,7 @@ NavHost(nav, startDestination = "home", modifier = Modifier.fillMaxSize()) {
         DetailsScreen(id)
       }
     }
+  }
   }
 }
 }
@@ -247,30 +264,3 @@ fun SettingsScreen(onBack: () -> Unit) {
   }
 }
 @Composable
-fun TopBarWithMenu(nav: NavHostController) {
-  var open by remember { mutableStateOf(false) }
-  CenterAlignedTopAppBar(
-    title = { Text(titleFor(nav)) },
-    navigationIcon = {
-      Box {
-        IconButton(onClick = { open = true }) {
-          Icon(Icons.Filled.Menu, contentDescription = "Menu")
-        }
-        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
-          DropdownMenuItem(text = { Text("Home") }, onClick = {
-            open = false
-            nav.navigate("home") { launchSingleTop = true }
-          })
-          DropdownMenuItem(text = { Text("Inbox") }, onClick = {
-            open = false
-            nav.navigate("inbox")
-          })
-          DropdownMenuItem(text = { Text("Settings") }, onClick = {
-            open = false
-            nav.navigate("settings")
-          })
-        }
-      }
-    }
-  )
-    }
