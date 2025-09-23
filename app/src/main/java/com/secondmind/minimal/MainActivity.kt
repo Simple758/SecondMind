@@ -9,8 +9,6 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Icon
 import android.Manifest
@@ -94,6 +92,16 @@ fun AppNav() {
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val backstack by nav.currentBackStackEntryAsState()
   val currentRoute = backstack?.destination?.route?.substringBefore("/") ?: "home"
+  ModalNavigationDrawer(
+    drawerState = drawerState,
+    drawerContent = {
+      com.secondmind.minimal.ui.DrawerContent(
+        selectedRoute = currentRoute,
+        onDestinationClicked = { route -> nav.navigate(route) { launchSingleTop = true } },
+        drawerState = drawerState
+      )
+    }
+  ) {
   Scaffold(containerColor = Color.Black, topBar = { }) { pad ->
 
   ModalNavigationDrawer(
@@ -124,6 +132,7 @@ NavHost(nav, startDestination = "home", modifier = Modifier.fillMaxSize()) {
   }
   }
 }
+  }
 }
 @Composable
 fun titleFor(nav: NavHostController): String {
