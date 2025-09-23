@@ -101,11 +101,17 @@ object RssNewsApi {
 
   // --------------- helpers: link/image/date ---------------
   private fun resolveLink(item: Element): String? {
-    firstText(item, "link")?.trim()?.let { if (it.startsWith("http")) return it }
+    // Safe replacement (no non-local return inside let)
+    val linkText = firstText(item, "link")?.trim()
+    if (linkText != null && linkText.startsWith("http")) return linkText
+
+    // Atom <link rel="alternate" href="..."/>
     getFirstByTag(item, "link")?.let { l ->
       val href = l.getAttribute("href")
       if (!href.isNullOrBlank() && href.startsWith("http")) return href
     }
+
+    // GUID fallback if permalink
     getFirstByTag(item, "guid")?.let { g ->
       val isPerma = g.getAttribute("isPermaLink")
       val txt = g.textContent?.trim()
@@ -211,7 +217,7 @@ object RssNewsApi {
     }
   }
 
-  // --------------- missing helper (now included) ---------------
+  // --------------- helper now included ---------------
   private fun attrOnFirstNS(parent: Element, ns: String, local: String, attr: String): String? {
     val nl = parent.getElementsByTagNameNS(ns, local)
     for (i in 0 until nl.length) {
