@@ -44,7 +44,7 @@ fun NewsPanel(modifier: Modifier = Modifier, initialTab: Int = 1) {
         isLoading = true
         try {
             val res = withContext(Dispatchers.IO) {
-                NewsApi.fetchTopHeadlines()
+                RssNewsApi.fetchTopHeadlines()
             }
             articles = filterForTab(res, tab)
         } catch (_: Throwable) {
