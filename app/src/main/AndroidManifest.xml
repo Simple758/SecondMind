@@ -47,5 +47,101 @@
     </service>
 </application>
 
+  <!-- ===== POWER-CAPABILITIES START (managed) ===== -->
+  <!-- Core device/network controls -->
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+  <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+  <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+  <uses-permission android:name="android.permission.VIBRATE"/>
+
+  <!-- Foreground services + longevity -->
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"/>
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA"/>
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE"/>
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL"/>
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION"/>
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH"/>
+  <uses-permission android:name="android.permission.WAKE_LOCK"/>
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
+  <!-- Exact alarms / doze -->
+  <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+  <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
+  <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+
+  <!-- Location -->
+  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+  <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+
+  <!-- Bluetooth / nearby -->
+  <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
+  <uses-permission android:name="android.permission.BLUETOOTH_SCAN"/>
+  <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE"/>
+
+  <!-- Sensors / activity -->
+  <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
+  <uses-permission android:name="android.permission.BODY_SENSORS"/>
+  <uses-permission android:name="android.permission.BODY_SENSORS_BACKGROUND"/>
+
+  <!-- Camera / mic -->
+  <uses-permission android:name="android.permission.CAMERA"/>
+  <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+
+  <!-- Local media (Android 13+) -->
+  <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+  <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
+  <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
+  <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED"/>
+
+  <!-- Storage (special access + legacy) -->
+  <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+  <!-- Contacts / calendar -->
+  <uses-permission android:name="android.permission.READ_CONTACTS"/>
+  <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
+  <uses-permission android:name="android.permission.READ_CALENDAR"/>
+  <uses-permission android:name="android.permission.WRITE_CALENDAR"/>
+
+  <!-- Phone & calls (some require default dialer role) -->
+  <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+  <uses-permission android:name="android.permission.READ_PHONE_NUMBERS"/>
+  <uses-permission android:name="android.permission.CALL_PHONE"/>
+  <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS"/>
+  <uses-permission android:name="android.permission.READ_CALL_LOG"/>
+  <uses-permission android:name="android.permission.WRITE_CALL_LOG"/>
+
+  <!-- Messaging (full power if default SMS role) -->
+  <uses-permission android:name="android.permission.SEND_SMS"/>
+  <uses-permission android:name="android.permission.RECEIVE_SMS"/>
+  <uses-permission android:name="android.permission.READ_SMS"/>
+  <uses-permission android:name="android.permission.RECEIVE_MMS"/>
+  <uses-permission android:name="android.permission.RECEIVE_WAP_PUSH"/>
+
+  <!-- Nearby tech -->
+  <uses-permission android:name="android.permission.NFC"/>
+
+  <!-- Package visibility & mgmt -->
+  <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
+  <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"/>
+  <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+  <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES"/>
+
+  <!-- Overlays & system tweaks (user must grant) -->
+  <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+  <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+
+  <!-- Signature/privileged (commented; won’t grant on stock) -->
+  <!-- <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"/> -->
+  <!-- <uses-permission android:name="android.permission.READ_LOGS"/> -->
+  <!-- <uses-permission android:name="android.permission.MODIFY_PHONE_STATE"/> -->
+  <!-- ===== POWER-CAPABILITIES END ===== -->
+
 </manifest>
 
