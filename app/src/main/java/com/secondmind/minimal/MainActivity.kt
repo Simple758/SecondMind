@@ -2,6 +2,7 @@
     
 package com.secondmind.minimal
 import androidx.compose.ui.graphics.Color
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 import androidx.compose.runtime.getValue
 import androidx.compose.material3.lightColorScheme
@@ -91,7 +92,8 @@ fun AppNav() {
   val nav = rememberNavController()
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val backstack by nav.currentBackStackEntryAsState()
-  val currentRoute = backstack?.destination?.route?.substringBefore("/") ?: "home"
+  val currentRoute = backstack?.destination?.route?.substringBefore("/") ?: NavigationRoutes.HOME
+
   ModalNavigationDrawer(
     drawerState = drawerState,
     drawerContent = {
@@ -102,29 +104,26 @@ fun AppNav() {
       )
     }
   ) {
-  Scaffold(containerColor = Color.Black, topBar = { }) { pad ->
-
-  ) {
-Box(Modifier.fillMaxSize().padding(pad)) {
-    
-NavHost(nav, startDestination = "home", modifier = Modifier.fillMaxSize()) {
-      composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }, onOpenNews = { nav.navigate("news") }) }
-      composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
-      composable("inbox") { InboxScreen() }
-      composable("news") { com.secondmind.minimal.news.NewsPanel(modifier = Modifier.fillMaxSize()) }
-      composable(
-        route = "notification/{id}",
-        arguments = listOf(navArgument("id"){ type = NavType.LongType })
-      ) { back ->
-        val id = back.arguments?.getLong("id") ?: -1L
-        DetailsScreen(id)
+    Scaffold(containerColor = Color.Black, topBar = { }) { pad ->
+      Box(Modifier.fillMaxSize().padding(pad)) {
+        NavHost(nav, startDestination = "home", modifier = Modifier.fillMaxSize()) {
+              composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }, onOpenNews = { nav.navigate("news") }) }
+              composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
+              composable("inbox") { InboxScreen() }
+              composable("news") { com.secondmind.minimal.news.NewsPanel(modifier = Modifier.fillMaxSize()) }
+              composable(
+                route = "notification/{id}",
+                arguments = listOf(navArgument("id"){ type = NavType.LongType })
+              ) { back ->
+                val id = back.arguments?.getLong("id") ?: -1L
+                DetailsScreen(id)
+              }
+            }
       }
     }
   }
-  }
 }
-  }
-}
+
 @Composable
 fun titleFor(nav: NavHostController): String {
   val e by nav.currentBackStackEntryAsState()
