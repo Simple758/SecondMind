@@ -167,7 +167,6 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit, onOpenNews: () -> Un
     onOpenNews = onOpenNews
   )
 }
-}
 @Composable
 fun SettingsScreen(onBack: () -> Unit) {
   val ctx = LocalContext.current
