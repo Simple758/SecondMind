@@ -71,22 +71,32 @@ class MainActivity : ComponentActivity() {
     
 val mode by rememberThemeMode()
       val dark = when (mode) { "dark" -> true; "light" -> false; else -> isSystemInDarkTheme() }
-      val scheme = if (dark) darkColorScheme() else lightColorScheme()
+
+val scheme = if (dark) darkColorScheme() else lightColorScheme()
       MaterialTheme(colorScheme = scheme) { AppNav() }
-  }
+
+}
+
 //   private fun ensureChannel() {
 //     if (Build.VERSION.SDK_INT >= 26) {
 //       val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 //       nm.createNotificationChannel(NotificationChannel("sm", "SecondMind", NotificationManager.IMPORTANCE_DEFAULT))
 //     }
-  }
+
 }
+
+}
+
 @Composable
 fun rememberThemeMode(): State<String> {
   val ctx = LocalContext.current
-  val flow = remember { ctx.dataStore.data.map { it[Keys.THEME] ?: "system" } }
-  return flow.collectAsState(initial = "system")
+  val flow = remember { ctx.dataStore.data.map { it[Keys.THEME] ?: "system" }
+
 }
+
+return flow.collectAsState(initial = "system")
+}
+
 @Composable
 fun AppNav() {
   val nav = rememberNavController()
@@ -99,29 +109,57 @@ fun AppNav() {
     drawerContent = {
       com.secondmind.minimal.ui.DrawerContent(
         selectedRoute = currentRoute,
-        onDestinationClicked = { route -> nav.navigate(route) { launchSingleTop = true } },
+        onDestinationClicked = { route -> nav.navigate(route) { launchSingleTop = true }
+
+}
+
+,
         drawerState = drawerState
       )
     }
-  ) {
-    Scaffold(containerColor = Color.Black, topBar = { }) { pad ->
+
+) {
+    Scaffold(containerColor = Color.Black, topBar = { }
+
+) { pad ->
       Box(Modifier.fillMaxSize().padding(pad)) {
         NavHost(nav, startDestination = "home", modifier = Modifier.fillMaxSize()) {
-              composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }, onOpenNews = { nav.navigate("news") }) }
-              composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
-              composable("inbox") { InboxScreen() }
-              composable("news") { com.secondmind.minimal.news.NewsPanel(modifier = Modifier.fillMaxSize()) }
-              composable(
-                route = "notification/{id}",
-                arguments = listOf(navArgument("id"){ type = NavType.LongType })
+              composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }
+
+, onInbox = { nav.navigate("inbox") }
+
+, onOpenNews = { nav.navigate("news") }
+
+) }
+
+composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }
+
+) }
+
+composable("inbox") { InboxScreen() }
+
+composable("news") { com.secondmind.minimal.news.NewsPanel(modifier = Modifier.fillMaxSize()) }
+
+composable(
+                route = "notification/{id}
+
+",
+                arguments = listOf(navArgument("id"){ type = NavType.LongType }
+
+)
               ) { back ->
                 val id = back.arguments?.getLong("id") ?: -1L
                 DetailsScreen(id)
               }
-            }
-      }
-    }
-  }
+
+}
+
+}
+
+}
+
+}
+
 }
 
 @Composable
@@ -133,7 +171,9 @@ fun titleFor(nav: NavHostController): String {
     "notification" -> "Details"
     else -> "SecondMind"
   }
+
 }
+
 private fun showLocalNotification(ctx: Context) {
   val n = NotificationCompat.Builder(ctx, "sm")
     .setContentTitle("SecondMind")
@@ -142,6 +182,7 @@ private fun showLocalNotification(ctx: Context) {
     .build()
   NotificationManagerCompat.from(ctx).notify(1, n)
 }
+
 @Composable
 fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit, onOpenNews: () -> Unit) {
   androidx.compose.foundation.layout.Column(
@@ -157,26 +198,44 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit, onOpenNews: () -> Un
     androidx.compose.material3.OutlinedButton(onClick = onInbox) {
       androidx.compose.material3.Text("Inbox")
     }
-    androidx.compose.material3.OutlinedButton(onClick = onSettings) {
+
+androidx.compose.material3.OutlinedButton(onClick = onSettings) {
       androidx.compose.material3.Text("Settings")
     }
-  }
 
-  com.secondmind.minimal.home.HomeCarousel(
+}
+
+com.secondmind.minimal.home.HomeCarousel(
     modifier = androidx.compose.ui.Modifier.fillMaxSize(),
     onOpenNews = onOpenNews
   )
 }
+
 @Composable
 fun SettingsScreen(onBack: () -> Unit) {
   val ctx = LocalContext.current
   val scope = rememberCoroutineScope()
-  val themeFlow = remember { ctx.dataStore.data.map { it[Keys.THEME] ?: "system" } }
-  val retentionFlow = remember { ctx.dataStore.data.map { it[Keys.RETENTION_DAYS] ?: 7 } }
-  val enabledFlow = remember { ctx.dataStore.data.map { it[Keys.READER_ENABLED] ?: true } }
-  val rateFlow = remember { ctx.dataStore.data.map { it[Keys.READER_RATE] ?: 1.0f } }
-  val pitchFlow = remember { ctx.dataStore.data.map { it[Keys.READER_PITCH] ?: 1.0f } }
-  val theme by themeFlow.collectAsState(initial = "system")
+  val themeFlow = remember { ctx.dataStore.data.map { it[Keys.THEME] ?: "system" }
+
+}
+
+val retentionFlow = remember { ctx.dataStore.data.map { it[Keys.RETENTION_DAYS] ?: 7 }
+
+}
+
+val enabledFlow = remember { ctx.dataStore.data.map { it[Keys.READER_ENABLED] ?: true }
+
+}
+
+val rateFlow = remember { ctx.dataStore.data.map { it[Keys.READER_RATE] ?: 1.0f }
+
+}
+
+val pitchFlow = remember { ctx.dataStore.data.map { it[Keys.READER_PITCH] ?: 1.0f }
+
+}
+
+val theme by themeFlow.collectAsState(initial = "system")
   val retention by retentionFlow.collectAsState(initial = 7)
   val readerEnabled by enabledFlow.collectAsState(initial = true)
   val readerRate by rateFlow.collectAsState(initial = 1.0f)
@@ -184,7 +243,8 @@ fun SettingsScreen(onBack: () -> Unit) {
   LaunchedEffect(readerEnabled, readerRate, readerPitch) {
     Reader.updateConfig(readerEnabled, readerRate, readerPitch, ctx)
   }
-  Box(
+
+Box(
     Modifier.fillMaxSize()
       
       .imePadding()
@@ -196,55 +256,128 @@ fun SettingsScreen(onBack: () -> Unit) {
     ) {
       Text("Settings", fontSize = 22.sp)
       Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "system" } } }) { Text("System") }
-        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "light" } } }) { Text("Light") }
-        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "dark" } } }) { Text("Dark") }
-      }
-      Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "system" }
+
+}
+
+}
+
+) { Text("System") }
+
+OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "light" }
+
+}
+
+}
+
+) { Text("Light") }
+
+OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "dark" }
+
+}
+
+}
+
+) { Text("Dark") }
+
+}
+
+Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
         Text("Retention (days): $retention")
-        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.RETENTION_DAYS] = maxOf(1, retention - 1) } } }) { Text("-") }
-        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.RETENTION_DAYS] = retention + 1 } } }) { Text("+") }
-      }
-      Divider()
+        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.RETENTION_DAYS] = maxOf(1, retention - 1) }
+
+}
+
+}
+
+) { Text("-") }
+
+OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.RETENTION_DAYS] = retention + 1 }
+
+}
+
+}
+
+) { Text("+") }
+
+}
+
+Divider()
       Text("Reader", style = MaterialTheme.typography.titleMedium)
       val idText = remember {
         android.content.ComponentName(
           ctx, com.secondmind.minimal.access.SecondMindAccessibilityService::class.java
         ).flattenToString()
       }
-      val enabledNow = remember {
+
+val enabledNow = remember {
         val v = android.provider.Settings.Secure.getString(
           ctx.contentResolver,
           android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
         )
         v?.contains(idText) == true
       }
-      Text("Accessibility: " + if (enabledNow) "ON" else "OFF")
+
+Text("Accessibility: " + if (enabledNow) "ON" else "OFF")
       Text("Service ID: " + idText, fontSize = 12.sp)
       Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Enabled")
-        Switch(checked = readerEnabled, onCheckedChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_ENABLED] = v } } })
+        Switch(checked = readerEnabled, onCheckedChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_ENABLED] = v }
+
+}
+
+}
+
+)
       }
-      Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text("Rate: ${"%.2f".format(readerRate)}")
+
+Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text("Rate: ${"%.2f".format(readerRate)}
+
+")
         Slider(value = readerRate,
-               onValueChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_RATE] = v.coerceIn(0.5f, 1.5f) } } },
+               onValueChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_RATE] = v.coerceIn(0.5f, 1.5f) }
+
+}
+
+}
+
+,
                valueRange = 0.5f..1.5f, steps = 10)
-        Text("Pitch: ${"%.2f".format(readerPitch)}")
+        Text("Pitch: ${"%.2f".format(readerPitch)}
+
+")
         Slider(value = readerPitch,
-               onValueChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_PITCH] = v.coerceIn(0.5f, 1.5f) } } },
+               onValueChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_PITCH] = v.coerceIn(0.5f, 1.5f) }
+
+}
+
+}
+
+,
                valueRange = 0.5f..1.5f, steps = 10)
       }
-      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+
+Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         com.secondmind.minimal.ui.TtsSettings()
-        OutlinedButton(onClick = { com.secondmind.minimal.tts.Reader.stop() }) { Text("Stop reading") }
-        OutlinedButton(onClick = { Reader.speak(ctx, "This is a test of the SecondMind reader.") }) { Text("Test Read") }
-        OutlinedButton(onClick = {
+        OutlinedButton(onClick = { com.secondmind.minimal.tts.Reader.stop() }
+
+) { Text("Stop reading") }
+
+OutlinedButton(onClick = { Reader.speak(ctx, "This is a test of the SecondMind reader.") }
+
+) { Text("Test Read") }
+
+OutlinedButton(onClick = {
           val i = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
           ctx.startActivity(i)
-        }) { Text("Open Accessibility Settings") }
-      }
-      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        }
+
+) { Text("Open Accessibility Settings") }
+
+}
+
+Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         OutlinedButton(onClick = {
           val ctx2 = ctx
           try {
@@ -252,13 +385,24 @@ fun SettingsScreen(onBack: () -> Unit) {
             val i = android.content.Intent("android.settings.ACCESSIBILITY_DETAILS_SETTINGS")
             i.putExtra("android.provider.extra.EXTRA_ACCESSIBILITY_COMPONENT_NAME", cn.flattenToString())
             ctx2.startActivity(i)
-          } catch (e: Throwable) {
+          }
+
+catch (e: Throwable) {
             ctx2.startActivity(android.content.Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS))
           }
-        }) { Text("Toggle My Accessibility") }
-      }
-      OutlinedButton(onClick = onBack) { Text("Back") }
-    }
-  }
+
 }
+
+) { Text("Toggle My Accessibility") }
+
+}
+
+OutlinedButton(onClick = onBack) { Text("Back") }
+
+}
+
+}
+
+}
+
 @Composable
