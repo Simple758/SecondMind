@@ -141,9 +141,7 @@ composable("inbox") { InboxScreen() }
 composable("news") { com.secondmind.minimal.news.NewsPanel(modifier = Modifier.fillMaxSize()) }
 
 composable(
-                route = "notification/{id}
-
-",
+                route = "notification/{id}  ",
                 arguments = listOf(navArgument("id"){ type = NavType.LongType }
 
 )
@@ -332,9 +330,7 @@ Text("Accessibility: " + if (enabledNow) "ON" else "OFF")
       }
 
 Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text("Rate: ${"%.2f".format(readerRate)}
-
-")
+        Text("Rate: ${"%.2f".format(readerRate)}  ")
         Slider(value = readerRate,
                onValueChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_RATE] = v.coerceIn(0.5f, 1.5f) }
 
@@ -344,9 +340,7 @@ Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalArrangement =
 
 ,
                valueRange = 0.5f..1.5f, steps = 10)
-        Text("Pitch: ${"%.2f".format(readerPitch)}
-
-")
+        Text("Pitch: ${"%.2f".format(readerPitch)}  ")
         Slider(value = readerPitch,
                onValueChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_PITCH] = v.coerceIn(0.5f, 1.5f) }
 
