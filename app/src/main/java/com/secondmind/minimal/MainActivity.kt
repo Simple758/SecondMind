@@ -1,6 +1,7 @@
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
     
 package com.secondmind.minimal
+import com.secondmind.minimal.ui.NavigationRoutes
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.currentBackStackEntryAsState
 
@@ -102,7 +103,7 @@ fun AppNav() {
   val nav = rememberNavController()
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val backstack by nav.currentBackStackEntryAsState()
-  val currentRoute = backstack?.destination?.route?.substringBefore("/") ?: NavigationRoutes.HOME
+  val currentRoute = backstack?.destination?.route?.substringBefore("/") ?: com.secondmind.minimal.ui.NavigationRoutes.HOME
 
   ModalNavigationDrawer(
     drawerState = drawerState,
