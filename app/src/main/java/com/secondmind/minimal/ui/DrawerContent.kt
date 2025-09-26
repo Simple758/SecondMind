@@ -2,6 +2,8 @@ package com.secondmind.minimal.ui
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.SmartToy
+import androidx.compose.material3.Icon
 import androidx.compose.material.icons.filled.Article
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.filled.Mail

@@ -45,6 +45,8 @@
             <action android:name="android.service.notification.NotificationListenerService" />
         </intent-filter>
     </service>
+    <activity android:name="com.secondmind.minimal.ai.AiChatActivity" android:exported="false" android:label="AI Chat" />
+    <activity android:name="com.secondmind.minimal.dev.DeveloperActivity" android:exported="false" android:label="Developer" />
 </application>
 
   <!-- ===== POWER-CAPABILITIES START (managed) ===== -->

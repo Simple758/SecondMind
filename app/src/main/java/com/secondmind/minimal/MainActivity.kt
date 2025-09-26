@@ -2,6 +2,7 @@
     
 package com.secondmind.minimal
 import com.secondmind.minimal.ui.NavigationRoutes
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.currentBackStackEntryAsState
 
@@ -141,6 +142,24 @@ composable("inbox") { InboxScreen() }
 
 composable("news") { com.secondmind.minimal.news.NewsPanel(modifier = Modifier.fillMaxSize()) }
 
+
+
+  
+
+  composable("ai") {
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    androidx.compose.runtime.LaunchedEffect("open_ai") {
+      ctx.startActivity(android.content.Intent(ctx, com.secondmind.minimal.ai.AiChatActivity::class.java))
+      nav.popBackStack()
+    }
+  }
+composable("developer") {
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    androidx.compose.runtime.LaunchedEffect("open_dev") {
+      ctx.startActivity(android.content.Intent(ctx, com.secondmind.minimal.dev.DeveloperActivity::class.java))
+      nav.popBackStack()
+    }
+  }
 composable(
                 route = "notification/{id}  ",
                 arguments = listOf(navArgument("id"){ type = NavType.LongType }
