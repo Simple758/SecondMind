@@ -1,6 +1,7 @@
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
     
 package com.secondmind.minimal
+import com.secondmind.minimal.SettingsScreen
 import com.secondmind.minimal.ui.NavigationRoutes
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.currentBackStackEntryAsState
