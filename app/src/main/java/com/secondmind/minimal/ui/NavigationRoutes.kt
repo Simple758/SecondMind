@@ -7,4 +7,5 @@ object NavigationRoutes {
     const val INBOX = "inbox"
     const val SETTINGS = "settings"
     const val DEVELOPER = "developer"
+  const val WIKI = "wiki"
 }

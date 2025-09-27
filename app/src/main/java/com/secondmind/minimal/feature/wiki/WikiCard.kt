@@ -53,7 +53,7 @@ fun WikiBrainFoodCard(modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically
       ) {
         Text("Brain Food (Wikipedia)", style = MaterialTheme.typography.titleLarge)
-        TextButton(onClick = { scope.launch { fetch() } }) { Text("Refresh") }
+        TextButton(onClick = { navController?.navigate(NavigationRoutes.WIKI) } }) { Text("Refresh") }
       }
       Spacer(Modifier.height(8.dp))
 

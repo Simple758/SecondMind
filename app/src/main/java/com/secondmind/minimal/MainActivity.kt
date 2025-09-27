@@ -1,6 +1,10 @@
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
     
 package com.secondmind.minimal
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material.icons.filled.SmartToy
+import androidx.compose.material3.FloatingActionButton
 import com.secondmind.minimal.ui.NavigationRoutes
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
@@ -138,9 +142,25 @@ composable("settings") { com.secondmind.minimal.ui.SettingsScreen(onBack = { nav
 
 ) }
 
-composable("inbox") { InboxScreen() }
+  // InboxAIOverlay
+  composable() {
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    androidx.compose.foundation.layout.Box(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
+      InboxScreen()
+      androidx.compose.material3.FloatingActionButton(
+        onClick = {
+          com.secondmind.minimal.inbox.InboxGate.active = true
+          com.secondmind.minimal.notify.SecondMindNotificationListener.triggerRebind(ctx)
+        },
+        modifier = androidx.compose.ui.Modifier.align(androidx.compose.ui.Alignment.BottomEnd).padding(16.dp)
+      ) {
+        androidx.compose.material3.Icon(imageVector = androidx.compose.material.icons.Icons.Filled.SmartToy, contentDescription = )
+      }
+    }
+  }
 
 composable("news") { com.secondmind.minimal.news.NewsPanel(modifier = Modifier.fillMaxSize()) }
+  composable("wiki") { com.secondmind.minimal.feature.wiki.WikiScreen() }
 
 
 

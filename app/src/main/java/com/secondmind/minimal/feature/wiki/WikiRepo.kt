@@ -26,3 +26,71 @@ object WikiRepo {
         }
     }.getOrNull()
 }
+// ====== Added by ui_wiki_patch (safe append) ======
+/**
+ * Minimal search and summary helpers using Wikipedia REST.
+ * No external deps; uses java.net + org.json (Android built-in).
+ */
+private fun httpGetJson(url: String): org.json.JSONObject {
+    val u = java.net.URL(url)
+    val c = (u.openConnection() as java.net.HttpURLConnection).apply {
+        requestMethod = "GET"
+        setRequestProperty("Accept", "application/json")
+        connectTimeout = 8000
+        readTimeout = 8000
+    }
+    return try {
+        val text = c.inputStream.bufferedReader().use { it.readText() }
+        org.json.JSONObject(text)
+    } finally {
+        c.disconnect()
+    }
+}
+
+fun searchTitles(query: String, limit: Int = 5): List<String> {
+    return try {
+        val enc = java.net.URLEncoder.encode(query, "UTF-8")
+        val j = httpGetJson("https://en.wikipedia.org/w/rest.php/v1/search/title?q=$enc&limit=$limit")
+        val arr = j.optJSONArray("pages") ?: return emptyList()
+        buildList {
+            for (i in 0 until arr.length()) {
+                val obj = arr.optJSONObject(i) ?: continue
+                val t = obj.optString("title")
+                if (t.isNotBlank()) add(t)
+            }
+        }
+    } catch (_: Throwable) { emptyList() }
+}
+
+data class WikiSummary(val title: String, val extract: String, val thumbnail: String? = null)
+
+fun getSummary(title: String): WikiSummary? {
+    return try {
+        val enc = java.net.URLEncoder.encode(title, "UTF-8")
+        val j = httpGetJson("https://en.wikipedia.org/api/rest_v1/page/summary/$enc")
+        val extract = j.optString("extract")
+        val thumb = j.optJSONObject("thumbnail")?.optString("source")
+        if (extract.isNullOrBlank()) null else WikiSummary(title = j.optString("title", title), extract = extract, thumbnail = thumb)
+    } catch (_: Throwable) { null }
+}
+
+// Simple 7-day TTL cache using SharedPreferences (JSON map)
+fun cacheGet(context: android.content.Context, key: String): String? {
+    val sp = context.getSharedPreferences("wiki_cache", 0)
+    val now = System.currentTimeMillis()
+    return try {
+        val raw = sp.getString(key, null) ?: return null
+        val j = org.json.JSONObject(raw)
+        val ttl = j.optLong("ttl", 0L)
+        val until = j.optLong("until", 0L)
+        if (ttl <= 0L || until < now) { null } else j.optString("value", null)
+    } catch (_: Throwable) { null }
+}
+fun cachePut(context: android.content.Context, key: String, value: String, days: Int = 7) {
+    val sp = context.getSharedPreferences("wiki_cache", 0)
+    val now = System.currentTimeMillis()
+    val until = now + days * 24L * 3600_000L
+    val j = org.json.JSONObject().put("value", value).put("ttl", days).put("until", until)
+    sp.edit().putString(key, j.toString()).apply()
+}
+// ====== end ui_wiki_patch append ======
