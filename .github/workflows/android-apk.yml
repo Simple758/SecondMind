@@ -13,6 +13,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Inject DeepSeek key
+        run: |
+          mkdir -p ~/.gradle
+          echo "DEEPSEEK_API_KEY=${{ secrets.DEEPSEEK_API_KEY }}" >> ~/.gradle/gradle.properties
       - name: Checkout
         uses: actions/checkout@v4
 
