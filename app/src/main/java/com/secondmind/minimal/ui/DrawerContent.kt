@@ -27,6 +27,7 @@ private val items = listOf(
     DrawerItem("Markets", Icons.Filled.TrendingUp, NavigationRoutes.MARKETS),
     DrawerItem("Inbox", Icons.Filled.Mail, NavigationRoutes.INBOX),
     DrawerItem("Settings", Icons.Filled.Settings, NavigationRoutes.SETTINGS),
+    DrawerItem("AI", Icons.Filled.SmartToy, "ai"),
     DrawerItem("Developer", Icons.Filled.Build, NavigationRoutes.DEVELOPER),
 )
 
