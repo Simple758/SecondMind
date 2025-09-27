@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
@@ -17,7 +18,7 @@ class DeveloperActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     setContent {
       MaterialTheme {
-        Surface {
+        Surface(modifier = Modifier.fillMaxSize(), color = Color.Black) {
           DevScreen()
         }
       }
@@ -33,9 +34,10 @@ private fun DevScreen() {
   var busy by remember { mutableStateOf(false) }
 
   Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-    Text("Developer Tools", style = MaterialTheme.typography.titleLarge)
-    Divider()
-    Text("DeepSeek Connectivity", style = MaterialTheme.typography.titleMedium)
+    Text("Developer Tools", style = MaterialTheme.typography.titleLarge, color = Color.White)
+    Divider(color = Color(0x22FFFFFF))
+    Text("DeepSeek Connectivity", style = MaterialTheme.typography.titleMedium, color = Color.White)
+
     OutlinedButton(
       enabled = !busy,
       onClick = {
@@ -53,6 +55,6 @@ private fun DevScreen() {
       }
     ) { Text(if (busy) "Testing…" else "Ping DeepSeek") }
 
-    if (status != null) Text(status!!)
+    if (status != null) Text(status!!, color = Color.White)
   }
 }
