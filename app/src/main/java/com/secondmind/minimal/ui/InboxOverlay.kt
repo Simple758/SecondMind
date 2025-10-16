@@ -55,8 +55,8 @@ fun InboxAIOverlay(padding: PaddingValues = PaddingValues(0.dp)) {
         } catch (_: Throwable) { }
         scope.launch {
           try {
-            val result = try { NotificationSummarizer.summarize(ctx) } catch (_: Throwable) { null }
-            digest = result ?: "No active notifications to summarize right now."
+            val lines = com.secondmind.minimal.inbox.InboxStore.items.value.map { "${it.appLabel}: ${it.title} ${it.text}" }
+            val result = try { NotificationSummarizer.summarizeWithAI(ctx, lines) } catch (_: Throwable) { null }
             dialogOpen = true
           } finally {
             InboxGate.active = false

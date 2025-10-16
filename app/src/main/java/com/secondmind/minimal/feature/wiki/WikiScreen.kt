@@ -1,4 +1,5 @@
 package com.secondmind.minimal.feature.wiki
+import androidx.compose.ui.unit.Dp
 
 import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.Image
