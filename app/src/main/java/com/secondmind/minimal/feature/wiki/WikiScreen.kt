@@ -28,7 +28,7 @@ fun WikiScreen(vm: WikiViewModel = viewModel(), modifier: Modifier = Modifier) {
   val bg = MaterialTheme.colorScheme.background
   var tts by remember { mutableStateOf<TextToSpeech?>(null) }
   DisposableEffect(Unit) {
-    val engine = TextToSpeech(ctx) { s -> if (s == TextToSpeech.SUCCESS) try { engine.language = Locale.getDefault() } catch (_: Throwable) {} }
+    val engine = TextToSpeech(ctx) { s -> if (s == TextToSpeech.SUCCESS) try { tts?.language = Locale.getDefault() } catch (_: Throwable) {} }
     tts = engine
     onDispose { engine.stop(); engine.shutdown() }
   }
@@ -101,7 +101,7 @@ fun WikiScreen(vm: WikiViewModel = viewModel(), modifier: Modifier = Modifier) {
 private fun FlowRow(
   modifier: Modifier = Modifier,
   horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
-  verticalSpacing: dp = 8.dp,
+  verticalSpacing: Dp = 8.dp,
   content: @Composable () -> Unit
 ) {
   Row(modifier = modifier, horizontalArrangement = horizontalArrangement) { content() }

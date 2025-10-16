@@ -55,7 +55,7 @@ fun InboxAIOverlay(padding: PaddingValues = PaddingValues(0.dp)) {
         } catch (_: Throwable) { }
         scope.launch {
           try {
-            val result = try { NotificationSummarizer.summarizeOnce(ctx) } catch (_: Throwable) { null }
+            val result = try { NotificationSummarizer.summarize(ctx) } catch (_: Throwable) { null }
             digest = result ?: "No active notifications to summarize right now."
             dialogOpen = true
           } finally {

@@ -60,7 +60,7 @@ class WikiViewModel(app: Application) : AndroidViewModel(app) {
   private fun relatedFrom(s: WikiSummary): List<String> {
     // naive: split by sentences and pick keywords
     val txt = s.extract
-    val words = txt.split(Regex("\W+")).map { it.trim() }.filter { it.length in 4..16 }
+    val words = txt.split(Regex("""\W+""")).map { it.trim() }.filter { it.length in 4..16 }
     return words.groupingBy { it }.eachCount().toList().sortedByDescending { it.second }.map { it.first }.distinct().take(6)
   }
 }
