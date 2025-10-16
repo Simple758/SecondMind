@@ -19,7 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 
 
 @Composable
-fun HomeCarousel(modifier: Modifier = Modifier, onOpenNews: () -> Unit = {}) {
+fun HomeCarousel(navController: androidx.navigation.NavController, modifier: Modifier = Modifier, onOpenNews: () -> Unit = {}) {
     var sheetOpen by rememberSaveable { mutableStateOf(false) }
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -44,7 +44,7 @@ LazyVerticalGrid(
     }
     // Row 2 — Quick Note + Brain Food
     item { com.secondmind.minimal.ui.components.QuickNoteCard() }
-    item { com.secondmind.minimal.feature.wiki.WikiBrainFoodCard() }
+    item { com.secondmind.minimal.feature.wiki.WikiBrainFoodCard(navController = navController) }
     // Row 3 — Telegram + Watch Later
     item { com.secondmind.minimal.feature.tg.TelegramCard() }
     item { com.secondmind.minimal.feature.youtube.YtWatchLaterCard() }

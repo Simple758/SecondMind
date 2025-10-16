@@ -247,7 +247,7 @@ androidx.compose.material3.OutlinedButton(onClick = onSettings) {
 
 }
 
-com.secondmind.minimal.home.HomeCarousel(
+com.secondmind.minimal.home.HomeCarousel(navController = nav, 
     modifier = androidx.compose.ui.Modifier.fillMaxSize(),
     onOpenNews = onOpenNews
   )
