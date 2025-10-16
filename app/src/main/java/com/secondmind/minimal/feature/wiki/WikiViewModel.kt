@@ -27,6 +27,7 @@ class WikiViewModel(app: Application) : AndroidViewModel(app) {
     val ctx = getApplication<Application>()
     _state.value = _state.value.copy(loading = true, error = null)
     viewModelScope.launch {
+kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
       try {
         // cache by title after resolving
         val titles = searchTitles(query, limit = 5)
@@ -52,6 +53,7 @@ class WikiViewModel(app: Application) : AndroidViewModel(app) {
         } else {
           _state.value = UiState(loading = false, error = "Wikipedia returned no summary for '$title'. Article may not exist.", answer = null, related = emptyList())
         }
+}
       } catch (t: Throwable) {
         _state.value = UiState(loading = false, error = t.message ?: "Failed", answer = null, related = emptyList())
       }
