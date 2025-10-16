@@ -51,7 +51,7 @@ private fun httpGetJson(url: String): org.json.JSONObject {
 fun searchTitles(query: String, limit: Int = 5): List<String> {
     return try {
         val enc = java.net.URLEncoder.encode(query, "UTF-8")
-        val j = httpGetJson("https://en.wikipedia.org/w/rest.php/v1/search/title?q=$enc&limit=$limit")
+        val j = httpGetJson("https://api.wikimedia.org/core/v1/wikipedia/en/search/title?q=$enc&limit=$limit")
         val arr = j.optJSONArray("pages") ?: return emptyList()
         buildList {
             for (i in 0 until arr.length()) {
