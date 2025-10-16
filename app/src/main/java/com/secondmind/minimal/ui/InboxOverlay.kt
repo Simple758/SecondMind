@@ -57,7 +57,7 @@ fun InboxAIOverlay(padding: PaddingValues = PaddingValues(0.dp)) {
           try {
             val lines = com.secondmind.minimal.inbox.InboxStore.items.value.map { "${it.appLabel}: ${it.title} ${it.text}" }
             val result = try { NotificationSummarizer.summarizeWithAI(ctx, lines) } catch (_: Throwable) { null }
-digest = result ?: "No active notifications to summarize right now."
+            digest = result ?: "No active notifications to summarize right now."
             dialogOpen = true
           } finally {
             InboxGate.active = false
