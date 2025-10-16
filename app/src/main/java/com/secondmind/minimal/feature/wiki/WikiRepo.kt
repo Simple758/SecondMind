@@ -48,20 +48,44 @@ private fun httpGetJson(url: String): org.json.JSONObject {
     }
 }
 
+
 fun searchTitles(query: String, limit: Int = 5): List<String> {
     return try {
         val enc = java.net.URLEncoder.encode(query, "UTF-8")
-        val j = httpGetJson("https://en.wikipedia.org/w/rest.php/v1/search/title?q=$enc&limit=$limit")
-        val arr = j.optJSONArray("pages") ?: return emptyList()
+        val url = "https://en.wikipedia.org/w/rest.php/v1/search/title?q=$enc&limit=$limit"
+        android.util.Log.d("WikiRepo", "searchTitles: URL=$url")
+        val j = httpGetJson(url)
+        android.util.Log.d("WikiRepo", "searchTitles: Response=${j.toString().take(300)}")
+        val arr = j.optJSONArray("pages")
+        if (arr == null) {
+            android.util.Log.e("WikiRepo", "searchTitles: No 'pages' array. Full response: ${j.toString()}")
+            return emptyList()
+        }
         buildList {
             for (i in 0 until arr.length()) {
                 val obj = arr.optJSONObject(i) ?: continue
                 val t = obj.optString("title")
                 if (t.isNotBlank()) add(t)
             }
-        }
-    } catch (_: Throwable) { emptyList() }
+        }.also { android.util.Log.d("WikiRepo", "searchTitles: Found ${it.size} titles: $it") }
+    } catch (e: Throwable) {
+        android.util.Log.e("WikiRepo", "searchTitles: Exception: ${e.javaClass.simpleName}: ${e.message}", e)
+        emptyList()
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 data class WikiSummary(val title: String, val extract: String, val thumbnail: String? = null)
 
