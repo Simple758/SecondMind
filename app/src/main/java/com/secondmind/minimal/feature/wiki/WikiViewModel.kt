@@ -62,7 +62,7 @@ class WikiViewModel(app: Application) : AndroidViewModel(app) {
     }
   }
 
-fun random() = ask("Special:Random")
+  fun random() = ask("Special:Random")
   private fun relatedFrom(sum: WikiSummary): List<String> {
     val txt = sum.extract
     val candidates = txt.split(" ").filter { it.length > 6 && it[0].isUpperCase() }
