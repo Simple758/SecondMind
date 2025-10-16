@@ -30,7 +30,12 @@ class WikiViewModel(app: Application) : AndroidViewModel(app) {
       try {
         // cache by title after resolving
         val titles = searchTitles(query, limit = 5)
+        if (titles.isEmpty()) {
+          _state.value = UiState(loading = false, error = "No Wikipedia results for '$query'. Try different keywords.", answer = null, related = emptyList())
+          return@launch
+        }
         val title = titles.firstOrNull() ?: query
+        android.util.Log.d("WikiViewModel", "Searching for: $query -> Found titles: $titles -> Using: $title")
         val cacheKey = "sum:$title"
         val cached = cacheGet(ctx, cacheKey)
         val summary = if (cached != null) WikiSummary(title, cached, null) else getSummary(title)
@@ -45,7 +50,7 @@ class WikiViewModel(app: Application) : AndroidViewModel(app) {
             error = null
           )
         } else {
-          _state.value = UiState(loading = false, error = "No summary available.", answer = null, related = emptyList())
+          _state.value = UiState(loading = false, error = "Wikipedia returned no summary for '$title'. Article may not exist.", answer = null, related = emptyList())
         }
       } catch (t: Throwable) {
         _state.value = UiState(loading = false, error = t.message ?: "Failed", answer = null, related = emptyList())
