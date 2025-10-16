@@ -5,6 +5,7 @@ import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
@@ -38,8 +39,13 @@ fun WikiScreen(vm: WikiViewModel = viewModel(), modifier: Modifier = Modifier) {
   val state by vm.state.collectAsState()
 
   Surface(color = bg, modifier = modifier.fillMaxSize()) {
-    Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-      Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(Modifier.fillMaxSize()) {
+      // Fixed search bar at top
+      Row(
+        Modifier.fillMaxWidth().padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+      ) {
         OutlinedTextField(
           modifier = Modifier.weight(1f),
           value = query,
@@ -47,63 +53,88 @@ fun WikiScreen(vm: WikiViewModel = viewModel(), modifier: Modifier = Modifier) {
           singleLine = true,
           placeholder = { Text("Ask Wikipedia…") }
         )
-        Button(enabled = !state.loading, onClick = { vm.ask(query.text) }) { Text(if (state.loading) "…" else "Search") }
-        IconButton(onClick = { vm.random() }) { Icon(Icons.Filled.Refresh, contentDescription = "Random") }
+        Button(enabled = !state.loading, onClick = { vm.ask(query.text) }) { 
+          Text(if (state.loading) "…" else "Search") 
+        }
+        IconButton(onClick = { vm.random() }) { 
+          Icon(Icons.Filled.Refresh, contentDescription = "Random") 
+        }
       }
 
-      if (state.error != null) {
-        Text(state.error ?: "", color = MaterialTheme.colorScheme.error)
-      }
+      // Scrollable content area
+      LazyColumn(
+        Modifier.fillMaxSize().padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+      ) {
+        // Error message
+        if (state.error != null) {
+          item {
+            Text(state.error ?: "", color = MaterialTheme.colorScheme.error)
+          }
+        }
 
-      if (state.answer != null) {
-        val a = state.answer!!
-        Surface(
-          shape = MaterialTheme.shapes.medium,
-          color = MaterialTheme.colorScheme.surface,
-          tonalElevation = 1.dp,
-          modifier = Modifier.fillMaxWidth()
-        ) {
-          Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-              Text(a.title, style = MaterialTheme.typography.titleMedium)
-              IconButton(onClick = { tts?.speak(a.extract, TextToSpeech.QUEUE_FLUSH, null, "wiki-read") }) {
-                Icon(Icons.Filled.VolumeUp, contentDescription = "Speak")
+        // Answer card with image
+        if (state.answer != null) {
+          item {
+            val a = state.answer!!
+            Surface(
+              shape = MaterialTheme.shapes.medium,
+              color = MaterialTheme.colorScheme.surface,
+              tonalElevation = 1.dp,
+              modifier = Modifier.fillMaxWidth()
+            ) {
+              Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                  Modifier.fillMaxWidth(),
+                  horizontalArrangement = Arrangement.SpaceBetween,
+                  verticalAlignment = Alignment.CenterVertically
+                ) {
+                  Text(a.title, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                  IconButton(onClick = { 
+                    tts?.speak(a.extract, TextToSpeech.QUEUE_FLUSH, null, "wiki-read") 
+                  }) {
+                    Icon(Icons.Filled.VolumeUp, contentDescription = "Speak")
+                  }
+                }
+                
+                // Display thumbnail image
+                if (a.thumbnail != null) {
+                  Image(
+                    painter = rememberAsyncImagePainter(a.thumbnail),
+                    contentDescription = "Article thumbnail",
+                    modifier = Modifier.fillMaxWidth().height(180.dp),
+                    contentScale = ContentScale.Crop
+                  )
+                }
+                
+                Text(a.extract, style = MaterialTheme.typography.bodyMedium)
               }
             }
-            if (a.thumbnail != null) {
-              Image(
-                painter = rememberAsyncImagePainter(a.thumbnail),
-                contentDescription = "Thumb",
-                modifier = Modifier.fillMaxWidth().height(140.dp),
-                contentScale = ContentScale.Crop
-              )
+          }
+        }
+
+        // Horizontally scrollable related section
+        if (state.related.isNotEmpty()) {
+          item {
+            Text("Related", style = MaterialTheme.typography.titleSmall)
+          }
+          item {
+            LazyRow(
+              horizontalArrangement = Arrangement.spacedBy(8.dp),
+              contentPadding = PaddingValues(vertical = 4.dp)
+            ) {
+              items(state.related) { r ->
+                AssistChip(onClick = { vm.ask(r) }, label = { Text(r) })
+              }
             }
-            Text(a.extract)
           }
         }
-      }
 
-      if (state.related.isNotEmpty()) {
-        Text("Related", style = MaterialTheme.typography.titleSmall)
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-          state.related.forEach { r ->
-            AssistChip(onClick = { vm.ask(r) }, label = { Text(r) })
-          }
+        // Bottom spacer
+        item {
+          Spacer(Modifier.height(16.dp))
         }
       }
-
-      Spacer(Modifier.height(4.dp))
     }
   }
-}
-
-/** Simple FlowRow without extra deps */
-@Composable
-private fun FlowRow(
-  modifier: Modifier = Modifier,
-  horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
-  verticalSpacing: Dp = 8.dp,
-  content: @Composable () -> Unit
-) {
-  Row(modifier = modifier, horizontalArrangement = horizontalArrangement) { content() }
 }
