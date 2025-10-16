@@ -36,6 +36,7 @@ private fun httpGetJson(url: String): org.json.JSONObject {
     val c = (u.openConnection() as java.net.HttpURLConnection).apply {
         requestMethod = "GET"
         setRequestProperty("Accept", "application/json")
+setRequestProperty("User-Agent", "SecondMind/1.0 (Android)")
         connectTimeout = 8000
         readTimeout = 8000
     }
