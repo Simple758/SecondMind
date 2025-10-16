@@ -130,7 +130,7 @@ fun AppNav() {
 ) { pad ->
       Box(Modifier.fillMaxSize().padding(pad)) {
         NavHost(nav, startDestination = "home", modifier = Modifier.fillMaxSize()) {
-              composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }
+              composable("home") { HomeScreen(navController = nav, onSettings = { nav.navigate("settings") }
 
 , onInbox = { nav.navigate("inbox") }
 
@@ -226,7 +226,7 @@ private fun showLocalNotification(ctx: Context) {
 }
 
 @Composable
-fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit, onOpenNews: () -> Unit) {
+fun HomeScreen(navController: androidx.navigation.NavController, onSettings: () -> Unit, onInbox: () -> Unit, onOpenNews: () -> Unit) {
   androidx.compose.foundation.layout.Column(
   modifier = androidx.compose.ui.Modifier
     .fillMaxSize()
@@ -247,7 +247,7 @@ androidx.compose.material3.OutlinedButton(onClick = onSettings) {
 
 }
 
-com.secondmind.minimal.home.HomeCarousel(navController = nav, 
+com.secondmind.minimal.home.HomeCarousel(navController = navController, 
     modifier = androidx.compose.ui.Modifier.fillMaxSize(),
     onOpenNews = onOpenNews
   )
