@@ -1,0 +1,15 @@
+// ============================================
+// FILE: app/build.gradle.kts (PATCH)
+// ============================================
+
+// Dependencies to add:
+dependencies {
+    // PDF extraction (Android port of iText 5)
+    implementation("com.itextpdf:itextg:5.5.10")
+    // Material icons extended (for MenuBook)
+    implementation("androidx.compose.material:material-icons-extended:1.7.4")
+    // DocumentFile helpers (optional)
+    implementation("androidx.documentfile:documentfile:1.0.1")
+    // Coroutines (ensure your version alignment)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+}

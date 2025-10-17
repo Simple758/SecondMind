@@ -1,0 +1,16 @@
+diff --git a/app/src/main/java/com/secondmind/minimal/ui/NavigationRoutes.kt b/app/src/main/java/com/secondmind/minimal/ui/NavigationRoutes.kt
+new file mode 100644
+index 0000000..ee7b796
+--- /dev/null
++++ b/app/src/main/java/com/secondmind/minimal/ui/NavigationRoutes.kt
+@@ -0,0 +1,10 @@
++package com.secondmind.minimal.ui
++
++object NavigationRoutes {
++    const val HOME = "home"
++    const val NEWS = "news"
++    const val MARKETS = "markets"
++    const val INBOX = "inbox"
++    const val SETTINGS = "settings"
++    const val DEVELOPER = "developer"
++}

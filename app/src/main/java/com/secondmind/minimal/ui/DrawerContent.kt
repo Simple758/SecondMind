@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
@@ -29,6 +30,7 @@ private val items = listOf(
     DrawerItem("Settings", Icons.Filled.Settings, NavigationRoutes.SETTINGS),
     DrawerItem("AI", Icons.Filled.SmartToy, "ai"),
     DrawerItem("Developer", Icons.Filled.Build, NavigationRoutes.DEVELOPER),
+DrawerItem("Audiobooks", Icons.Filled.MenuBook, NavigationRoutes.AUDIOBOOKS),
 )
 
 @Composable

@@ -1,0 +1,10 @@
+== HEAD: SettingsScreen definitions ==
+app/src/main/java/com/secondmind/minimal/MainActivity.kt:215:fun SettingsScreen(onBack: () -> Unit) {
+
+== 96bbb14: SettingsScreen definitions ==
+96bbb14:app/src/main/java/com/secondmind/minimal/MainActivity.kt:156:fun SettingsScreen(onBack: () -> Unit) {
+
+== HEAD: NavigationRoutes defs ==
+app/src/main/java/com/secondmind/minimal/ui/NavigationRoutes.kt:3:object NavigationRoutes {
+
+== 96bbb14: NavigationRoutes defs ==

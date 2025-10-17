@@ -2,10 +2,6 @@ plugins {
   id 'com.android.application'
   id 'org.jetbrains.kotlin.android'
   id 'org.jetbrains.kotlin.kapt'
-    // ===== AUDIOBOOK FEATURE =====
-    implementation "com.itextpdf:itextg:5.5.10"
-    implementation "androidx.compose.material:material-icons-extended:1.7.5"
-    implementation "androidx.documentfile:documentfile:1.0.1"
 }
 
 def deepseekKey = System.getenv("DEEPSEEK_API_KEY") ?: (project.hasProperty("DEEPSEEK_API_KEY") ? project.property("DEEPSEEK_API_KEY") : "")
@@ -43,6 +39,7 @@ versionCode 140
 dependencies {
     implementation "androidx.compose.runtime:runtime-saveable"
     implementation "org.jsoup:jsoup:1.17.2"
+  implementation "androidx.compose.material:material-icons-extended"
   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1"
   implementation "com.google.firebase:firebase-messaging:24.0.0"
   implementation platform("androidx.compose:compose-bom:2024.06.00")

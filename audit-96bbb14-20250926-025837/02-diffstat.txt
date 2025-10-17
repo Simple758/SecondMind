@@ -1,0 +1,17 @@
+ .../9.0.0/executionHistory/executionHistory.bin    | Bin 0 -> 19605 bytes
+ .../9.0.0/executionHistory/executionHistory.lock   | Bin 0 -> 17 bytes
+ .gradle/9.0.0/fileHashes/fileHashes.bin            | Bin 0 -> 18697 bytes
+ .gradle/9.0.0/fileHashes/fileHashes.lock           | Bin 17 -> 17 bytes
+ .gradle/buildOutputCleanup/buildOutputCleanup.lock | Bin 17 -> 17 bytes
+ .gradle/buildOutputCleanup/outputFiles.bin         | Bin 0 -> 18731 bytes
+ app/src/main/AndroidManifest.xml                   |   1 -
+ .../java/com/secondmind/minimal/MainActivity.kt    | 311 +++++++++++++++------
+ .../com/secondmind/minimal/ui/DrawerContent.kt     |  52 ++++
+ .../com/secondmind/minimal/ui/NavigationRoutes.kt  |  10 +
+ diagnose.sh                                        | 112 ++++++++
+ gradle/wrapper/gradle-wrapper.jar                  | Bin 0 -> 45457 bytes
+ gradle/wrapper/gradle-wrapper.properties           |   7 +
+ gradlew                                            | 251 +++++++++++++++++
+ gradlew.bat                                        |  94 +++++++
+ tools/fix_mainactivity_l402.sh                     |  26 ++
+ 16 files changed, 771 insertions(+), 93 deletions(-)

@@ -1,0 +1,13 @@
+// ============================================
+// FILE: MainActivity.kt (PATCH)
+// ============================================
+
+// Inside your NavHost, add:
+// composable(NavigationRoutes.AUDIOBOOKS) {
+//     val vm = remember { AudiobookViewModel() }
+//     AudiobookScreen(vm = vm, onOpenPlayer = {
+//         vm.state.value.current?.let { book ->
+//             // Navigate to a player composable or show a dialog
+//         }
+//     })
+// }

@@ -1,0 +1,7 @@
+// ============================================
+// FILE: app/src/main/AndroidManifest.xml (PATCH)
+// ============================================
+
+<!-- Add permissions (Note: on Android 10+ prefer SAF; these may be ignored) -->
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />

@@ -1,0 +1,16 @@
+A	.gradle/9.0.0/executionHistory/executionHistory.bin
+A	.gradle/9.0.0/executionHistory/executionHistory.lock
+A	.gradle/9.0.0/fileHashes/fileHashes.bin
+M	.gradle/9.0.0/fileHashes/fileHashes.lock
+M	.gradle/buildOutputCleanup/buildOutputCleanup.lock
+A	.gradle/buildOutputCleanup/outputFiles.bin
+M	app/src/main/AndroidManifest.xml
+M	app/src/main/java/com/secondmind/minimal/MainActivity.kt
+A	app/src/main/java/com/secondmind/minimal/ui/DrawerContent.kt
+A	app/src/main/java/com/secondmind/minimal/ui/NavigationRoutes.kt
+A	diagnose.sh
+A	gradle/wrapper/gradle-wrapper.jar
+A	gradle/wrapper/gradle-wrapper.properties
+A	gradlew
+A	gradlew.bat
+A	tools/fix_mainactivity_l402.sh

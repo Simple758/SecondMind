@@ -1,0 +1,6 @@
+// ============================================
+// FILE: ui/NavigationRoutes.kt (PATCH)
+// ============================================
+
+// Add this constant to your existing routes object/file:
+// const val AUDIOBOOKS = "audiobooks"

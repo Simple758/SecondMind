@@ -1,0 +1,12 @@
+// ============================================
+// FILE: ui/DrawerContent.kt (PATCH)
+// ============================================
+
+// Add this DrawerItem (ensure you have material-icons-extended dependency)
+// import androidx.compose.material.icons.Icons
+// import androidx.compose.material.icons.filled.MenuBook
+// DrawerItem(
+//     icon = Icons.Filled.MenuBook,
+//     label = "Audiobooks",
+//     route = NavigationRoutes.AUDIOBOOKS
+// )

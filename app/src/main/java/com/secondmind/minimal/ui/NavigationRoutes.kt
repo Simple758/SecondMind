@@ -8,4 +8,5 @@ object NavigationRoutes {
     const val SETTINGS = "settings"
     const val DEVELOPER = "developer"
   const val WIKI = "wiki"
+const val AUDIOBOOKS = "audiobooks"
 }

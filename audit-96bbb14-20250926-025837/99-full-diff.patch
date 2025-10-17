@@ -1,0 +1,1073 @@
+diff --git a/.gradle/9.0.0/executionHistory/executionHistory.bin b/.gradle/9.0.0/executionHistory/executionHistory.bin
+new file mode 100644
+index 0000000..6660d65
+Binary files /dev/null and b/.gradle/9.0.0/executionHistory/executionHistory.bin differ
+diff --git a/.gradle/9.0.0/executionHistory/executionHistory.lock b/.gradle/9.0.0/executionHistory/executionHistory.lock
+new file mode 100644
+index 0000000..5998c7f
+Binary files /dev/null and b/.gradle/9.0.0/executionHistory/executionHistory.lock differ
+diff --git a/.gradle/9.0.0/fileHashes/fileHashes.bin b/.gradle/9.0.0/fileHashes/fileHashes.bin
+new file mode 100644
+index 0000000..f5a77d2
+Binary files /dev/null and b/.gradle/9.0.0/fileHashes/fileHashes.bin differ
+diff --git a/.gradle/9.0.0/fileHashes/fileHashes.lock b/.gradle/9.0.0/fileHashes/fileHashes.lock
+index 522893a..cc04dc6 100644
+Binary files a/.gradle/9.0.0/fileHashes/fileHashes.lock and b/.gradle/9.0.0/fileHashes/fileHashes.lock differ
+diff --git a/.gradle/buildOutputCleanup/buildOutputCleanup.lock b/.gradle/buildOutputCleanup/buildOutputCleanup.lock
+index 0c497da..aa9d993 100644
+Binary files a/.gradle/buildOutputCleanup/buildOutputCleanup.lock and b/.gradle/buildOutputCleanup/buildOutputCleanup.lock differ
+diff --git a/.gradle/buildOutputCleanup/outputFiles.bin b/.gradle/buildOutputCleanup/outputFiles.bin
+new file mode 100644
+index 0000000..4a318dc
+Binary files /dev/null and b/.gradle/buildOutputCleanup/outputFiles.bin differ
+diff --git a/app/src/main/AndroidManifest.xml b/app/src/main/AndroidManifest.xml
+index 032bef8..4b42d9d 100644
+--- a/app/src/main/AndroidManifest.xml
++++ b/app/src/main/AndroidManifest.xml
+@@ -49,7 +49,6 @@
+ 
+   <!-- ===== POWER-CAPABILITIES START (managed) ===== -->
+   <!-- Core device/network controls -->
+-  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+   <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+   <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+   <uses-permission android:name="android.permission.VIBRATE"/>
+diff --git a/app/src/main/java/com/secondmind/minimal/MainActivity.kt b/app/src/main/java/com/secondmind/minimal/MainActivity.kt
+index e5bc8b0..3a78c71 100644
+--- a/app/src/main/java/com/secondmind/minimal/MainActivity.kt
++++ b/app/src/main/java/com/secondmind/minimal/MainActivity.kt
+@@ -1,7 +1,10 @@
+ @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+     
+ package com.secondmind.minimal
++import com.secondmind.minimal.SettingsScreen
++import com.secondmind.minimal.ui.NavigationRoutes
+ import androidx.compose.ui.graphics.Color
++import androidx.navigation.compose.currentBackStackEntryAsState
+ 
+ import androidx.compose.runtime.getValue
+ import androidx.compose.material3.lightColorScheme
+@@ -9,8 +12,6 @@ import androidx.compose.material3.darkColorScheme
+ import androidx.compose.material3.MaterialTheme
+ import androidx.compose.foundation.layout.imePadding
+ import androidx.compose.foundation.layout.heightIn
+-import androidx.compose.material3.DropdownMenuItem
+-import androidx.compose.material3.DropdownMenu
+ import androidx.compose.material3.IconButton
+ import androidx.compose.material3.Icon
+ import android.Manifest
+@@ -61,6 +62,9 @@ import kotlinx.coroutines.flow.map
+ import kotlinx.coroutines.launch
+ import com.secondmind.minimal.news.NewsPanel
+ import androidx.compose.foundation.lazy.LazyColumn
++import androidx.compose.material3.ModalNavigationDrawer
++import androidx.compose.material3.rememberDrawerState
++import androidx.compose.material3.DrawerValue
+ class MainActivity : ComponentActivity() {
+   override fun onCreate(savedInstanceState: Bundle?) {
+     super.onCreate(savedInstanceState)
+@@ -69,45 +73,95 @@ class MainActivity : ComponentActivity() {
+     
+ val mode by rememberThemeMode()
+       val dark = when (mode) { "dark" -> true; "light" -> false; else -> isSystemInDarkTheme() }
+-      val scheme = if (dark) darkColorScheme() else lightColorScheme()
++
++val scheme = if (dark) darkColorScheme() else lightColorScheme()
+       MaterialTheme(colorScheme = scheme) { AppNav() }
+-  }
++
++}
++
+ //   private fun ensureChannel() {
+ //     if (Build.VERSION.SDK_INT >= 26) {
+ //       val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+ //       nm.createNotificationChannel(NotificationChannel("sm", "SecondMind", NotificationManager.IMPORTANCE_DEFAULT))
+ //     }
+-  }
++
+ }
++
++}
++
+ @Composable
+ fun rememberThemeMode(): State<String> {
+   val ctx = LocalContext.current
+-  val flow = remember { ctx.dataStore.data.map { it[Keys.THEME] ?: "system" } }
+-  return flow.collectAsState(initial = "system")
++  val flow = remember { ctx.dataStore.data.map { it[Keys.THEME] ?: "system" }
++
++}
++
++return flow.collectAsState(initial = "system")
+ }
++
+ @Composable
+ fun AppNav() {
+   val nav = rememberNavController()
+-  Scaffold(containerColor = Color.Black, topBar = { TopBarWithMenu(nav) }) { pad ->
++  val drawerState = rememberDrawerState(DrawerValue.Closed)
++  val backstack by nav.currentBackStackEntryAsState()
++  val currentRoute = backstack?.destination?.route?.substringBefore("/") ?: com.secondmind.minimal.ui.NavigationRoutes.HOME
+ 
+-Box(Modifier.fillMaxSize().padding(pad)) {
+-    
+-NavHost(nav, startDestination = "home", modifier = Modifier.fillMaxSize()) {
+-      composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }, onInbox = { nav.navigate("inbox") }, onOpenNews = { nav.navigate("news") }) }
+-      composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }) }
+-      composable("inbox") { InboxScreen() }
+-      composable("news") { com.secondmind.minimal.news.NewsPanel(modifier = Modifier.fillMaxSize()) }
+-      composable(
+-        route = "notification/{id}",
+-        arguments = listOf(navArgument("id"){ type = NavType.LongType })
+-      ) { back ->
+-        val id = back.arguments?.getLong("id") ?: -1L
+-        DetailsScreen(id)
+-      }
++  ModalNavigationDrawer(
++    drawerState = drawerState,
++    drawerContent = {
++      com.secondmind.minimal.ui.DrawerContent(
++        selectedRoute = currentRoute,
++        onDestinationClicked = { route -> nav.navigate(route) { launchSingleTop = true }
++
++}
++
++,
++        drawerState = drawerState
++      )
+     }
+-  }
++
++) {
++    Scaffold(containerColor = Color.Black, topBar = { }
++
++) { pad ->
++      Box(Modifier.fillMaxSize().padding(pad)) {
++        NavHost(nav, startDestination = "home", modifier = Modifier.fillMaxSize()) {
++              composable("home") { HomeScreen(onSettings = { nav.navigate("settings") }
++
++, onInbox = { nav.navigate("inbox") }
++
++, onOpenNews = { nav.navigate("news") }
++
++) }
++
++composable("settings") { SettingsScreen(onBack = { nav.popBackStack() }
++
++) }
++
++composable("inbox") { InboxScreen() }
++
++composable("news") { com.secondmind.minimal.news.NewsPanel(modifier = Modifier.fillMaxSize()) }
++
++composable(
++                route = "notification/{id}  ",
++                arguments = listOf(navArgument("id"){ type = NavType.LongType }
++
++)
++              ) { back ->
++                val id = back.arguments?.getLong("id") ?: -1L
++                DetailsScreen(id)
++              }
++
++}
++
+ }
++
++}
++
++}
++
+ }
++
+ @Composable
+ fun titleFor(nav: NavHostController): String {
+   val e by nav.currentBackStackEntryAsState()
+@@ -117,7 +171,9 @@ fun titleFor(nav: NavHostController): String {
+     "notification" -> "Details"
+     else -> "SecondMind"
+   }
++
+ }
++
+ private fun showLocalNotification(ctx: Context) {
+   val n = NotificationCompat.Builder(ctx, "sm")
+     .setContentTitle("SecondMind")
+@@ -126,6 +182,7 @@ private fun showLocalNotification(ctx: Context) {
+     .build()
+   NotificationManagerCompat.from(ctx).notify(1, n)
+ }
++
+ @Composable
+ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit, onOpenNews: () -> Unit) {
+   androidx.compose.foundation.layout.Column(
+@@ -141,27 +198,44 @@ fun HomeScreen(onSettings: () -> Unit, onInbox: () -> Unit, onOpenNews: () -> Un
+     androidx.compose.material3.OutlinedButton(onClick = onInbox) {
+       androidx.compose.material3.Text("Inbox")
+     }
+-    androidx.compose.material3.OutlinedButton(onClick = onSettings) {
++
++androidx.compose.material3.OutlinedButton(onClick = onSettings) {
+       androidx.compose.material3.Text("Settings")
+     }
+-  }
+ 
+-  com.secondmind.minimal.home.HomeCarousel(
++}
++
++com.secondmind.minimal.home.HomeCarousel(
+     modifier = androidx.compose.ui.Modifier.fillMaxSize(),
+     onOpenNews = onOpenNews
+   )
+ }
+-}
++
+ @Composable
+ fun SettingsScreen(onBack: () -> Unit) {
+   val ctx = LocalContext.current
+   val scope = rememberCoroutineScope()
+-  val themeFlow = remember { ctx.dataStore.data.map { it[Keys.THEME] ?: "system" } }
+-  val retentionFlow = remember { ctx.dataStore.data.map { it[Keys.RETENTION_DAYS] ?: 7 } }
+-  val enabledFlow = remember { ctx.dataStore.data.map { it[Keys.READER_ENABLED] ?: true } }
+-  val rateFlow = remember { ctx.dataStore.data.map { it[Keys.READER_RATE] ?: 1.0f } }
+-  val pitchFlow = remember { ctx.dataStore.data.map { it[Keys.READER_PITCH] ?: 1.0f } }
+-  val theme by themeFlow.collectAsState(initial = "system")
++  val themeFlow = remember { ctx.dataStore.data.map { it[Keys.THEME] ?: "system" }
++
++}
++
++val retentionFlow = remember { ctx.dataStore.data.map { it[Keys.RETENTION_DAYS] ?: 7 }
++
++}
++
++val enabledFlow = remember { ctx.dataStore.data.map { it[Keys.READER_ENABLED] ?: true }
++
++}
++
++val rateFlow = remember { ctx.dataStore.data.map { it[Keys.READER_RATE] ?: 1.0f }
++
++}
++
++val pitchFlow = remember { ctx.dataStore.data.map { it[Keys.READER_PITCH] ?: 1.0f }
++
++}
++
++val theme by themeFlow.collectAsState(initial = "system")
+   val retention by retentionFlow.collectAsState(initial = 7)
+   val readerEnabled by enabledFlow.collectAsState(initial = true)
+   val readerRate by rateFlow.collectAsState(initial = 1.0f)
+@@ -169,7 +243,8 @@ fun SettingsScreen(onBack: () -> Unit) {
+   LaunchedEffect(readerEnabled, readerRate, readerPitch) {
+     Reader.updateConfig(readerEnabled, readerRate, readerPitch, ctx)
+   }
+-  Box(
++
++Box(
+     Modifier.fillMaxSize()
+       
+       .imePadding()
+@@ -181,55 +256,124 @@ fun SettingsScreen(onBack: () -> Unit) {
+     ) {
+       Text("Settings", fontSize = 22.sp)
+       Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+-        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "system" } } }) { Text("System") }
+-        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "light" } } }) { Text("Light") }
+-        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "dark" } } }) { Text("Dark") }
+-      }
+-      Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
++        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "system" }
++
++}
++
++}
++
++) { Text("System") }
++
++OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "light" }
++
++}
++
++}
++
++) { Text("Light") }
++
++OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.THEME] = "dark" }
++
++}
++
++}
++
++) { Text("Dark") }
++
++}
++
++Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+         Text("Retention (days): $retention")
+-        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.RETENTION_DAYS] = maxOf(1, retention - 1) } } }) { Text("-") }
+-        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.RETENTION_DAYS] = retention + 1 } } }) { Text("+") }
+-      }
+-      Divider()
++        OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.RETENTION_DAYS] = maxOf(1, retention - 1) }
++
++}
++
++}
++
++) { Text("-") }
++
++OutlinedButton(onClick = { scope.launch { ctx.dataStore.edit { it[Keys.RETENTION_DAYS] = retention + 1 }
++
++}
++
++}
++
++) { Text("+") }
++
++}
++
++Divider()
+       Text("Reader", style = MaterialTheme.typography.titleMedium)
+       val idText = remember {
+         android.content.ComponentName(
+           ctx, com.secondmind.minimal.access.SecondMindAccessibilityService::class.java
+         ).flattenToString()
+       }
+-      val enabledNow = remember {
++
++val enabledNow = remember {
+         val v = android.provider.Settings.Secure.getString(
+           ctx.contentResolver,
+           android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+         )
+         v?.contains(idText) == true
+       }
+-      Text("Accessibility: " + if (enabledNow) "ON" else "OFF")
++
++Text("Accessibility: " + if (enabledNow) "ON" else "OFF")
+       Text("Service ID: " + idText, fontSize = 12.sp)
+       Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+         Text("Enabled")
+-        Switch(checked = readerEnabled, onCheckedChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_ENABLED] = v } } })
++        Switch(checked = readerEnabled, onCheckedChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_ENABLED] = v }
++
++}
++
++}
++
++)
+       }
+-      Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+-        Text("Rate: ${"%.2f".format(readerRate)}")
++
++Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
++        Text("Rate: ${"%.2f".format(readerRate)}  ")
+         Slider(value = readerRate,
+-               onValueChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_RATE] = v.coerceIn(0.5f, 1.5f) } } },
++               onValueChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_RATE] = v.coerceIn(0.5f, 1.5f) }
++
++}
++
++}
++
++,
+                valueRange = 0.5f..1.5f, steps = 10)
+-        Text("Pitch: ${"%.2f".format(readerPitch)}")
++        Text("Pitch: ${"%.2f".format(readerPitch)}  ")
+         Slider(value = readerPitch,
+-               onValueChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_PITCH] = v.coerceIn(0.5f, 1.5f) } } },
++               onValueChange = { v -> scope.launch { ctx.dataStore.edit { it[Keys.READER_PITCH] = v.coerceIn(0.5f, 1.5f) }
++
++}
++
++}
++
++,
+                valueRange = 0.5f..1.5f, steps = 10)
+       }
+-      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
++
++Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+         com.secondmind.minimal.ui.TtsSettings()
+-        OutlinedButton(onClick = { com.secondmind.minimal.tts.Reader.stop() }) { Text("Stop reading") }
+-        OutlinedButton(onClick = { Reader.speak(ctx, "This is a test of the SecondMind reader.") }) { Text("Test Read") }
+-        OutlinedButton(onClick = {
++        OutlinedButton(onClick = { com.secondmind.minimal.tts.Reader.stop() }
++
++) { Text("Stop reading") }
++
++OutlinedButton(onClick = { Reader.speak(ctx, "This is a test of the SecondMind reader.") }
++
++) { Text("Test Read") }
++
++OutlinedButton(onClick = {
+           val i = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+           ctx.startActivity(i)
+-        }) { Text("Open Accessibility Settings") }
+-      }
+-      Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
++        }
++
++) { Text("Open Accessibility Settings") }
++
++}
++
++Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+         OutlinedButton(onClick = {
+           val ctx2 = ctx
+           try {
+@@ -237,40 +381,23 @@ fun SettingsScreen(onBack: () -> Unit) {
+             val i = android.content.Intent("android.settings.ACCESSIBILITY_DETAILS_SETTINGS")
+             i.putExtra("android.provider.extra.EXTRA_ACCESSIBILITY_COMPONENT_NAME", cn.flattenToString())
+             ctx2.startActivity(i)
+-          } catch (e: Throwable) {
++          }
++
++catch (e: Throwable) {
+             ctx2.startActivity(android.content.Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS))
+           }
+-        }) { Text("Toggle My Accessibility") }
+-      }
+-      OutlinedButton(onClick = onBack) { Text("Back") }
+-    }
+-  }
++
++}
++
++) { Text("Toggle My Accessibility") }
++
++}
++
++OutlinedButton(onClick = onBack) { Text("Back") }
++
++}
++
++}
++
++}
+ }
+-@Composable
+-fun TopBarWithMenu(nav: NavHostController) {
+-  var open by remember { mutableStateOf(false) }
+-  CenterAlignedTopAppBar(
+-    title = { Text(titleFor(nav)) },
+-    navigationIcon = {
+-      Box {
+-        IconButton(onClick = { open = true }) {
+-          Icon(Icons.Filled.Menu, contentDescription = "Menu")
+-        }
+-        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+-          DropdownMenuItem(text = { Text("Home") }, onClick = {
+-            open = false
+-            nav.navigate("home") { launchSingleTop = true }
+-          })
+-          DropdownMenuItem(text = { Text("Inbox") }, onClick = {
+-            open = false
+-            nav.navigate("inbox")
+-          })
+-          DropdownMenuItem(text = { Text("Settings") }, onClick = {
+-            open = false
+-            nav.navigate("settings")
+-          })
+-        }
+-      }
+-    }
+-  )
+-    }
+diff --git a/app/src/main/java/com/secondmind/minimal/ui/DrawerContent.kt b/app/src/main/java/com/secondmind/minimal/ui/DrawerContent.kt
+new file mode 100644
+index 0000000..1e59b6a
+--- /dev/null
++++ b/app/src/main/java/com/secondmind/minimal/ui/DrawerContent.kt
+@@ -0,0 +1,52 @@
++package com.secondmind.minimal.ui
++
++import androidx.compose.material.icons.Icons
++import androidx.compose.material.icons.filled.Home
++import androidx.compose.material.icons.filled.Article
++import androidx.compose.material.icons.filled.TrendingUp
++import androidx.compose.material.icons.filled.Mail
++import androidx.compose.material.icons.filled.Settings
++import androidx.compose.material.icons.filled.Build
++import androidx.compose.material3.DrawerState
++import androidx.compose.material3.ModalDrawerSheet
++import androidx.compose.material3.NavigationDrawerItem
++import androidx.compose.material3.Text
++import androidx.compose.runtime.Composable
++import androidx.compose.runtime.rememberCoroutineScope
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.graphics.vector.ImageVector
++import kotlinx.coroutines.launch
++
++data class DrawerItem(val label: String, val icon: ImageVector, val route: String)
++
++private val items = listOf(
++    DrawerItem("Home", Icons.Filled.Home, NavigationRoutes.HOME),
++    DrawerItem("News", Icons.Filled.Article, NavigationRoutes.NEWS),
++    DrawerItem("Markets", Icons.Filled.TrendingUp, NavigationRoutes.MARKETS),
++    DrawerItem("Inbox", Icons.Filled.Mail, NavigationRoutes.INBOX),
++    DrawerItem("Settings", Icons.Filled.Settings, NavigationRoutes.SETTINGS),
++    DrawerItem("Developer", Icons.Filled.Build, NavigationRoutes.DEVELOPER),
++)
++
++@Composable
++fun DrawerContent(
++    selectedRoute: String,
++    onDestinationClicked: (String) -> Unit,
++    drawerState: DrawerState,
++    modifier: Modifier = Modifier,
++) {
++    val scope = rememberCoroutineScope()
++    ModalDrawerSheet(modifier = modifier) {
++        items.forEach { item ->
++            NavigationDrawerItem(
++                icon = { androidx.compose.material3.Icon(item.icon, contentDescription = item.label) },
++                label = { Text(item.label) },
++                selected = item.route == selectedRoute,
++                onClick = {
++                    scope.launch { drawerState.close() }
++                    onDestinationClicked(item.route)
++                }
++            )
++        }
++    }
++}
+diff --git a/app/src/main/java/com/secondmind/minimal/ui/NavigationRoutes.kt b/app/src/main/java/com/secondmind/minimal/ui/NavigationRoutes.kt
+new file mode 100644
+index 0000000..ee7b796
+--- /dev/null
++++ b/app/src/main/java/com/secondmind/minimal/ui/NavigationRoutes.kt
+@@ -0,0 +1,10 @@
++package com.secondmind.minimal.ui
++
++object NavigationRoutes {
++    const val HOME = "home"
++    const val NEWS = "news"
++    const val MARKETS = "markets"
++    const val INBOX = "inbox"
++    const val SETTINGS = "settings"
++    const val DEVELOPER = "developer"
++}
+diff --git a/diagnose.sh b/diagnose.sh
+new file mode 100755
+index 0000000..cd16fb9
+--- /dev/null
++++ b/diagnose.sh
+@@ -0,0 +1,112 @@
++#!/usr/bin/env bash
++set -u
++cd ~/SecondMind || exit 1
++
++MAIN="app/src/main/java/com/secondmind/minimal/MainActivity.kt"
++MANI="app/src/main/AndroidManifest.xml"
++
++[ -f "$MAIN" ] || { echo "❌ Missing: $MAIN"; exit 1; }
++
++echo "== File info =="
++echo "  $(wc -l < "$MAIN") lines — $MAIN"
++
++echo
++echo "== Context around likely lines (240 260 264 268 270 300) =="
++for L in 240 260 264 268 270 300; do
++  total=$(wc -l < "$MAIN")
++  [ "$L" -le "$total" ] || continue
++  s=$((L-12)); [ $s -lt 1 ] && s=1
++  e=$((L+12)); [ $e -gt $total ] && e=$total
++  echo "-- near line $L --"
++  nl -ba "$MAIN" | sed -n "${s},${e}p"
++done
++
++echo
++echo "== Tail 40 lines =="
++nl -ba "$MAIN" | tail -n 40
++
++echo
++echo "== Whole-file balance (braces & parens) =="
++awk 'BEGIN{b=0;p=0;bad=0}
++{
++  lb=gsub(/\{/,"{"); rb=gsub(/\}/,"}");
++  lp=gsub(/\(/,"("); rp=gsub(/\)/,")");
++  b+=lb-rb; p+=lp-rp;
++  if (b<0 || p<0) {
++    printf("  NEGATIVE depth at line %d (braces=%d, parens=%d): %s\n", NR,b,p,$0);
++    bad=1
++  }
++}
++END{
++  printf("  Totals: braces=%d, parens=%d\n", b,p);
++  if(bad==0) print "  OK: never went negative";
++}' "$MAIN"
++
++echo
++echo "== Suspicious sequences =="
++if ! grep -nE '}\s*@Composable' "$MAIN"; then echo "  (none for '} @Composable')"; fi
++if ! grep -nE '^\s*\)\s*$' "$MAIN"; then echo "  (no lone \")\" lines)"; fi
++echo "  closing-brace-only lines at:"
++grep -nE '^\s*\}\s*$' "$MAIN" || echo "  (none)"
++
++echo
++echo "== AppNav() block range =="
++awk '
++BEGIN{inb=0;depth=0;start=0;seenBrace=0}
++{
++  if(inb==0 && $0 ~ /^[[:space:]]*fun[[:space:]]+AppNav[[:space:]]*\(/){
++    inb=1; start=NR;
++  }
++  if(inb==1){
++    ob=gsub(/\{/,"{"); cb=gsub(/\}/,"}");
++    if(ob>0) seenBrace=1
++    depth+=ob-cb;
++    if(seenBrace==1 && depth<=0){ print "  AppNav range: " start " .. " NR; exit }
++  }
++}
++END{ if(inb==1) print "  AppNav appears unterminated from line " start; }
++' "$MAIN"
++
++echo
++echo "== Counts inside AppNav (Drawer/Scaffold/NavHost) =="
++awk '
++BEGIN{inb=0;depth=0;start=0;drawer=0;scaf=0;navh=0;seenBrace=0}
++{
++  if(inb==0 && $0 ~ /^[[:space:]]*fun[[:space:]]+AppNav[[:space:]]*\(/){
++    inb=1; start=NR;
++  }
++  if(inb==1){
++    if($0 ~ /ModalNavigationDrawer\(/) drawer++
++    if($0 ~ /Scaffold\(/) scaf++
++    if($0 ~ /NavHost\(/) navh++
++    ob=gsub(/\{/,"{"); cb=gsub(/\}/,"}"); if(ob>0) seenBrace=1; depth+=ob-cb
++    if(seenBrace==1 && depth<=0){
++      printf("  Drawer=%d, Scaffold=%d, NavHost=%d  (lines %d..%d)\n", drawer, scaf, navh, start, NR)
++      exit
++    }
++  }
++}
++END{ if(inb==1) printf("  Unterminated: Drawer=%d, Scaffold=%d, NavHost=%d\n", drawer, scaf, navh) }
++' "$MAIN"
++
++echo
++echo "== Import checks =="
++if grep -q 'currentBackStackEntryAsState' "$MAIN"; then
++  if grep -q '^import androidx.navigation.compose.currentBackStackEntryAsState' "$MAIN"; then
++    echo "  ✓ backstack import present"
++  else
++    echo "  ❌ Missing import: androidx.navigation.compose.currentBackStackEntryAsState"
++  fi
++else
++  echo "  (backstack state not used)"
++fi
++
++echo
++echo "== Manifest duplicates =="
++if [ -f "$MANI" ]; then
++  grep -n 'ACCESS_NETWORK_STATE' "$MANI" || true
++  cnt=$(grep -c 'ACCESS_NETWORK_STATE' "$MANI" || true)
++  [ "$cnt" -gt 1 ] && echo "  ⚠️ Duplicate permission detected ($cnt times)"
++else
++  echo "  (manifest not found)"
++fi
+diff --git a/gradle/wrapper/gradle-wrapper.jar b/gradle/wrapper/gradle-wrapper.jar
+new file mode 100644
+index 0000000..8bdaf60
+Binary files /dev/null and b/gradle/wrapper/gradle-wrapper.jar differ
+diff --git a/gradle/wrapper/gradle-wrapper.properties b/gradle/wrapper/gradle-wrapper.properties
+new file mode 100644
+index 0000000..2a84e18
+--- /dev/null
++++ b/gradle/wrapper/gradle-wrapper.properties
+@@ -0,0 +1,7 @@
++distributionBase=GRADLE_USER_HOME
++distributionPath=wrapper/dists
++distributionUrl=https\://services.gradle.org/distributions/gradle-9.0.0-bin.zip
++networkTimeout=10000
++validateDistributionUrl=true
++zipStoreBase=GRADLE_USER_HOME
++zipStorePath=wrapper/dists
+diff --git a/gradlew b/gradlew
+new file mode 100755
+index 0000000..ef07e01
+--- /dev/null
++++ b/gradlew
+@@ -0,0 +1,251 @@
++#!/bin/sh
++
++#
++# Copyright © 2015 the original authors.
++#
++# Licensed under the Apache License, Version 2.0 (the "License");
++# you may not use this file except in compliance with the License.
++# You may obtain a copy of the License at
++#
++#      https://www.apache.org/licenses/LICENSE-2.0
++#
++# Unless required by applicable law or agreed to in writing, software
++# distributed under the License is distributed on an "AS IS" BASIS,
++# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++# See the License for the specific language governing permissions and
++# limitations under the License.
++#
++# SPDX-License-Identifier: Apache-2.0
++#
++
++##############################################################################
++#
++#   Gradle start up script for POSIX generated by Gradle.
++#
++#   Important for running:
++#
++#   (1) You need a POSIX-compliant shell to run this script. If your /bin/sh is
++#       noncompliant, but you have some other compliant shell such as ksh or
++#       bash, then to run this script, type that shell name before the whole
++#       command line, like:
++#
++#           ksh Gradle
++#
++#       Busybox and similar reduced shells will NOT work, because this script
++#       requires all of these POSIX shell features:
++#         * functions;
++#         * expansions «$var», «${var}», «${var:-default}», «${var+SET}»,
++#           «${var#prefix}», «${var%suffix}», and «$( cmd )»;
++#         * compound commands having a testable exit status, especially «case»;
++#         * various built-in commands including «command», «set», and «ulimit».
++#
++#   Important for patching:
++#
++#   (2) This script targets any POSIX shell, so it avoids extensions provided
++#       by Bash, Ksh, etc; in particular arrays are avoided.
++#
++#       The "traditional" practice of packing multiple parameters into a
++#       space-separated string is a well documented source of bugs and security
++#       problems, so this is (mostly) avoided, by progressively accumulating
++#       options in "$@", and eventually passing that to Java.
++#
++#       Where the inherited environment variables (DEFAULT_JVM_OPTS, JAVA_OPTS,
++#       and GRADLE_OPTS) rely on word-splitting, this is performed explicitly;
++#       see the in-line comments for details.
++#
++#       There are tweaks for specific operating systems such as AIX, CygWin,
++#       Darwin, MinGW, and NonStop.
++#
++#   (3) This script is generated from the Groovy template
++#       https://github.com/gradle/gradle/blob/HEAD/platforms/jvm/plugins-application/src/main/resources/org/gradle/api/internal/plugins/unixStartScript.txt
++#       within the Gradle project.
++#
++#       You can find Gradle at https://github.com/gradle/gradle/.
++#
++##############################################################################
++
++# Attempt to set APP_HOME
++
++# Resolve links: $0 may be a link
++app_path=$0
++
++# Need this for daisy-chained symlinks.
++while
++    APP_HOME=${app_path%"${app_path##*/}"}  # leaves a trailing /; empty if no leading path
++    [ -h "$app_path" ]
++do
++    ls=$( ls -ld "$app_path" )
++    link=${ls#*' -> '}
++    case $link in             #(
++      /*)   app_path=$link ;; #(
++      *)    app_path=$APP_HOME$link ;;
++    esac
++done
++
++# This is normally unused
++# shellcheck disable=SC2034
++APP_BASE_NAME=${0##*/}
++# Discard cd standard output in case $CDPATH is set (https://github.com/gradle/gradle/issues/25036)
++APP_HOME=$( cd -P "${APP_HOME:-./}" > /dev/null && printf '%s\n' "$PWD" ) || exit
++
++# Use the maximum available, or set MAX_FD != -1 to use that value.
++MAX_FD=maximum
++
++warn () {
++    echo "$*"
++} >&2
++
++die () {
++    echo
++    echo "$*"
++    echo
++    exit 1
++} >&2
++
++# OS specific support (must be 'true' or 'false').
++cygwin=false
++msys=false
++darwin=false
++nonstop=false
++case "$( uname )" in                #(
++  CYGWIN* )         cygwin=true  ;; #(
++  Darwin* )         darwin=true  ;; #(
++  MSYS* | MINGW* )  msys=true    ;; #(
++  NONSTOP* )        nonstop=true ;;
++esac
++
++CLASSPATH="\\\"\\\""
++
++
++# Determine the Java command to use to start the JVM.
++if [ -n "$JAVA_HOME" ] ; then
++    if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
++        # IBM's JDK on AIX uses strange locations for the executables
++        JAVACMD=$JAVA_HOME/jre/sh/java
++    else
++        JAVACMD=$JAVA_HOME/bin/java
++    fi
++    if [ ! -x "$JAVACMD" ] ; then
++        die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
++
++Please set the JAVA_HOME variable in your environment to match the
++location of your Java installation."
++    fi
++else
++    JAVACMD=java
++    if ! command -v java >/dev/null 2>&1
++    then
++        die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
++
++Please set the JAVA_HOME variable in your environment to match the
++location of your Java installation."
++    fi
++fi
++
++# Increase the maximum file descriptors if we can.
++if ! "$cygwin" && ! "$darwin" && ! "$nonstop" ; then
++    case $MAX_FD in #(
++      max*)
++        # In POSIX sh, ulimit -H is undefined. That's why the result is checked to see if it worked.
++        # shellcheck disable=SC2039,SC3045
++        MAX_FD=$( ulimit -H -n ) ||
++            warn "Could not query maximum file descriptor limit"
++    esac
++    case $MAX_FD in  #(
++      '' | soft) :;; #(
++      *)
++        # In POSIX sh, ulimit -n is undefined. That's why the result is checked to see if it worked.
++        # shellcheck disable=SC2039,SC3045
++        ulimit -n "$MAX_FD" ||
++            warn "Could not set maximum file descriptor limit to $MAX_FD"
++    esac
++fi
++
++# Collect all arguments for the java command, stacking in reverse order:
++#   * args from the command line
++#   * the main class name
++#   * -classpath
++#   * -D...appname settings
++#   * --module-path (only if needed)
++#   * DEFAULT_JVM_OPTS, JAVA_OPTS, and GRADLE_OPTS environment variables.
++
++# For Cygwin or MSYS, switch paths to Windows format before running java
++if "$cygwin" || "$msys" ; then
++    APP_HOME=$( cygpath --path --mixed "$APP_HOME" )
++    CLASSPATH=$( cygpath --path --mixed "$CLASSPATH" )
++
++    JAVACMD=$( cygpath --unix "$JAVACMD" )
++
++    # Now convert the arguments - kludge to limit ourselves to /bin/sh
++    for arg do
++        if
++            case $arg in                                #(
++              -*)   false ;;                            # don't mess with options #(
++              /?*)  t=${arg#/} t=/${t%%/*}              # looks like a POSIX filepath
++                    [ -e "$t" ] ;;                      #(
++              *)    false ;;
++            esac
++        then
++            arg=$( cygpath --path --ignore --mixed "$arg" )
++        fi
++        # Roll the args list around exactly as many times as the number of
++        # args, so each arg winds up back in the position where it started, but
++        # possibly modified.
++        #
++        # NB: a `for` loop captures its iteration list before it begins, so
++        # changing the positional parameters here affects neither the number of
++        # iterations, nor the values presented in `arg`.
++        shift                   # remove old arg
++        set -- "$@" "$arg"      # push replacement arg
++    done
++fi
++
++
++# Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
++DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
++
++# Collect all arguments for the java command:
++#   * DEFAULT_JVM_OPTS, JAVA_OPTS, and optsEnvironmentVar are not allowed to contain shell fragments,
++#     and any embedded shellness will be escaped.
++#   * For example: A user cannot expect ${Hostname} to be expanded, as it is an environment variable and will be
++#     treated as '${Hostname}' itself on the command line.
++
++set -- \
++        "-Dorg.gradle.appname=$APP_BASE_NAME" \
++        -classpath "$CLASSPATH" \
++        -jar "$APP_HOME/gradle/wrapper/gradle-wrapper.jar" \
++        "$@"
++
++# Stop when "xargs" is not available.
++if ! command -v xargs >/dev/null 2>&1
++then
++    die "xargs is not available"
++fi
++
++# Use "xargs" to parse quoted args.
++#
++# With -n1 it outputs one arg per line, with the quotes and backslashes removed.
++#
++# In Bash we could simply go:
++#
++#   readarray ARGS < <( xargs -n1 <<<"$var" ) &&
++#   set -- "${ARGS[@]}" "$@"
++#
++# but POSIX shell has neither arrays nor command substitution, so instead we
++# post-process each arg (as a line of input to sed) to backslash-escape any
++# character that might be a shell metacharacter, then use eval to reverse
++# that process (while maintaining the separation between arguments), and wrap
++# the whole thing up as a single "set" statement.
++#
++# This will of course break if any of these variables contains a newline or
++# an unmatched quote.
++#
++
++eval "set -- $(
++        printf '%s\n' "$DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS" |
++        xargs -n1 |
++        sed ' s~[^-[:alnum:]+,./:=@_]~\\&~g; ' |
++        tr '\n' ' '
++    )" '"$@"'
++
++exec "$JAVACMD" "$@"
+diff --git a/gradlew.bat b/gradlew.bat
+new file mode 100644
+index 0000000..5eed7ee
+--- /dev/null
++++ b/gradlew.bat
+@@ -0,0 +1,94 @@
++@rem
++@rem Copyright 2015 the original author or authors.
++@rem
++@rem Licensed under the Apache License, Version 2.0 (the "License");
++@rem you may not use this file except in compliance with the License.
++@rem You may obtain a copy of the License at
++@rem
++@rem      https://www.apache.org/licenses/LICENSE-2.0
++@rem
++@rem Unless required by applicable law or agreed to in writing, software
++@rem distributed under the License is distributed on an "AS IS" BASIS,
++@rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++@rem See the License for the specific language governing permissions and
++@rem limitations under the License.
++@rem
++@rem SPDX-License-Identifier: Apache-2.0
++@rem
++
++@if "%DEBUG%"=="" @echo off
++@rem ##########################################################################
++@rem
++@rem  Gradle startup script for Windows
++@rem
++@rem ##########################################################################
++
++@rem Set local scope for the variables with windows NT shell
++if "%OS%"=="Windows_NT" setlocal
++
++set DIRNAME=%~dp0
++if "%DIRNAME%"=="" set DIRNAME=.
++@rem This is normally unused
++set APP_BASE_NAME=%~n0
++set APP_HOME=%DIRNAME%
++
++@rem Resolve any "." and ".." in APP_HOME to make it shorter.
++for %%i in ("%APP_HOME%") do set APP_HOME=%%~fi
++
++@rem Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
++set DEFAULT_JVM_OPTS="-Xmx64m" "-Xms64m"
++
++@rem Find java.exe
++if defined JAVA_HOME goto findJavaFromJavaHome
++
++set JAVA_EXE=java.exe
++%JAVA_EXE% -version >NUL 2>&1
++if %ERRORLEVEL% equ 0 goto execute
++
++echo. 1>&2
++echo ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH. 1>&2
++echo. 1>&2
++echo Please set the JAVA_HOME variable in your environment to match the 1>&2
++echo location of your Java installation. 1>&2
++
++goto fail
++
++:findJavaFromJavaHome
++set JAVA_HOME=%JAVA_HOME:"=%
++set JAVA_EXE=%JAVA_HOME%/bin/java.exe
++
++if exist "%JAVA_EXE%" goto execute
++
++echo. 1>&2
++echo ERROR: JAVA_HOME is set to an invalid directory: %JAVA_HOME% 1>&2
++echo. 1>&2
++echo Please set the JAVA_HOME variable in your environment to match the 1>&2
++echo location of your Java installation. 1>&2
++
++goto fail
++
++:execute
++@rem Setup the command line
++
++set CLASSPATH=
++
++
++@rem Execute Gradle
++"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -classpath "%CLASSPATH%" -jar "%APP_HOME%\gradle\wrapper\gradle-wrapper.jar" %*
++
++:end
++@rem End local scope for the variables with windows NT shell
++if %ERRORLEVEL% equ 0 goto mainEnd
++
++:fail
++rem Set variable GRADLE_EXIT_CONSOLE if you need the _script_ return code instead of
++rem the _cmd.exe /c_ return code!
++set EXIT_CODE=%ERRORLEVEL%
++if %EXIT_CODE% equ 0 set EXIT_CODE=1
++if not ""=="%GRADLE_EXIT_CONSOLE%" exit %EXIT_CODE%
++exit /b %EXIT_CODE%
++
++:mainEnd
++if "%OS%"=="Windows_NT" endlocal
++
++:omega
+diff --git a/tools/fix_mainactivity_l402.sh b/tools/fix_mainactivity_l402.sh
+new file mode 100644
+index 0000000..2611b89
+--- /dev/null
++++ b/tools/fix_mainactivity_l402.sh
+@@ -0,0 +1,26 @@
++#!/usr/bin/env bash
++set -Eeuo pipefail
++set +H
++
++# --- Locate files ---
++cd "/data/data/com.termux/files/home/SecondMind"
++MAIN="app/src/main/java/com/secondmind/minimal/MainActivity.kt"
++if [ -z "" ]; then
++  MAIN="app/src/main/java/com/secondmind/minimal/MainActivity.kt"
++fi
++[ -n "" ] || { echo "❌ MainActivity.kt not found under app/src/main/java"; exit 1; }
++
++TARGET=402
++WSTART=-10; [  -lt 1 ] && WSTART=1
++WEND=10
++tot=; [ "" -gt "" ] && WEND=""
++
++show_window () { sed -n ",p" "" | nl -ba; }
++
++echo "== BEFORE (-) =="
++show_window
++
++# --- Step 1: normalize quotes & invisible chars (safe/idempotent) ---
++if command -v perl >/dev/null 2>&1; then
++  tmp="/data/data/com.termux/files/usr/tmp/tmp.v6l6q89XPv"
++  perl -CSDA -pe tr/x{2018}x{2019}/x27x27/

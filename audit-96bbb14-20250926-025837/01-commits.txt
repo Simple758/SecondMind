@@ -1,0 +1,12 @@
+* 63da9bc (HEAD -> main, origin/main, origin/HEAD) Fix: wire SettingsScreen import into MainActivity; ensure NavigationRoutes import when needed; idempotent.
+* 306209e Fix: ensure SettingsScreen() exists to resolve unresolved reference; keep NavigationRoutes fully-qualified; idempotent.
+* 6d77a8a Fix: remove trailing lone "}" at EOF in MainActivity.kt; keep orphan @Composable removed
+* 0392f1e Chore: remove stray standalone @Composable near EOF; keep brace balance
+* bbc0f05 Fix: resolve "Expecting an expression" at MainActivity.kt EOF by removing stray @Composable and balancing braces; idempotent patch.
+* edc62dd (fix/eof-composable-20250926-013846) Fix: normalize quotes, join split strings, cleanup commas; dedupe ACCESS_NETWORK_STATE
+* 7892d67 Fix: resolve Kotlin syntax at ~L264 in MainActivity; dedupe ACCESS_NETWORK_STATE
+* 1bafdd2 Fix: remove extra brace before @Composable titleFor(); ensure backstack import
+* c1ca874 FINAL v3: robust AppNav() rewrite via Perl; single drawer wrapper; preserved NavHost; ensure imports; refresh DrawerContent & NavigationRoutes
+* d1cff00 Fix: remove duplicate ModalNavigationDrawer block; ensure single drawer wrapper in AppNav
+* 7fec502 UI: Replace dropdown with ChatGPT-style drawer (Home, News, Markets, Inbox, Settings, Developer). Add DrawerContent + NavigationRoutes.
+* 7733334 Replace dropdown menu with ChatGPT-style navigation drawer (Home, News, Markets, Inbox, Settings, Developer)
