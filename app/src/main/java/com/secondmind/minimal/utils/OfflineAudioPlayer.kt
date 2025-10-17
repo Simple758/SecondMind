@@ -1,72 +1,87 @@
-// ============================================
-// FILE: utils/OfflineAudioPlayer.kt
-// ============================================
-
 package com.secondmind.minimal.utils
 
 import android.media.MediaPlayer
 import android.media.PlaybackParams
-import java.io.File
+import android.os.Build
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import android.os.Handler
+import android.os.Looper
 
-/**
- * Simple wrapper around MediaPlayer for offline WAV playback with speed control (API 23+).
- */
 class OfflineAudioPlayer {
-
-    private var mp: MediaPlayer? = null
-
-    // Progress callback: (positionMs, durationMs)
-    var onProgress: ((Long, Long) -> Unit)? = null
+    private var player: MediaPlayer? = null
+    private val _isPlaying = MutableStateFlow(false)
+    val isPlaying: StateFlow<Boolean> = _isPlaying
+    
+    private val handler = Handler(Looper.getMainLooper())
+    private var progressCallback: ((Long, Long) -> Unit)? = null
 
     fun load(path: String) {
-        release()
-        val file = File(path)
-        val p = MediaPlayer()
-        p.setDataSource(file.absolutePath)
-        p.setOnPreparedListener { startProgress() }
-        p.prepareAsync()
-        mp = p
-    }
-
-    private fun startProgress() {
-        // Very light polling loop
-        Thread {
-            while (mp != null) {
-                try {
-                    val cur = mp!!.currentPosition.toLong()
-                    val dur = mp!!.duration.toLong()
-                    onProgress?.invoke(cur, dur)
-                    Thread.sleep(300)
-                } catch (_: Throwable) { break }
+        player?.release()
+        player = MediaPlayer().apply {
+            setDataSource(path)
+            prepare()
+            setOnCompletionListener { 
+                _isPlaying.value = false
+                stopProgressUpdates()
             }
-        }.start()
-    }
-
-    fun play() {
-        mp?.start()
-    }
-
-    fun pause() {
-        mp?.pause()
-    }
-
-    fun seekTo(ms: Long) {
-        mp?.seekTo(ms.toInt())
-    }
-
-    fun setSpeed(speed: Float) {
-        try {
-            val p = mp?.playbackParams ?: PlaybackParams()
-            p.speed = speed
-            mp?.playbackParams = p
-        } catch (_: Throwable) {
-            // ignore if not supported
         }
     }
 
+    fun play() {
+        player?.start()
+        _isPlaying.value = true
+        startProgressUpdates()
+    }
+
+    fun pause() {
+        player?.pause()
+        _isPlaying.value = false
+        stopProgressUpdates()
+    }
+
+    fun seekBy(ms: Long) {
+        player?.let {
+            val newPos = (it.currentPosition + ms).coerceIn(0, it.duration)
+            it.seekTo(newPos.toInt())
+        }
+    }
+
+    fun seekTo(position: Long) {
+        player?.seekTo(position.toInt())
+    }
+
+    fun setSpeed(speed: Float) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            player?.playbackParams = player?.playbackParams?.setSpeed(speed) ?: PlaybackParams().setSpeed(speed)
+        }
+    }
+
+    fun onProgress(callback: (position: Long, duration: Long) -> Unit) {
+        progressCallback = callback
+    }
+
+    private fun startProgressUpdates() {
+        handler.post(object : Runnable {
+            override fun run() {
+                player?.let {
+                    progressCallback?.invoke(it.currentPosition.toLong(), it.duration.toLong())
+                }
+                if (_isPlaying.value) {
+                    handler.postDelayed(this, 100)
+                }
+            }
+        })
+    }
+
+    private fun stopProgressUpdates() {
+        handler.removeCallbacksAndMessages(null)
+    }
+
     fun release() {
-        mp?.stop()
-        mp?.release()
-        mp = null
+        stopProgressUpdates()
+        player?.release()
+        player = null
+        _isPlaying.value = false
     }
 }
