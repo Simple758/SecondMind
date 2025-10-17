@@ -373,6 +373,7 @@ mport com.secondmind.minimal.presentation.audiobook.AudiobookViewModel
                 val vm = remember { AudiobookViewModel() }
                 AudiobookScreen(vm = vm)
             }
+            }
 mport com.secondmind.minimal.presentation.audiobook.AudiobookViewModel
     }
 mport com.secondmind.minimal.presentation.audiobook.AudiobookViewModel
