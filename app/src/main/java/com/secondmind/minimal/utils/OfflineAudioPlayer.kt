@@ -12,7 +12,6 @@ class OfflineAudioPlayer {
     private var player: MediaPlayer? = null
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
-    
     private val handler = Handler(Looper.getMainLooper())
     private var progressCallback: ((Long, Long) -> Unit)? = null
 
