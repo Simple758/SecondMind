@@ -116,12 +116,12 @@ class PdfExtractor {
         for ((start, end) in indices) {
             val chunk = pageJoin.substring(start, end)
             val titleLine = chunk.lineSequence().firstOrNull()?.trim().takeUnless { it.isNullOrBlank() } ?: "Chapter ${chapterIdx+1}"
-            val pagesCovered = Regex(r"<<<PAGE:(\d+?)>>>").findAll(chunk).map { it.groupValues[1].toInt() }.toList()
+            val pagesCovered = Regex("<<<PAGE:(\\d+?)>>>").findAll(chunk).map { it.groupValues[1].toInt() }.toList()
             val startPage = pagesCovered.minOrNull() ?: 1
             val endPage = pagesCovered.maxOrNull() ?: startPage
 
             // Remove the <<<PAGE:n>>> markers
-            val cleanText = chunk.replace(Regex(r"<<<PAGE:\d+>>>"), "").trim()
+            val cleanText = chunk.replace(Regex("<<<PAGE:\\d+>>>"), "").trim()
 
             chapters += Chapter(
                 index = chapterIdx,

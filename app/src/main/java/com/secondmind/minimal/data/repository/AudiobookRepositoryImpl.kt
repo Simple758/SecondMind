@@ -1,10 +1,7 @@
-// ============================================
-// FILE: data/repository/AudiobookRepositoryImpl.kt
-// ============================================
+// File: data/repository/AudiobookRepositoryImpl.kt
+@file:Suppress("UNUSED_IMPORT")
 
 package com.secondmind.minimal.data.repository
-
-@file:Suppress("UNUSED_IMPORT")
 
 import android.content.Context
 import android.net.Uri
@@ -20,7 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import java.io.File
 
-// DeepSeek integration (assuming these exist in your project under this package)
+// DeepSeek integration
 import com.secondmind.minimal.ai.AIServiceLocator
 import com.secondmind.minimal.ai.AIResult
 import com.secondmind.minimal.ai.ContextPacket
@@ -41,7 +38,6 @@ class AudiobookRepositoryImpl(
 
     override suspend fun importPdf(context: Context, uri: Uri): Audiobook = withContext(Dispatchers.IO) {
         val book = extractor.extractToAudiobook(context, uri)
-        // Update cache listing (in-memory for now)
         cacheFlow.value = (cacheFlow.value + book).distinctBy { it.id }
         book
     }
@@ -60,13 +56,11 @@ class AudiobookRepositoryImpl(
         val updated = book.chapters.mapIndexed { idx, ch ->
             val out = File(dir, "ch_${idx+1}.wav")
             val bytes = cache.synthesizeToWav(context, ch.text, out)
-            // Very rough estimation placeholder: bytes/16 ~= ms (depends on TTS output; adjust if needed)
             val durationGuess = bytes / 16
             totalDuration += durationGuess
             ch.copy(audioFilePath = out.absolutePath, durationMs = durationGuess)
         }
         val newBook = book.copy(chapters = updated, totalDurationMs = totalDuration)
-        // Update listing
         cacheFlow.value = cacheFlow.value.map { if (it.id == book.id) newBook else it }
         newBook
     }
@@ -77,7 +71,7 @@ class AudiobookRepositoryImpl(
                 context = context,
                 prompt = Prompt(
                     system("You are a helpful literary assistant. Provide a concise 3-bullet summary."),
-                    user("Summarize '$chapterTitle' of '$bookTitle' in 3 bullet points. Focus on key plot, themes, and characters."),
+                    user("Summarize '$chapterTitle' of '$bookTitle' in 3 bullet points."),
                     options(AIOptions(
                         model = "deepseek-chat",
                         maxTokens = 400,
