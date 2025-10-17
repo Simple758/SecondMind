@@ -172,6 +172,17 @@ composable("news") { com.secondmind.minimal.news.NewsPanel(modifier = Modifier.f
           // Audiobook feature
           composable(NavigationRoutes.AUDIOBOOKS) {
             val vm = remember { AudiobookViewModel() }
+            AudiobookScreen(vm = vm, onOpenPlayer = { nav.navigate("audiobook_player") })
+          }
+          composable("audiobook_player") {
+            val vm = remember { AudiobookViewModel() }
+            val state by vm.state.collectAsState()
+            state.current?.let { AudiobookPlayerScreen(book = it) }
+          }
+
+          // Audiobook feature
+          composable(NavigationRoutes.AUDIOBOOKS) {
+            val vm = remember { AudiobookViewModel() }
             AudiobookScreen(vm = vm, onOpenPlayer = { nav.navigate() })
           }
           composable() {
