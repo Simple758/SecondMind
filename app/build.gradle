@@ -74,8 +74,4 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     // debugImplementation("com.squareup.okhttp3:logging-interceptor:4.12.0") // optional
 
-    // ===== AUDIOBOOK FEATURE =====
-    implementation "com.itextpdf:itextg:5.5.10"
-    implementation "androidx.compose.material:material-icons-extended:1.7.5"
-    implementation "androidx.documentfile:documentfile:1.0.1"
 }
