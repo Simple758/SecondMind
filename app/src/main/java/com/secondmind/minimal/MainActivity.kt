@@ -69,7 +69,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.DrawerValue
-import com.secondmind.minimal.presentation.audiobook.AudiobookScreenimport com.secondmind.minimal.presentation.audiobook.AudiobookViewModelclass MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 // ensureChannel(…) removed for CI
@@ -184,7 +184,7 @@ composable("developer") {
       nav.popBackStack()
     }
   }
-            // Audiobook route            composable(NavigationRoutes.AUDIOBOOKS) {                val vm = remember { AudiobookViewModel() }                AudiobookScreen(vm = vm)            }composable(
+composable(
                 route = "notification/{id}  ",
                 arguments = listOf(navArgument("id"){ type = NavType.LongType }
 
