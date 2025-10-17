@@ -46,7 +46,7 @@ class OfflineAudioPlayer {
         }
     }
 
-    fun seekTo(position: Long) {
+    fun seekTo(position: Int) {
         player?.seekTo(position.toInt())
     }
 
