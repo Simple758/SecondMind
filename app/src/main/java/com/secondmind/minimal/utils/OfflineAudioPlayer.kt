@@ -47,7 +47,7 @@ class OfflineAudioPlayer {
     }
 
     fun seekTo(position: Int) {
-        player?.seekTo(position.toInt())
+        player?.seekTo(position)
     }
 
     fun setSpeed(speed: Float) {

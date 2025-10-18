@@ -26,10 +26,10 @@ fun PlaybackControls(
     var speed by remember { mutableStateOf(1.0f) }
 
     LaunchedEffect(Unit) {
-        player.onProgress({ pos, dur ->
+        player.onProgress { pos, dur ->
             position = pos
             duration = if (dur <= 0) 1 else dur
-        }))
+        }
     }
 
     Column(Modifier.fillMaxWidth()) {
