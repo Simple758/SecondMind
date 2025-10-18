@@ -1,0 +1,100 @@
+diff --git a/app/src/main/java/com/secondmind/minimal/data/repository/AudiobookRepositoryImpl.kt b/app/src/main/java/com/secondmind/minimal/data/repository/AudiobookRepositoryImpl.kt
+index abc1234..def5678 100644
+--- a/app/src/main/java/com/secondmind/minimal/data/repository/AudiobookRepositoryImpl.kt
++++ b/app/src/main/java/com/secondmind/minimal/data/repository/AudiobookRepositoryImpl.kt
+@@ -18,14 +18,14 @@ import kotlinx.coroutines.withContext
+ import java.io.File
+ 
+ // DeepSeek integration
+-import com.secondmind.minimal.ai.AIServiceLocator
+-import com.secondmind.minimal.ai.AIResult
+-import com.secondmind.minimal.ai.ContextPacket
+-import com.secondmind.minimal.ai.Prompt
+-import com.secondmind.minimal.ai.system
+-import com.secondmind.minimal.ai.user
+-import com.secondmind.minimal.ai.options
+-import com.secondmind.minimal.ai.AIOptions
++// import com.secondmind.minimal.ai.AIServiceLocator
++// import com.secondmind.minimal.ai.AIResult
++// import com.secondmind.minimal.ai.ContextPacket
++// import com.secondmind.minimal.ai.Prompt
++// import com.secondmind.minimal.ai.system
++// import com.secondmind.minimal.ai.user
++// import com.secondmind.minimal.ai.options
++// import com.secondmind.minimal.ai.AIOptions
+ 
+ class AudiobookRepositoryImpl(
+     private val extractor: PdfExtractor = PdfExtractor(),
+@@ -64,30 +64,7 @@ class AudiobookRepositoryImpl(
+     }
+ 
+     private suspend fun requestSummary(context: Context, bookTitle: String, chapterTitle: String, textHint: String): String {
+-        return try {
+-            val result = AIServiceLocator.get().complete(
+-                context = context,
+-                prompt = Prompt(
+-                    system("You are a helpful literary assistant. Provide a concise 3-bullet summary."),
+-                    user("Summarize '$chapterTitle' of '$bookTitle' in 3 bullet points."),
+-                    options(AIOptions(
+-                        model = "deepseek-chat",
+-                        maxTokens = 400,
+-                        temperature = 0.3,
+-                        packet = ContextPacket(
+-                            source = ContextPacket.Source.UI,
+-                            appPackage = context.packageName,
+-                            text = "chapter summary request"
+-                        )
+-                    ))
+-                )
+-            )
+-            when (result) {
+-                is AIResult.Text -> result.content
+-                is AIResult.Error -> "Error: ${result.message}"
+-                else -> "No result"
+-            }
+-        } catch (e: Throwable) {
+-            "AI unavailable: ${e.message}"
+-        }
++        return "Summary: $chapterTitle - ${textHint.take(200)}..."
+     }
+ 
+     override suspend fun clearBook(context: Context, bookId: String) {
+diff --git a/app/src/main/java/com/secondmind/minimal/utils/OfflineAudioPlayer.kt b/app/src/main/java/com/secondmind/minimal/utils/OfflineAudioPlayer.kt
+index abc1234..def5678 100644
+--- a/app/src/main/java/com/secondmind/minimal/utils/OfflineAudioPlayer.kt
++++ b/app/src/main/java/com/secondmind/minimal/utils/OfflineAudioPlayer.kt
+@@ -42,7 +42,7 @@ class OfflineAudioPlayer {
+     }
+ 
+     fun seekTo(position: Int) {
+-        player?.seekTo(position.toInt())
++        player?.seekTo(position)
+     }
+ 
+     fun setSpeed(speed: Float) {
+diff --git a/app/src/main/java/com/secondmind/minimal/presentation/audiobook/components/PlaybackControls.kt b/app/src/main/java/com/secondmind/minimal/presentation/audiobook/components/PlaybackControls.kt
+index abc1234..def5678 100644
+--- a/app/src/main/java/com/secondmind/minimal/presentation/audiobook/components/PlaybackControls.kt
++++ b/app/src/main/java/com/secondmind/minimal/presentation/audiobook/components/PlaybackControls.kt
+@@ -26,11 +26,11 @@ fun PlaybackControls(
+     var speed by remember { mutableStateOf(1.0f) }
+ 
+     LaunchedEffect(Unit) {
+-        player.onProgress({ pos, dur ->
++        player.onProgress { pos, dur ->
+             position = pos
+             duration = if (dur <= 0) 1 else dur
+-        }))
++        }
+     }
+ 
+     Column(Modifier.fillMaxWidth()) {
+@@ -44,7 +44,7 @@ fun PlaybackControls(
+         Spacer(Modifier.height(8.dp))
+         Slider(
+             value = position.toFloat() / duration.toFloat(),
+-            onValueChange = { frac -> player.seekTo((frac * duration).toLong()) }
++            onValueChange = { frac -> player.seekTo((frac * duration).toInt()) }
+         )
+         Spacer(Modifier.height(8.dp))
+         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

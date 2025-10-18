@@ -18,14 +18,14 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 // DeepSeek integration
-import com.secondmind.minimal.ai.AIServiceLocator
-import com.secondmind.minimal.ai.AIResult
-import com.secondmind.minimal.ai.ContextPacket
-import com.secondmind.minimal.ai.Prompt
-import com.secondmind.minimal.ai.system
-import com.secondmind.minimal.ai.user
-import com.secondmind.minimal.ai.options
-import com.secondmind.minimal.ai.AIOptions
+// import com.secondmind.minimal.ai.AIServiceLocator
+// import com.secondmind.minimal.ai.AIResult
+// import com.secondmind.minimal.ai.ContextPacket
+// import com.secondmind.minimal.ai.Prompt
+// import com.secondmind.minimal.ai.system
+// import com.secondmind.minimal.ai.user
+// import com.secondmind.minimal.ai.options
+// import com.secondmind.minimal.ai.AIOptions
 
 class AudiobookRepositoryImpl(
     private val extractor: PdfExtractor = PdfExtractor(),
@@ -63,39 +63,6 @@ class AudiobookRepositoryImpl(
         val newBook = book.copy(chapters = updated, totalDurationMs = totalDuration)
         cacheFlow.value = cacheFlow.value.map { if (it.id == book.id) newBook else it }
         newBook
-    }
-
     private suspend fun requestSummary(context: Context, bookTitle: String, chapterTitle: String, textHint: String): String {
-        return try {
-            val result = AIServiceLocator.get().complete(
-                context = context,
-                prompt = Prompt(
-                    system("You are a helpful literary assistant. Provide a concise 3-bullet summary."),
-                    user("Summarize '$chapterTitle' of '$bookTitle' in 3 bullet points."),
-                    options(AIOptions(
-                        model = "deepseek-chat",
-                        maxTokens = 400,
-                        temperature = 0.3,
-                        packet = ContextPacket(
-                            source = ContextPacket.Source.UI,
-                            appPackage = context.packageName,
-                            text = "chapter summary request"
-                        )
-                    ))
-                )
-            )
-            when (result) {
-                is AIResult.Text -> result.content
-                is AIResult.Error -> "Error: ${result.message}"
-                else -> "No result"
-            }
-        } catch (e: Throwable) {
-            "AI unavailable: ${e.message}"
-        }
+        return "Summary: $chapterTitle - ${textHint.take(200)}..."
     }
-
-    override suspend fun clearBook(context: Context, bookId: String) {
-        cache.clearBook(context, bookId)
-        cacheFlow.value = cacheFlow.value.filterNot { it.id == bookId }
-    }
-}

@@ -42,7 +42,7 @@ fun PlaybackControls(
         Spacer(Modifier.height(8.dp))
         Slider(
             value = position.toFloat() / duration.toFloat(),
-            onValueChange = { frac -> player.seekTo((frac * duration).toLong()) }
+            onValueChange = { frac -> player.seekTo((frac * duration).toInt()) }
         )
         Spacer(Modifier.height(8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

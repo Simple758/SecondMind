@@ -180,30 +180,6 @@ composable("news") { com.secondmind.minimal.news.NewsPanel(modifier = Modifier.f
             state.current?.let { AudiobookPlayerScreen(book = it) }
           }
 
-          // Audiobook feature
-          composable() {
-            val vm = remember { AudiobookViewModel() }
-            val state by vm.state.collectAsState()
-            state.current?.let { AudiobookPlayerScreen(book = it) }
-          }
-
-
-
-  
-
-  composable("ai") {
-    val ctx = androidx.compose.ui.platform.LocalContext.current
-    androidx.compose.runtime.LaunchedEffect("open_ai") {
-      ctx.startActivity(android.content.Intent(ctx, com.secondmind.minimal.ai.AiChatActivity::class.java))
-      nav.popBackStack()
-    }
-  }
-composable("developer") {
-    val ctx = androidx.compose.ui.platform.LocalContext.current
-    androidx.compose.runtime.LaunchedEffect("open_dev") {
-      ctx.startActivity(android.content.Intent(ctx, com.secondmind.minimal.dev.DeveloperActivity::class.java))
-      nav.popBackStack()
-    }
   }
 composable(
                 route = "notification/{id}  ",

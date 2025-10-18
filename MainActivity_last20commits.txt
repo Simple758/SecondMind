@@ -1,0 +1,316 @@
+========== Commit: fada7771ba9cf179389bebe7da4b8797de109dd0 ==========
+File not found in this commit
+
+
+
+========== Commit: 32f3a7ac883b5b6420535c43892893341456713a ==========
+File not found in this commit
+
+
+
+========== Commit: dd30e9af6781ac0d538f89b11df3ada4b64f79c3 ==========
+// ============================================
+// FILE: MainActivity.kt (PATCH)
+// ============================================
+
+// Inside your NavHost, add:
+// composable(NavigationRoutes.AUDIOBOOKS) {
+//     val vm = remember { AudiobookViewModel() }
+//     AudiobookScreen(vm = vm, onOpenPlayer = {
+//         vm.state.value.current?.let { book ->
+//             // Navigate to a player composable or show a dialog
+//         }
+//     })
+// }
+
+
+
+========== Commit: b2c3be1cf053df04611055c78709968b25f765c7 ==========
+// ============================================
+// FILE: MainActivity.kt (PATCH)
+// ============================================
+
+// Inside your NavHost, add:
+// composable(NavigationRoutes.AUDIOBOOKS) {
+//     val vm = remember { AudiobookViewModel() }
+//     AudiobookScreen(vm = vm, onOpenPlayer = {
+//         vm.state.value.current?.let { book ->
+//             // Navigate to a player composable or show a dialog
+//         }
+//     })
+// }
+
+
+
+========== Commit: 163d22e68b4dc6266223cd10b3ec0769e4d04225 ==========
+// ============================================
+// FILE: MainActivity.kt (PATCH)
+// ============================================
+
+// Inside your NavHost, add:
+// composable(NavigationRoutes.AUDIOBOOKS) {
+//     val vm = remember { AudiobookViewModel() }
+//     AudiobookScreen(vm = vm, onOpenPlayer = {
+//         vm.state.value.current?.let { book ->
+//             // Navigate to a player composable or show a dialog
+//         }
+//     })
+// }
+
+
+
+========== Commit: bdcd597b6a1e4bc0a27e525eededd54277a0b8cc ==========
+// ============================================
+// FILE: MainActivity.kt (PATCH)
+// ============================================
+
+// Inside your NavHost, add:
+// composable(NavigationRoutes.AUDIOBOOKS) {
+//     val vm = remember { AudiobookViewModel() }
+//     AudiobookScreen(vm = vm, onOpenPlayer = {
+//         vm.state.value.current?.let { book ->
+//             // Navigate to a player composable or show a dialog
+//         }
+//     })
+// }
+
+
+
+========== Commit: ea919af41042acbbb08dfd3f5f90083e532c5930 ==========
+// ============================================
+// FILE: MainActivity.kt (PATCH)
+// ============================================
+
+// Inside your NavHost, add:
+// composable(NavigationRoutes.AUDIOBOOKS) {
+//     val vm = remember { AudiobookViewModel() }
+//     AudiobookScreen(vm = vm, onOpenPlayer = {
+//         vm.state.value.current?.let { book ->
+//             // Navigate to a player composable or show a dialog
+//         }
+//     })
+// }
+
+
+
+========== Commit: 21894ecb69acce5c271d780f12752d2e88e14107 ==========
+// ============================================
+// FILE: MainActivity.kt (PATCH)
+// ============================================
+
+// Inside your NavHost, add:
+// composable(NavigationRoutes.AUDIOBOOKS) {
+//     val vm = remember { AudiobookViewModel() }
+//     AudiobookScreen(vm = vm, onOpenPlayer = {
+//         vm.state.value.current?.let { book ->
+//             // Navigate to a player composable or show a dialog
+//         }
+//     })
+// }
+
+
+
+========== Commit: 9a00aa2c9fbc065b50e82b6c98eb6abcc43199c8 ==========
+// ============================================
+// FILE: MainActivity.kt (PATCH)
+// ============================================
+
+// Inside your NavHost, add:
+// composable(NavigationRoutes.AUDIOBOOKS) {
+//     val vm = remember { AudiobookViewModel() }
+//     AudiobookScreen(vm = vm, onOpenPlayer = {
+//         vm.state.value.current?.let { book ->
+//             // Navigate to a player composable or show a dialog
+//         }
+//     })
+// }
+
+
+
+========== Commit: 3db1c62cca358279fa9e1b3e445e90d6ea0a0099 ==========
+// ============================================
+// FILE: MainActivity.kt (PATCH)
+// ============================================
+
+// Inside your NavHost, add:
+// composable(NavigationRoutes.AUDIOBOOKS) {
+//     val vm = remember { AudiobookViewModel() }
+//     AudiobookScreen(vm = vm, onOpenPlayer = {
+//         vm.state.value.current?.let { book ->
+//             // Navigate to a player composable or show a dialog
+//         }
+//     })
+// }
+
+
+
+========== Commit: 9b17e1d79c7843d17712de7d1a6a2c8f90fe0cb0 ==========
+// ============================================
+// FILE: MainActivity.kt (PATCH)
+// ============================================
+
+// Inside your NavHost, add:
+// composable(NavigationRoutes.AUDIOBOOKS) {
+//     val vm = remember { AudiobookViewModel() }
+//     AudiobookScreen(vm = vm, onOpenPlayer = {
+//         vm.state.value.current?.let { book ->
+//             // Navigate to a player composable or show a dialog
+//         }
+//     })
+// }
+
+
+
+========== Commit: 1916d75782c785f3caf1dd56d0a6e67e22167d8b ==========
+// ============================================
+// FILE: MainActivity.kt (PATCH)
+// ============================================
+
+// Inside your NavHost, add:
+// composable(NavigationRoutes.AUDIOBOOKS) {
+//     val vm = remember { AudiobookViewModel() }
+//     AudiobookScreen(vm = vm, onOpenPlayer = {
+//         vm.state.value.current?.let { book ->
+//             // Navigate to a player composable or show a dialog
+//         }
+//     })
+// }
+
+
+
+========== Commit: f09a5bfb30560370dd32a0e7f70e0d40e9f27237 ==========
+// ============================================
+// FILE: MainActivity.kt (PATCH)
+// ============================================
+
+// Inside your NavHost, add:
+// composable(NavigationRoutes.AUDIOBOOKS) {
+//     val vm = remember { AudiobookViewModel() }
+//     AudiobookScreen(vm = vm, onOpenPlayer = {
+//         vm.state.value.current?.let { book ->
+//             // Navigate to a player composable or show a dialog
+//         }
+//     })
+// }
+
+
+
+========== Commit: a67e805d50d9b3fd0a69cd952d8d2a0b0503a433 ==========
+// ============================================
+// FILE: MainActivity.kt (PATCH)
+// ============================================
+
+// Inside your NavHost, add:
+// composable(NavigationRoutes.AUDIOBOOKS) {
+//     val vm = remember { AudiobookViewModel() }
+//     AudiobookScreen(vm = vm, onOpenPlayer = {
+//         vm.state.value.current?.let { book ->
+//             // Navigate to a player composable or show a dialog
+//         }
+//     })
+// }
+
+
+
+========== Commit: 3e3b3d2e5f02b5999952b9b370cd057e47800f58 ==========
+// ============================================
+// FILE: MainActivity.kt (PATCH)
+// ============================================
+
+// Inside your NavHost, add:
+// composable(NavigationRoutes.AUDIOBOOKS) {
+//     val vm = remember { AudiobookViewModel() }
+//     AudiobookScreen(vm = vm, onOpenPlayer = {
+//         vm.state.value.current?.let { book ->
+//             // Navigate to a player composable or show a dialog
+//         }
+//     })
+// }
+
+
+
+========== Commit: de22aad07302efa432e667187e109f747b32641e ==========
+// ============================================
+// FILE: MainActivity.kt (PATCH)
+// ============================================
+
+// Inside your NavHost, add:
+// composable(NavigationRoutes.AUDIOBOOKS) {
+//     val vm = remember { AudiobookViewModel() }
+//     AudiobookScreen(vm = vm, onOpenPlayer = {
+//         vm.state.value.current?.let { book ->
+//             // Navigate to a player composable or show a dialog
+//         }
+//     })
+// }
+
+
+
+========== Commit: 16ffdf0617bf93b65c0e985e763090a136bd3c81 ==========
+// ============================================
+// FILE: MainActivity.kt (PATCH)
+// ============================================
+
+// Inside your NavHost, add:
+// composable(NavigationRoutes.AUDIOBOOKS) {
+//     val vm = remember { AudiobookViewModel() }
+//     AudiobookScreen(vm = vm, onOpenPlayer = {
+//         vm.state.value.current?.let { book ->
+//             // Navigate to a player composable or show a dialog
+//         }
+//     })
+// }
+
+
+
+========== Commit: 7498628514c8a0c3637379b39e9bb17521dcdce1 ==========
+// ============================================
+// FILE: MainActivity.kt (PATCH)
+// ============================================
+
+// Inside your NavHost, add:
+// composable(NavigationRoutes.AUDIOBOOKS) {
+//     val vm = remember { AudiobookViewModel() }
+//     AudiobookScreen(vm = vm, onOpenPlayer = {
+//         vm.state.value.current?.let { book ->
+//             // Navigate to a player composable or show a dialog
+//         }
+//     })
+// }
+
+
+
+========== Commit: c1857c06d8fad853fe61df94f3acfaa7e8505e34 ==========
+// ============================================
+// FILE: MainActivity.kt (PATCH)
+// ============================================
+
+// Inside your NavHost, add:
+// composable(NavigationRoutes.AUDIOBOOKS) {
+//     val vm = remember { AudiobookViewModel() }
+//     AudiobookScreen(vm = vm, onOpenPlayer = {
+//         vm.state.value.current?.let { book ->
+//             // Navigate to a player composable or show a dialog
+//         }
+//     })
+// }
+
+
+
+========== Commit: c0b917e20c04bc79e21846d4c2f40fc703518518 ==========
+// ============================================
+// FILE: MainActivity.kt (PATCH)
+// ============================================
+
+// Inside your NavHost, add:
+// composable(NavigationRoutes.AUDIOBOOKS) {
+//     val vm = remember { AudiobookViewModel() }
+//     AudiobookScreen(vm = vm, onOpenPlayer = {
+//         vm.state.value.current?.let { book ->
+//             // Navigate to a player composable or show a dialog
+//         }
+//     })
+// }
+
+
+
