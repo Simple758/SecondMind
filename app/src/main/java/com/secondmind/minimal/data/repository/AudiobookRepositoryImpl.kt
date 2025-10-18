@@ -66,3 +66,10 @@ class AudiobookRepositoryImpl(
     private suspend fun requestSummary(context: Context, bookTitle: String, chapterTitle: String, textHint: String): String {
         return "Summary: $chapterTitle - ${textHint.take(200)}..."
     }
+    }
+
+    override suspend fun clearBook(context: Context, bookId: String) {
+        cache.deleteBook(context, bookId)
+        cacheFlow.value = cacheFlow.value.filterNot { it.id == bookId }
+    }
+}
